@@ -1,0 +1,399 @@
+<!doctype html>
+
+<html class="dark" lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap"
+      rel="stylesheet"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
+      rel="stylesheet"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
+      rel="stylesheet"
+    />
+    <script id="tailwind-config">
+      tailwind.config = {
+        darkMode: 'class',
+        theme: {
+          extend: {
+            colors: {
+              'secondary-fixed': '#d3e4fe',
+              tertiary: '#bcc7de',
+              'primary-container': '#2ca4ab',
+              'surface-bright': '#363a3b',
+              'surface-container-high': '#272a2c',
+              'on-surface-variant': '#bcc9c9',
+              'on-secondary-fixed': '#0b1c30',
+              'surface-container-lowest': '#0b0f10',
+              'on-secondary': '#213145',
+              'on-surface': '#e0e3e5',
+              'on-background': '#e0e3e5',
+              'tertiary-fixed-dim': '#bcc7de',
+              'on-primary': '#003739',
+              'on-tertiary': '#263143',
+              'inverse-primary': '#00696e',
+              'outline-variant': '#3d494a',
+              primary: '#6ad7de',
+              'inverse-surface': '#e0e3e5',
+              'secondary-container': '#3a4a5f',
+              'surface-dim': '#101415',
+              surface: '#101415',
+              'on-tertiary-fixed-variant': '#3c475a',
+              'on-secondary-fixed-variant': '#38485d',
+              'surface-container-low': '#191c1e',
+              'on-primary-fixed-variant': '#004f53',
+              'error-container': '#93000a',
+              'on-tertiary-fixed': '#111c2d',
+              'surface-tint': '#6ad7de',
+              'on-primary-fixed': '#002022',
+              'surface-variant': '#323537',
+              'on-primary-container': '#003436',
+              'secondary-fixed-dim': '#b7c8e1',
+              'on-error-container': '#ffdad6',
+              background: '#101415',
+              secondary: '#b7c8e1',
+              'primary-fixed-dim': '#6ad7de',
+              'tertiary-fixed': '#d8e3fb',
+              'primary-fixed': '#88f3fa',
+              'on-secondary-container': '#a9bad3',
+              'surface-container': '#1d2022',
+              error: '#ffb4ab',
+              'inverse-on-surface': '#2d3133',
+              'tertiary-container': '#8a95ab',
+              'on-error': '#690005',
+              'on-tertiary-container': '#232e40',
+              outline: '#879394',
+              'surface-container-highest': '#323537',
+            },
+            borderRadius: {
+              DEFAULT: '0.25rem',
+              lg: '0.5rem',
+              xl: '0.75rem',
+              full: '9999px',
+            },
+            spacing: {
+              margin: '20px',
+              lg: '24px',
+              gutter: '16px',
+              md: '16px',
+              unit: '4px',
+              xl: '32px',
+              sm: '8px',
+              xs: '4px',
+            },
+            fontFamily: {
+              'body-md': ['Inter'],
+              'headline-lg': ['Inter'],
+              'arabic-display': ['Inter'],
+              'headline-md': ['Inter'],
+              'label-md': ['Inter'],
+              'body-lg': ['Inter'],
+            },
+            fontSize: {
+              'body-md': ['16px', { lineHeight: '24px', fontWeight: '400' }],
+              'headline-lg': [
+                '32px',
+                { lineHeight: '40px', letterSpacing: '-0.02em', fontWeight: '700' },
+              ],
+              'arabic-display': ['40px', { lineHeight: '60px', fontWeight: '500' }],
+              'headline-md': [
+                '24px',
+                { lineHeight: '32px', letterSpacing: '-0.01em', fontWeight: '600' },
+              ],
+              'label-md': [
+                '14px',
+                { lineHeight: '20px', letterSpacing: '0.01em', fontWeight: '500' },
+              ],
+              'body-lg': ['18px', { lineHeight: '28px', fontWeight: '400' }],
+            },
+          },
+        },
+      };
+    </script>
+    <style>
+      .glass-panel {
+        background: rgba(30, 41, 59, 0.7);
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(44, 164, 171, 0.2);
+      }
+      .material-symbols-outlined {
+        font-variation-settings:
+          'FILL' 0,
+          'wght' 400,
+          'GRAD' 0,
+          'opsz' 24;
+      }
+    </style>
+  </head>
+  <body class="bg-surface text-on-surface font-body-md selection:bg-primary/30">
+    <!-- TopAppBar -->
+    <header
+      class="bg-slate-950/80 backdrop-blur-md fixed top-0 w-full z-50 border-b border-teal-500/20 shadow-none flex justify-between items-center px-5 h-16 w-full font-inter antialiased tracking-tight"
+    >
+      <div class="flex items-center gap-2">
+        <span class="text-xl font-bold tracking-widest text-teal-500">Al-Qalam</span>
+      </div>
+      <div class="hidden md:flex items-center space-x-8">
+        <a
+          class="text-teal-400 font-semibold hover:text-teal-300 transition-colors duration-200"
+          href="#"
+          >Home</a
+        >
+        <a class="text-slate-400 hover:text-teal-300 transition-colors duration-200" href="#"
+          >How to Play</a
+        >
+        <a class="text-slate-400 hover:text-teal-300 transition-colors duration-200" href="#"
+          >Community</a
+        >
+      </div>
+      <div class="flex items-center gap-4">
+        <button class="active:scale-95 transition-transform p-2 text-teal-500">
+          <span class="material-symbols-outlined">notifications</span>
+        </button>
+        <div class="w-8 h-8 rounded-full overflow-hidden border border-teal-500/30">
+          <img
+            alt="User profile avatar"
+            data-alt="minimalist 2d avatar of a scholarly man with a short beard wearing a simple cap, teal and navy color palette"
+            src="https://lh3.googleusercontent.com/aida-public/AB6AXuBuHthqw_vn74nsV_4BkNEg-657WmshRnUEoocu-5GcXH0qowMUnxXJcQ9TLSNbuxquO4cobPGI0cEC3e5qj6UesGOwiPiYo8Gry7Djn-toAx8ml69KGYkqtrk0tk7I4vVPsEZSphWxDtHmUJmXSqG29EqxmqdHYnMvDFjDoiKkycWK6b7hikeDuQ8PWEBBN3iPFXyUAk8e2qcNHxgx2d595OwYz6x1W0o2GtjJabv8Ubh1Mz01DsBJ1Qwi1WD2rKvn95IdyetAWpaQ"
+          />
+        </div>
+      </div>
+    </header>
+    <main class="min-h-screen pt-16 pb-24 md:pb-0 bg-[#0F172A]">
+      <!-- Hero Section -->
+      <section class="relative overflow-hidden px-margin py-xl md:py-32 flex flex-col items-center">
+        <div class="absolute inset-0 z-0">
+          <div class="absolute inset-0 bg-gradient-to-b from-teal-500/5 to-transparent"></div>
+          <div
+            class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full h-full opacity-20 pointer-events-none"
+          >
+            <img
+              class="w-full h-full object-cover mix-blend-overlay"
+              data-alt="blurred background of an ancient library with high arched ceilings and soft ambient teal lighting reflecting off aged paper"
+              src="https://lh3.googleusercontent.com/aida-public/AB6AXuCGiurZGXWIzFbttn6-t-LPuJOaW3d_279_qF4JB_SBuYMBpLTOsZfVaKYVmmin240WBKt1i1uYQJMbm_JsRew-_cLj9pf7TudNUXJwcEcz4SAPnJe-wgTACjfUIJvvQ77Bt2-5MEKj9zydXJEzma6z-I1kLmDEYXDuyi2SsxdQ5X9N9JdZGrAVlHOLiA1DzAZPX52t4tRfVh1Z2NQiH-Z7PZIiC5Uu-MNoZTi33OTpjJd_HCZU9K11UjkLEqyUMR-eZ1UIkirbYyK6"
+            />
+          </div>
+        </div>
+        <div class="relative z-10 max-w-4xl w-full text-center space-y-lg">
+          <div
+            class="inline-flex items-center px-4 py-1.5 rounded-full bg-primary-container/10 border border-primary-container/20 text-primary text-label-md mb-xs"
+          >
+            <span class="material-symbols-outlined text-[18px] mr-2">stars</span>
+            Newly Updated Challenges
+          </div>
+          <h1 class="font-headline-lg text-on-surface lg:text-6xl text-shadow-lg">
+            Master the <span class="text-primary">Holy Quran</span> Through Interactive Learning
+          </h1>
+          <p class="font-body-lg text-on-surface-variant max-w-2xl mx-auto">
+            Challenge yourself with verse identification, word meanings, and surah sequences. A
+            meditative journey for the modern student of knowledge.
+          </p>
+          <div class="flex flex-col sm:flex-row gap-gutter justify-center items-center pt-md">
+            <button
+              class="w-full sm:w-auto px-xl py-md bg-primary-container text-on-primary-container rounded-xl font-headline-md active:scale-95 transition-all shadow-lg shadow-primary-container/20"
+            >
+              Start Learning
+            </button>
+            <button
+              class="w-full sm:w-auto px-xl py-md border border-primary text-primary rounded-xl font-headline-md active:scale-95 transition-all hover:bg-primary/5"
+            >
+              View Rankings
+            </button>
+          </div>
+        </div>
+      </section>
+      <!-- Bento Grid Feature Section -->
+      <section class="px-margin py-xl max-w-6xl mx-auto">
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-gutter">
+          <!-- Large Login Panel (Bento Cell) -->
+          <div
+            class="md:col-span-2 glass-panel rounded-3xl p-lg flex flex-col md:flex-row items-center gap-xl"
+          >
+            <div class="w-full md:w-1/2 space-y-md">
+              <h2 class="font-headline-md text-on-surface">Continue Journey</h2>
+              <p class="font-body-md text-on-surface-variant">
+                Sign in to sync your progress across devices and climb the global leaderboards.
+              </p>
+              <form class="space-y-md">
+                <div class="space-y-1">
+                  <label class="text-label-md text-on-surface-variant px-1">Email Address</label>
+                  <input
+                    class="w-full bg-surface-container-low border-b-2 border-outline-variant focus:border-primary-container text-on-surface px-4 py-3 rounded-t-lg transition-colors outline-none"
+                    placeholder="student@knowledge.com"
+                    type="email"
+                  />
+                </div>
+                <div class="space-y-1">
+                  <label class="text-label-md text-on-surface-variant px-1">Access Key</label>
+                  <input
+                    class="w-full bg-surface-container-low border-b-2 border-outline-variant focus:border-primary-container text-on-surface px-4 py-3 rounded-t-lg transition-colors outline-none"
+                    placeholder="••••••••"
+                    type="password"
+                  />
+                </div>
+                <div class="flex items-center justify-between">
+                  <label class="flex items-center gap-2 cursor-pointer">
+                    <input
+                      class="rounded border-outline-variant bg-surface text-primary-container focus:ring-primary-container"
+                      type="checkbox"
+                    />
+                    <span class="text-label-md text-on-surface-variant">Remember me</span>
+                  </label>
+                  <a class="text-label-md text-primary hover:underline" href="#">Forgot access?</a>
+                </div>
+                <button
+                  class="w-full bg-primary-container text-on-primary-container py-3 rounded-xl font-headline-md active:scale-95 transition-transform"
+                  type="button"
+                >
+                  Sign In
+                </button>
+              </form>
+            </div>
+            <div
+              class="hidden md:block w-1/2 h-full min-h-[300px] rounded-2xl overflow-hidden relative"
+            >
+              <img
+                class="absolute inset-0 w-full h-full object-cover"
+                data-alt="close up of an open Quran with elegant calligraphy on high quality paper, warm gold light accenting the pages in a dark navy room"
+                src="https://lh3.googleusercontent.com/aida-public/AB6AXuA2xsd6Gzg9iRdBDk3SItlpJFEdSMMCmTkEjeNQYEMsVQ40ZxSXypQ2o2I-CsB06Vwrg7-HGoCeSGoLNRt1IJPZsNF4GpyBV1L4SBLSm1rcK8iOYYG99E9OpjPxTnJQXwgpyvQflVL8WxquAnWYOpO_GeaFr4tr3Cl34aj-BdE4HwDDe-6zmi45gigh9jDi5BvtSa2dI-nyAWju5ckkLEfHhDD8ZzQX7TeiXd0WFKcpXywhT8NCgO0TEHtsR1Yt40elv-SrCwNwLEXi"
+              />
+              <div
+                class="absolute inset-0 bg-gradient-to-t from-slate-950 via-transparent to-transparent"
+              ></div>
+              <div class="absolute bottom-4 left-4 right-4">
+                <p class="text-white font-label-md italic">
+                  "Knowledge is a light that Allah casts into the heart."
+                </p>
+              </div>
+            </div>
+          </div>
+          <!-- Secondary Bento Cell: Stats -->
+          <div class="glass-panel rounded-3xl p-lg flex flex-col justify-between">
+            <div>
+              <div
+                class="w-12 h-12 rounded-2xl bg-primary-container/20 flex items-center justify-center text-primary mb-md"
+              >
+                <span class="material-symbols-outlined">trending_up</span>
+              </div>
+              <h3 class="font-headline-md text-on-surface">Daily Streak</h3>
+              <p class="font-body-md text-on-surface-variant mt-sm">
+                Join 12,000+ students studying today.
+              </p>
+            </div>
+            <div class="mt-lg relative flex items-center justify-center">
+              <!-- Progress Ring -->
+              <svg class="w-32 h-32 transform -rotate-90">
+                <circle
+                  class="text-primary/10"
+                  cx="64"
+                  cy="64"
+                  fill="transparent"
+                  r="58"
+                  stroke="currentColor"
+                  stroke-width="8"
+                ></circle>
+                <circle
+                  class="text-primary"
+                  cx="64"
+                  cy="64"
+                  fill="transparent"
+                  r="58"
+                  stroke="currentColor"
+                  stroke-dasharray="364.4"
+                  stroke-dashoffset="100"
+                  stroke-linecap="round"
+                  stroke-width="8"
+                ></circle>
+              </svg>
+              <div class="absolute inset-0 flex flex-col items-center justify-center">
+                <span class="text-headline-md text-primary">72%</span>
+                <span class="text-[10px] uppercase tracking-widest text-on-surface-variant"
+                  >Global Avg</span
+                >
+              </div>
+            </div>
+          </div>
+          <!-- Features Cards -->
+          <div class="md:col-span-3 grid grid-cols-1 md:grid-cols-4 gap-gutter mt-gutter">
+            <div
+              class="bg-surface-container-low p-md rounded-2xl border border-outline-variant/30 hover:border-primary/50 transition-colors group"
+            >
+              <span class="material-symbols-outlined text-primary mb-sm">menu_book</span>
+              <h4 class="font-label-md text-on-surface group-hover:text-primary transition-colors">
+                Verse Quest
+              </h4>
+              <p class="text-xs text-on-surface-variant">
+                Identify verses from audio or text snippets.
+              </p>
+            </div>
+            <div
+              class="bg-surface-container-low p-md rounded-2xl border border-outline-variant/30 hover:border-primary/50 transition-colors group"
+            >
+              <span class="material-symbols-outlined text-primary mb-sm">translate</span>
+              <h4 class="font-label-md text-on-surface group-hover:text-primary transition-colors">
+                Meaning Match
+              </h4>
+              <p class="text-xs text-on-surface-variant">
+                Master the vocabulary of the Divine message.
+              </p>
+            </div>
+            <div
+              class="bg-surface-container-low p-md rounded-2xl border border-outline-variant/30 hover:border-primary/50 transition-colors group"
+            >
+              <span class="material-symbols-outlined text-primary mb-sm">format_list_numbered</span>
+              <h4 class="font-label-md text-on-surface group-hover:text-primary transition-colors">
+                Order Sort
+              </h4>
+              <p class="text-xs text-on-surface-variant">
+                Arrange Ayahs in their correct sequence.
+              </p>
+            </div>
+            <div
+              class="bg-surface-container-low p-md rounded-2xl border border-outline-variant/30 hover:border-primary/50 transition-colors group"
+            >
+              <span class="material-symbols-outlined text-primary mb-sm">groups</span>
+              <h4 class="font-label-md text-on-surface group-hover:text-primary transition-colors">
+                Live Duels
+              </h4>
+              <p class="text-xs text-on-surface-variant">
+                Compete in real-time with friends worldwide.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+    <!-- BottomNavBar (Mobile Only) -->
+    <nav
+      class="md:hidden bg-slate-900/90 backdrop-blur-lg fixed bottom-0 w-full rounded-t-2xl z-50 border-t border-teal-500/10 shadow-[0_-4px_12px_rgba(0,0,0,0.5)] flex justify-around items-center h-20 px-6 pb-safe w-full"
+    >
+      <a
+        class="flex flex-col items-center justify-center text-teal-400 bg-teal-500/10 rounded-xl px-4 py-1 active:scale-90 transition-all duration-300 ease-out"
+        href="#"
+      >
+        <span class="material-symbols-outlined" data-icon="quiz">quiz</span>
+        <span class="text-[11px] font-medium font-inter">Quiz</span>
+      </a>
+      <a
+        class="flex flex-col items-center justify-center text-slate-500 hover:bg-slate-800/50 active:scale-90 transition-all duration-300 ease-out"
+        href="#"
+      >
+        <span class="material-symbols-outlined" data-icon="leaderboard">leaderboard</span>
+        <span class="text-[11px] font-medium font-inter">Rankings</span>
+      </a>
+      <a
+        class="flex flex-col items-center justify-center text-slate-500 hover:bg-slate-800/50 active:scale-90 transition-all duration-300 ease-out"
+        href="#"
+      >
+        <span class="material-symbols-outlined" data-icon="person">person</span>
+        <span class="text-[11px] font-medium font-inter">Profile</span>
+      </a>
+    </nav>
+  </body>
+</html>
