@@ -1,0 +1,76 @@
+import { PrismaAdapter } from '@auth/prisma-adapter';
+import NextAuth from 'next-auth';
+
+import { prisma } from '@/lib/prisma';
+
+/** Quran Foundation OAuth2 base URL (switch via QF_ENVIRONMENT env var). */
+const qfAuthBase =
+  process.env.QF_ENVIRONMENT === 'production'
+    ? 'https://oauth2.quran.foundation'
+    : 'https://prelive-oauth2.quran.foundation';
+
+export const { handlers, auth, signIn, signOut } = NextAuth({
+  adapter: PrismaAdapter(prisma),
+
+  providers: [
+    {
+      id: 'quran-foundation',
+      name: 'Quran.com',
+      type: 'oidc',
+      issuer: qfAuthBase,
+      clientId: process.env.QF_CLIENT_ID!,
+      clientSecret: process.env.QF_CLIENT_SECRET!,
+      authorization: {
+        url: `${qfAuthBase}/oauth2/auth`,
+        params: {
+          scope: 'openid offline_access user',
+          // eslint-disable-next-line @typescript-eslint/naming-convention
+          response_type: 'code',
+        },
+      },
+      token: {
+        url: `${qfAuthBase}/oauth2/token`,
+      },
+      userinfo: {
+        url: `${qfAuthBase}/userinfo`,
+      },
+      checks: ['pkce', 'state', 'nonce'],
+      profile(profile: {
+        sub: string;
+        email?: string;
+        name?: string;
+        // eslint-disable-next-line @typescript-eslint/naming-convention
+        first_name?: string;
+        // eslint-disable-next-line @typescript-eslint/naming-convention
+        last_name?: string;
+        picture?: string;
+      }) {
+        return {
+          id: profile.sub,
+          name:
+            [profile.first_name, profile.last_name].filter(Boolean).join(' ') ||
+            profile.name ||
+            null,
+          email: profile.email ?? null,
+          image: profile.picture ?? null,
+        };
+      },
+    },
+  ],
+
+  session: {
+    strategy: 'database',
+  },
+
+  callbacks: {
+    session({ session, user }) {
+      // Expose the database user id in the session
+      session.user.id = user.id;
+      return session;
+    },
+  },
+
+  pages: {
+    signIn: '/auth/signin',
+  },
+});
