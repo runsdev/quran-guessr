@@ -11,6 +11,8 @@ export interface Question {
   segments: Segment[];
   /** HMAC-signed token; decoded only by the server on submission. */
   answerToken: string;
+  /** AES-256-GCM encrypted array of hidden VerseWords; revealed after submission. */
+  encryptedHiddenWords: string;
   /** Total number of Arabic words in this verse (used for adaptive timer). */
   totalWords: number;
   /** ELO of the page this verse is from (difficulty indicator). */
@@ -22,6 +24,8 @@ export interface SubmitResult {
   correctAnswer: number;
   /** Revealed after submission so the UI can display it. */
   verseKey: string;
+  /** Hidden words revealed after submission for full-verse display. */
+  hiddenWords: import('@/app/quiz/types').VerseWord[];
   /** ELO change for the authenticated user (null if not signed in or rate-limited). */
   userEloDelta: number | null;
   /** User's new ELO after this attempt (null if not signed in or rate-limited). */

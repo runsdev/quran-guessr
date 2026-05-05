@@ -52,6 +52,40 @@ export function decryptVerseKey(token: string): string {
   return Buffer.concat([decipher.update(ciphertext), decipher.final()]).toString('utf8');
 }
 
+/**
+ * Encrypts an array of hidden VerseWords so the client cannot see them until
+ * submission. Uses the same AES-256-GCM scheme as `encryptVerseKey`.
+ */
+export function encryptHiddenWords(words: object[]): string {
+  const iv = randomBytes(12);
+  const key = getAesKey();
+  const cipher = createCipheriv('aes-256-gcm', key, iv);
+  const json = JSON.stringify(words);
+  const encrypted = Buffer.concat([cipher.update(json, 'utf8'), cipher.final()]);
+  const tag = cipher.getAuthTag();
+  return [iv, encrypted, tag].map((b) => b.toString('base64url')).join('.');
+}
+
+/**
+ * Decrypts a value produced by `encryptHiddenWords`.
+ * Throws if the ciphertext is tampered with.
+ */
+export function decryptHiddenWords<T>(token: string): T[] {
+  const parts = token.split('.');
+  if (parts.length !== 3) {
+    throw new Error('Invalid encrypted hidden words');
+  }
+  const [ivB64, cipherB64, tagB64] = parts;
+  const iv = Buffer.from(ivB64, 'base64url');
+  const ciphertext = Buffer.from(cipherB64, 'base64url');
+  const tag = Buffer.from(tagB64, 'base64url');
+  const key = getAesKey();
+  const decipher = createDecipheriv('aes-256-gcm', key, iv);
+  decipher.setAuthTag(tag);
+  const json = Buffer.concat([decipher.update(ciphertext), decipher.final()]).toString('utf8');
+  return JSON.parse(json) as T[];
+}
+
 export function signAnswer(verseKey: string, missingCount: number, pageNumber: number): string {
   const hmac = createHmac('sha256', getSecret())
     .update(`${verseKey}:${missingCount}:${pageNumber}`)

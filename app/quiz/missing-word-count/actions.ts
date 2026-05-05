@@ -1,9 +1,10 @@
 'use server';
 
-import { verifyAnswer, decryptVerseKey } from './answerToken';
+import { verifyAnswer, decryptVerseKey, decryptHiddenWords } from './answerToken';
 import { getRandomQuestion } from './getQuestion';
 import type { Question, SubmitResult } from './types';
 
+import type { VerseWord } from '@/app/quiz/types';
 import { auth } from '@/auth';
 import { computeElo } from '@/lib/elo';
 import { prisma } from '@/lib/prisma';
@@ -43,8 +44,10 @@ export async function submitAnswer(
   encryptedVerseKey: string,
   answerToken: string,
   guess: number,
+  encryptedHiddenWords: string,
 ): Promise<SubmitResult> {
   const verseKey = decryptVerseKey(encryptedVerseKey);
+  const hiddenWords = decryptHiddenWords<VerseWord>(encryptedHiddenWords);
   const verified = verifyAnswer(verseKey, answerToken);
   if (verified === null) {
     throw new Error('Invalid answer token');
@@ -68,6 +71,7 @@ export async function submitAnswer(
       isCorrect,
       correctAnswer,
       verseKey,
+      hiddenWords,
       userEloDelta: null,
       newUserElo: null,
       newPageElo: pageEloRecord.elo,
@@ -89,6 +93,7 @@ export async function submitAnswer(
       isCorrect,
       correctAnswer,
       verseKey,
+      hiddenWords,
       userEloDelta: null,
       newUserElo: null,
       newPageElo: pageEloRecord.elo,
@@ -126,6 +131,7 @@ export async function submitAnswer(
     isCorrect,
     correctAnswer,
     verseKey,
+    hiddenWords,
     userEloDelta: result.userDelta,
     newUserElo: result.newUserElo,
     newPageElo: result.newPageElo,

@@ -35,7 +35,12 @@ export default function QuizClient({ initialQuestion }: QuizClientProps) {
     }
     startTransition(async () => {
       try {
-        const result = await submitAnswer(question.encryptedVerseKey, question.answerToken, guess);
+        const result = await submitAnswer(
+          question.encryptedVerseKey,
+          question.answerToken,
+          guess,
+          question.encryptedHiddenWords,
+        );
         setSubmitResult(result);
       } catch {
         setFetchError(true);
@@ -114,7 +119,9 @@ export default function QuizClient({ initialQuestion }: QuizClientProps) {
           loading={isPending}
           error={fetchError}
           submitted={submitted}
+          isCorrect={isCorrect}
           verseKey={submitResult?.verseKey ?? null}
+          hiddenWords={submitResult?.hiddenWords ?? null}
           loadedPages={loadedPages}
           onRetry={loadNextQuestion}
         />

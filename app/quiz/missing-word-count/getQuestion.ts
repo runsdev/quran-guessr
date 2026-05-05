@@ -1,4 +1,4 @@
-import { encryptVerseKey, signAnswer } from './answerToken';
+import { encryptVerseKey, signAnswer, encryptHiddenWords } from './answerToken';
 import type { Question, Segment } from './types';
 
 import type { VerseWord } from '@/app/quiz/types';
@@ -93,8 +93,10 @@ export async function getRandomQuestion(targetPageNumber?: number): Promise<Ques
 
     const segments: Segment[] = [];
     let currentWords: VerseWord[] = [];
+    const hiddenWords: VerseWord[] = [];
     for (let i = 0; i < words.length; i++) {
       if (hiddenSet.has(i)) {
+        hiddenWords.push(words[i] as VerseWord);
         if (currentWords.length > 0) {
           segments.push({ type: 'words', words: currentWords });
           currentWords = [];
@@ -121,6 +123,7 @@ export async function getRandomQuestion(targetPageNumber?: number): Promise<Ques
       encryptedVerseKey: encryptVerseKey(verse.verse_key),
       segments,
       answerToken: signAnswer(verse.verse_key, missingCount, pageNumber),
+      encryptedHiddenWords: encryptHiddenWords(hiddenWords),
       totalWords: wordCount,
       pageElo: Math.round(pageEloRecord.elo),
     };
