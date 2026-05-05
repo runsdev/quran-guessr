@@ -19,7 +19,7 @@ const TopAppBar = ({ activeTab }: TopAppBarProps): React.JSX.Element => (
   <header className="bg-surface-container-lowest/80 backdrop-blur-md fixed top-0 w-full z-50 border-b border-primary-container/20 flex justify-between items-center px-5 h-16 font-[Inter,var(--font-geist-sans)]">
     {/* Logo */}
     <div className="flex items-center gap-2">
-      <span className="text-xl font-bold tracking-widest text-primary">QuranGuessr</span>
+      <span className="text-xl font-bold text-primary">QuranGuessr</span>
     </div>
 
     {/* Desktop nav */}

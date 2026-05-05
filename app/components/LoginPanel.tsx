@@ -53,9 +53,6 @@ const LoginPanel = (): React.JSX.Element => {
                 onClick={() => signIn('quran-foundation', { callbackUrl: '/' })}
                 disabled={status === 'loading'}
               >
-                <span className="text-xl leading-none" aria-hidden="true">
-                  ﷽
-                </span>
                 Continue with Quran.com
               </button>
             </div>
