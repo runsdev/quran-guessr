@@ -55,12 +55,10 @@ export async function submitAnswer(
   const { missingCount: correctAnswer, pageNumber } = verified;
   const isCorrect = guess === correctAnswer;
 
-  // Fetch or initialise page ELO record
-  const pageEloRecord = await prisma.pageElo.upsert({
-    where: { pageNumber },
-    update: {},
-    create: { pageNumber, elo: 1200 },
-  });
+  // Read the page ELO record (created lazily on first ranked submit below).
+  // Using findUnique here avoids any upsert that could overwrite accumulated stats.
+  const existingPageElo = await prisma.pageElo.findUnique({ where: { pageNumber } });
+  const currentPageElo = existingPageElo?.elo ?? 1200;
 
   const session = await auth();
   const userId = (session?.user as { id?: string } | undefined)?.id ?? null;
@@ -74,7 +72,7 @@ export async function submitAnswer(
       hiddenWords,
       userEloDelta: null,
       newUserElo: null,
-      newPageElo: pageEloRecord.elo,
+      newPageElo: currentPageElo,
       ranked: false,
     };
   }
@@ -96,7 +94,7 @@ export async function submitAnswer(
       hiddenWords,
       userEloDelta: null,
       newUserElo: null,
-      newPageElo: pageEloRecord.elo,
+      newPageElo: currentPageElo,
       ranked: false,
     };
   }
@@ -109,16 +107,31 @@ export async function submitAnswer(
   const currentUserElo = user?.elo ?? 1000;
   const gamesPlayed = user?.gamesPlayed ?? 0;
 
-  const result = computeElo(currentUserElo, pageEloRecord.elo, isCorrect, gamesPlayed);
+  const result = computeElo(currentUserElo, currentPageElo, isCorrect, gamesPlayed);
 
   await prisma.$transaction([
     prisma.user.update({
       where: { id: userId },
-      data: { elo: result.newUserElo, gamesPlayed: { increment: 1 } },
+      data: {
+        elo: result.newUserElo,
+        gamesPlayed: { increment: 1 },
+        ...(isCorrect ? { mwcCorrect: { increment: 1 } } : {}),
+      },
     }),
-    prisma.pageElo.update({
+    // upsert so the record is created on first ranked attempt (getQuestion.ts no longer writes)
+    prisma.pageElo.upsert({
       where: { pageNumber },
-      data: { elo: result.newPageElo },
+      create: {
+        pageNumber,
+        elo: result.newPageElo,
+        totalAttempts: 1,
+        correctAttempts: isCorrect ? 1 : 0,
+      },
+      update: {
+        elo: result.newPageElo,
+        totalAttempts: { increment: 1 },
+        ...(isCorrect ? { correctAttempts: { increment: 1 } } : {}),
+      },
     }),
     prisma.dailyAttempt.update({
       // eslint-disable-next-line @typescript-eslint/naming-convention

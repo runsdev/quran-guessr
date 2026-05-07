@@ -46,6 +46,9 @@ export function LeaderboardTable({ paged, currentUserId }: TableProps) {
               Tier
             </th>
             <th className="px-6 py-4 text-[11px] font-bold text-on-surface-variant uppercase tracking-widest text-center">
+              MWC Win%
+            </th>
+            <th className="px-6 py-4 text-[11px] font-bold text-on-surface-variant uppercase tracking-widest text-center">
               Games
             </th>
           </tr>
@@ -97,6 +100,23 @@ export function LeaderboardTable({ paged, currentUserId }: TableProps) {
                         </span>
                       )}
                     </span>
+                    <div className="flex gap-2 mt-0.5 flex-wrap">
+                      {entry.gamesPlayed > 0 && (
+                        <span className="text-[10px] text-on-surface-variant">
+                          MWC&nbsp;{entry.gamesPlayed}
+                        </span>
+                      )}
+                      {entry.lvGames > 0 && (
+                        <span className="text-[10px] text-on-surface-variant">
+                          ·&nbsp;LV&nbsp;{entry.lvGames}
+                        </span>
+                      )}
+                      {entry.nvGames > 0 && (
+                        <span className="text-[10px] text-on-surface-variant">
+                          ·&nbsp;NV&nbsp;{entry.nvGames}
+                        </span>
+                      )}
+                    </div>
                   </div>
                 </td>
                 <td className="px-6 py-5">
@@ -111,8 +131,13 @@ export function LeaderboardTable({ paged, currentUserId }: TableProps) {
                     {mastery.label}
                   </span>
                 </td>
+                <td className="px-6 py-5 text-sm font-semibold text-on-surface text-center tabular-nums">
+                  {entry.gamesPlayed > 0
+                    ? `${Math.round((entry.mwcCorrect / entry.gamesPlayed) * 100)}%`
+                    : '—'}
+                </td>
                 <td className="px-6 py-5 text-sm text-on-surface-variant text-center tabular-nums">
-                  {entry.gamesPlayed}
+                  {entry.gamesPlayed + entry.lvGames + entry.nvGames}
                 </td>
               </tr>
             );
