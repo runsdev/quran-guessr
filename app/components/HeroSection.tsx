@@ -1,5 +1,7 @@
 import React from 'react';
 
+import Image from 'next/image';
+
 /**
  * Hero section for the home page — headline, subtitle, and CTA buttons.
  */
@@ -9,8 +11,8 @@ const HeroSection = (): React.JSX.Element => (
     <div className="absolute inset-0 z-0 pointer-events-none">
       <div className="absolute inset-0 bg-linear-to-b from-primary/5 to-transparent" />
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full h-full opacity-20">
-        <img
-          src="https://lh3.googleusercontent.com/aida-public/AB6AXuCGiurZGXWIzFbttn6-t-LPuJOaW3d_279_qF4JB_SBuYMBpLTOsZfVaKYVmmin240WBKt1i1uYQJMbm_JsRew-_cLj9pf7TudNUXJwcEcz4SAPnJe-wgTACjfUIJvvQ77Bt2-5MEKj9zydXJEzma6z-I1kLmDEYXDuyi2SsxdQ5X9N9JdZGrAVlHOLiA1DzAZPX52t4tRfVh1Z2NQiH-Z7PZIiC5Uu-MNoZTi33OTpjJd_HCZU9K11UjkLEqyUMR-eZ1UIkirbYyK6"
+        <Image
+          src="quran-hero.jpg"
           alt=""
           className="w-full h-full object-cover mix-blend-overlay"
         />

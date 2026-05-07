@@ -8,7 +8,7 @@ const LoginPanel = (): React.JSX.Element => {
   const { data: session, status } = useSession();
 
   return (
-    <div className="md:col-span-2 glass-panel rounded-3xl p-(--spacing-lg) flex flex-col md:flex-row items-center gap-(--spacing-xl)">
+    <div className="md:col-span-3 glass-panel rounded-3xl p-(--spacing-lg) flex flex-col md:flex-row items-center gap-(--spacing-xl)">
       <div className="w-full md:w-1/2 space-y-(--spacing-md)">
         {status === 'authenticated' ? (
           /* ── Signed-in state ────────────────────────────────── */
