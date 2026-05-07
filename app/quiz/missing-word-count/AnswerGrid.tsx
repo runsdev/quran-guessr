@@ -1,0 +1,47 @@
+const OPTIONS = [1, 2, 3, 4] as const;
+export type Option = (typeof OPTIONS)[number];
+
+interface AnswerGridProps {
+  selected: Option | null;
+  submitted: boolean;
+  correctAnswer: number | null;
+  isCorrect: boolean;
+  onSelect: (n: Option) => void;
+}
+
+export default function AnswerGrid({
+  selected,
+  submitted,
+  correctAnswer,
+  isCorrect,
+  onSelect,
+}: AnswerGridProps) {
+  return (
+    <div className="grid grid-cols-4 gap-2 w-full">
+      {OPTIONS.map((num) => {
+        const isSelected = selected === num;
+        const isAnswer = submitted && num === correctAnswer;
+        const isWrongPick = submitted && isSelected && !isCorrect;
+        let btnStyle =
+          'bg-[#1E293B] border-outline-variant text-on-surface hover:border-primary hover:bg-surface-container-high hover:text-primary';
+        if (isAnswer) {
+          btnStyle = 'bg-green-900/60 border-green-400 text-green-300';
+        } else if (isWrongPick) {
+          btnStyle = 'bg-red-900/60 border-red-400 text-red-300';
+        } else if (isSelected) {
+          btnStyle = 'bg-primary-container border-primary text-on-background';
+        }
+        return (
+          <button
+            key={num}
+            onClick={() => !submitted && onSelect(num)}
+            disabled={submitted}
+            className={`aspect-square border rounded-xl flex items-center justify-center transition-all duration-200 active:scale-95 disabled:cursor-default ${btnStyle}`}
+          >
+            <span className="text-3xl font-bold">{num}</span>
+          </button>
+        );
+      })}
+    </div>
+  );
+}

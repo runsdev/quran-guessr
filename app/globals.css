@@ -1,5 +1,12 @@
 @import 'tailwindcss';
 
+@font-face {
+  font-family: 'Scheherazade New';
+  src: url('https://fonts.googleapis.com/css2?family=Scheherazade+New:wght@400;700&display=swap')
+    format('woff2');
+  font-display: swap;
+}
+
 /* ── Design tokens ── */
 :root {
   /* Light theme (quran-guessr-light) */
@@ -135,7 +142,6 @@
   --color-on-background: var(--color-on-background);
 
   /* Spacing */
-  --spacing-unit: 4px;
   --spacing-xs: 4px;
   --spacing-sm: 8px;
   --spacing-md: 16px;
@@ -164,4 +170,12 @@
 body {
   background-color: var(--color-background);
   color: var(--color-on-surface);
+}
+
+.quran-text {
+  font-family: 'Scheherazade New', 'Traditional Arabic', serif;
+  font-size: 28px;
+  line-height: 2;
+  direction: rtl;
+  text-align: right;
 }

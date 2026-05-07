@@ -1,0 +1,430 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Al-Qalam | Page-Level ELO Dashboard</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #0F172A; /* Base Level 0 from Style Guidance */
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        /* Custom scrollbar for scholarly feel */
+        ::-webkit-scrollbar { width: 4px; }
+        ::-webkit-scrollbar-track { background: #0F172A; }
+        ::-webkit-scrollbar-thumb { background: #334155; border-radius: 10px; }
+        ::-webkit-scrollbar-thumb:hover { background: #2CA4AB; }
+    </style>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "on-tertiary-fixed": "#111c2d",
+                    "surface-container-low": "#191c1e",
+                    "inverse-primary": "#00696e",
+                    "surface-container-highest": "#323537",
+                    "primary-container": "#2ca4ab",
+                    "tertiary-fixed-dim": "#bcc7de",
+                    "secondary-fixed": "#d3e4fe",
+                    "on-tertiary-fixed-variant": "#3c475a",
+                    "on-secondary-fixed-variant": "#38485d",
+                    "on-primary-fixed-variant": "#004f53",
+                    "on-background": "#e0e3e5",
+                    "surface-container-lowest": "#0b0f10",
+                    "primary": "#6ad7de",
+                    "outline-variant": "#3d494a",
+                    "on-tertiary": "#263143",
+                    "on-tertiary-container": "#232e40",
+                    "surface": "#101415",
+                    "surface-variant": "#323537",
+                    "primary-fixed": "#88f3fa",
+                    "surface-bright": "#363a3b",
+                    "outline": "#879394",
+                    "error-container": "#93000a",
+                    "on-error-container": "#ffdad6",
+                    "secondary-fixed-dim": "#b7c8e1",
+                    "tertiary-fixed": "#d8e3fb",
+                    "surface-tint": "#6ad7de",
+                    "on-secondary-container": "#a9bad3",
+                    "on-primary": "#003739",
+                    "on-error": "#690005",
+                    "inverse-on-surface": "#2d3133",
+                    "on-primary-container": "#003436",
+                    "on-secondary-fixed": "#0b1c30",
+                    "tertiary": "#bcc7de",
+                    "primary-fixed-dim": "#6ad7de",
+                    "tertiary-container": "#8a95ab",
+                    "secondary-container": "#3a4a5f",
+                    "surface-container-high": "#272a2c",
+                    "error": "#ffb4ab",
+                    "secondary": "#b7c8e1",
+                    "surface-dim": "#101415",
+                    "on-surface-variant": "#bcc9c9",
+                    "surface-container": "#1d2022",
+                    "inverse-surface": "#e0e3e5",
+                    "background": "#101415",
+                    "on-secondary": "#213145",
+                    "on-surface": "#e0e3e5",
+                    "on-primary-fixed": "#002022"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.25rem",
+                    "lg": "0.5rem",
+                    "xl": "0.75rem",
+                    "full": "9999px"
+            },
+            "fontFamily": {
+                    "label-md": ["Inter"],
+                    "headline-lg": ["Inter"],
+                    "headline-md": ["Inter"],
+                    "body-lg": ["Inter"],
+                    "body-md": ["Inter"],
+                    "arabic-display": ["Inter"]
+            }
+          }
+        }
+      }
+    </script>
+</head>
+<body class="bg-surface text-on-surface antialiased overflow-hidden h-screen flex flex-col">
+<!-- TopAppBar -->
+<header class="bg-slate-950/80 backdrop-blur-md text-teal-500 font-inter antialiased tracking-tight fixed top-0 w-full z-50 border-b border-teal-500/20 shadow-none flex justify-between items-center px-5 h-16 w-full">
+<div class="flex items-center gap-4">
+<span class="text-xl font-bold tracking-widest text-teal-500 uppercase">Al-Qalam</span>
+<div class="hidden md:flex ml-8 gap-6 items-center">
+<a class="text-teal-400 font-semibold transition-colors duration-200 active:scale-95" href="#">Dashboard</a>
+<a class="text-slate-400 hover:text-teal-300 transition-colors duration-200 active:scale-95" href="#">Curriculum</a>
+<a class="text-slate-400 hover:text-teal-300 transition-colors duration-200 active:scale-95" href="#">Analytics</a>
+</div>
+</div>
+<div class="flex items-center gap-4">
+<button class="p-2 text-slate-400 hover:text-teal-300 transition-colors">
+<span class="material-symbols-outlined" data-icon="notifications">notifications</span>
+</button>
+<div class="w-8 h-8 rounded-full overflow-hidden border border-teal-500/30">
+<img alt="User profile avatar" class="w-full h-full object-cover" data-alt="A professional headshot of a scholarly man with a neat beard, wearing a modern dark slate blazer. The background is a soft-focus library with warm, dim amber lighting. The portrait uses deep shadows and high-end photographic lighting, fitting a premium, academic digital tool aesthetic with teal accent tones." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBgqomHYPJxvO3EiiR12RBPxjzskwy-vT5riNePDz1XrUipsxsRjj8lecTbFtpVPztY62H4bCyY7EvKQYFArPiD3yjbMV_pjVsK7jQZxncQi0QimYuiJoZV0TMdcRpZ3WPz9VNpmEV8SgSTAaIBamWpygQqfEt_YD6LOhSdTK_JgVoVl0Jc5g6MPrBPdUMAT9NWRYUSAwDBy09nCSVD9GfN8MQcIoos8irtN-1WFxFIYvHN1rKXzarZ8uHroIFsN6pL2SpHV_oZUwmx"/>
+</div>
+</div>
+</header>
+<!-- App Shell Layout -->
+<div class="flex flex-1 pt-16 overflow-hidden">
+<!-- Left Sidebar: Juz/Surah Navigation -->
+<aside class="hidden md:flex flex-col w-72 bg-slate-900/50 border-r border-teal-500/10 overflow-y-auto">
+<div class="p-6">
+<h3 class="text-xs font-bold text-slate-500 uppercase tracking-widest mb-6">Navigation (Juz)</h3>
+<nav class="space-y-1">
+<!-- Accordion Item Active -->
+<div class="space-y-1">
+<button class="w-full flex items-center justify-between px-4 py-3 bg-teal-500/10 rounded-xl text-teal-400 border border-teal-500/20 group">
+<span class="font-semibold text-label-md">Juz 1</span>
+<span class="material-symbols-outlined text-sm">expand_more</span>
+</button>
+<div class="pl-4 space-y-1 mt-1">
+<a class="block px-4 py-2 text-sm text-slate-400 hover:text-teal-300 hover:bg-slate-800/40 rounded-lg transition-all" href="#">Al-Fatihah</a>
+<a class="block px-4 py-2 text-sm text-teal-400 bg-teal-500/5 border-l-2 border-teal-500 rounded-r-lg font-medium" href="#">Al-Baqarah</a>
+</div>
+</div>
+<!-- Accordion Item Inactive -->
+<div class="space-y-1">
+<button class="w-full flex items-center justify-between px-4 py-3 text-slate-500 hover:bg-slate-800/40 rounded-xl transition-all group">
+<span class="font-medium text-label-md">Juz 2</span>
+<span class="material-symbols-outlined text-sm">chevron_right</span>
+</button>
+</div>
+<div class="space-y-1">
+<button class="w-full flex items-center justify-between px-4 py-3 text-slate-500 hover:bg-slate-800/40 rounded-xl transition-all group">
+<span class="font-medium text-label-md">Juz 3</span>
+<span class="material-symbols-outlined text-sm">chevron_right</span>
+</button>
+</div>
+<div class="space-y-1">
+<button class="w-full flex items-center justify-between px-4 py-3 text-slate-500 hover:bg-slate-800/40 rounded-xl transition-all group">
+<span class="font-medium text-label-md">Juz 4</span>
+<span class="material-symbols-outlined text-sm">chevron_right</span>
+</button>
+</div>
+</nav>
+</div>
+<div class="mt-auto p-6">
+<div class="p-4 bg-slate-800/40 rounded-2xl border border-slate-700/50">
+<p class="text-xs text-slate-500 mb-2">My Current ELO</p>
+<div class="flex items-end gap-2">
+<span class="text-2xl font-bold text-teal-400">1,482</span>
+<span class="text-[10px] text-teal-500/70 mb-1 px-1 bg-teal-500/10 rounded">↑ 12</span>
+</div>
+</div>
+</div>
+</aside>
+<!-- Main Content Area -->
+<main class="flex-1 overflow-y-auto bg-surface p-4 md:p-8">
+<div class="max-w-6xl mx-auto space-y-8">
+<!-- Header Section -->
+<div class="flex flex-col md:flex-row md:items-end justify-between gap-4">
+<div>
+<h1 class="text-headline-lg font-bold text-on-surface tracking-tight mb-2">Global Page Mastery</h1>
+<p class="text-slate-400 max-w-xl text-body-md">Advanced ELO distribution based on recitation accuracy, fluency, and memorization retention across the 604 pages of the Mushaf.</p>
+</div>
+<div class="flex gap-2">
+<span class="px-4 py-2 bg-slate-800/80 text-slate-300 rounded-xl text-sm border border-slate-700/50 flex items-center gap-2">
+<span class="material-symbols-outlined text-sm">filter_list</span> Filter
+                        </span>
+<span class="px-4 py-2 bg-teal-500 text-slate-950 rounded-xl text-sm font-semibold hover:bg-teal-400 transition-colors cursor-pointer">
+                            Export Data
+                        </span>
+</div>
+</div>
+<!-- Stats Overview (Bento Grid Style) -->
+<div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+<div class="bg-slate-900/40 border border-teal-500/10 p-6 rounded-3xl backdrop-blur-sm">
+<div class="flex justify-between items-start mb-4">
+<div class="p-2 bg-teal-500/10 rounded-lg">
+<span class="material-symbols-outlined text-teal-500">trending_up</span>
+</div>
+<span class="text-[10px] font-bold text-teal-500/50 uppercase tracking-widest">Global Avg</span>
+</div>
+<h4 class="text-3xl font-bold text-white mb-1">1,240</h4>
+<p class="text-sm text-slate-500">Historical average page ELO</p>
+</div>
+<div class="bg-slate-900/40 border border-teal-500/10 p-6 rounded-3xl backdrop-blur-sm">
+<div class="flex justify-between items-start mb-4">
+<div class="p-2 bg-secondary-container rounded-lg">
+<span class="material-symbols-outlined text-secondary">workspace_premium</span>
+</div>
+<span class="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Mastery Rate</span>
+</div>
+<h4 class="text-3xl font-bold text-white mb-1">14.2%</h4>
+<p class="text-sm text-slate-500">Pages with ELO above 1,800</p>
+</div>
+<div class="bg-slate-900/40 border border-teal-500/10 p-6 rounded-3xl backdrop-blur-sm relative overflow-hidden group">
+<div class="flex justify-between items-start mb-4">
+<div class="p-2 bg-error-container/20 rounded-lg">
+<span class="material-symbols-outlined text-error">priority_high</span>
+</div>
+<span class="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Complex Pages</span>
+</div>
+<h4 class="text-3xl font-bold text-white mb-1">Page 281</h4>
+<p class="text-sm text-slate-500">Lowest global average ELO</p>
+<div class="absolute -right-4 -bottom-4 opacity-10 group-hover:opacity-20 transition-opacity">
+<span class="material-symbols-outlined text-8xl">auto_graph</span>
+</div>
+</div>
+</div>
+<!-- Leaderboard Table -->
+<div class="bg-slate-900/40 border border-teal-500/20 rounded-3xl overflow-hidden backdrop-blur-md">
+<div class="overflow-x-auto">
+<table class="w-full text-left border-collapse">
+<thead>
+<tr class="border-b border-teal-500/10 bg-slate-950/20">
+<th class="px-6 py-4 text-[11px] font-bold text-slate-500 uppercase tracking-widest">#</th>
+<th class="px-6 py-4 text-[11px] font-bold text-slate-500 uppercase tracking-widest">Page</th>
+<th class="px-6 py-4 text-[11px] font-bold text-slate-500 uppercase tracking-widest">Surah Context</th>
+<th class="px-6 py-4 text-[11px] font-bold text-slate-500 uppercase tracking-widest">Avg. ELO</th>
+<th class="px-6 py-4 text-[11px] font-bold text-slate-500 uppercase tracking-widest">Tier</th>
+<th class="px-6 py-4 text-[11px] font-bold text-slate-500 uppercase tracking-widest text-center">Pop. Spread</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-teal-500/5">
+<!-- Row 1 -->
+<tr class="hover:bg-teal-500/[0.02] transition-colors group">
+<td class="px-6 py-5 text-sm font-medium text-teal-400">01</td>
+<td class="px-6 py-5">
+<div class="flex items-center gap-3">
+<div class="w-8 h-10 bg-slate-800 rounded flex items-center justify-center border border-slate-700">
+<span class="text-xs font-bold text-slate-300">1</span>
+</div>
+<span class="text-sm font-semibold text-white">Page 1</span>
+</div>
+</td>
+<td class="px-6 py-5 text-sm text-slate-400 italic">Al-Fatihah</td>
+<td class="px-6 py-5">
+<span class="text-sm font-bold text-white">2,150</span>
+</td>
+<td class="px-6 py-5">
+<span class="px-3 py-1 bg-teal-500/10 text-teal-400 text-[10px] font-bold uppercase rounded-full border border-teal-500/20">Master</span>
+</td>
+<td class="px-6 py-5">
+<div class="flex items-end justify-center gap-[2px] h-8">
+<div class="w-2 bg-slate-800 h-2 rounded-t-sm"></div>
+<div class="w-2 bg-slate-800 h-3 rounded-t-sm"></div>
+<div class="w-2 bg-slate-800 h-5 rounded-t-sm"></div>
+<div class="w-2 bg-teal-500 h-8 rounded-t-sm"></div>
+<div class="w-2 bg-teal-500/50 h-6 rounded-t-sm"></div>
+<div class="w-2 bg-slate-800 h-4 rounded-t-sm"></div>
+</div>
+</td>
+</tr>
+<!-- Row 2 -->
+<tr class="hover:bg-teal-500/[0.02] transition-colors group">
+<td class="px-6 py-5 text-sm font-medium text-slate-500">02</td>
+<td class="px-6 py-5">
+<div class="flex items-center gap-3">
+<div class="w-8 h-10 bg-slate-800 rounded flex items-center justify-center border border-slate-700">
+<span class="text-xs font-bold text-slate-300">2</span>
+</div>
+<span class="text-sm font-semibold text-white">Page 2</span>
+</div>
+</td>
+<td class="px-6 py-5 text-sm text-slate-400 italic">Al-Baqarah</td>
+<td class="px-6 py-5">
+<span class="text-sm font-bold text-white">1,980</span>
+</td>
+<td class="px-6 py-5">
+<span class="px-3 py-1 bg-secondary-container/20 text-secondary text-[10px] font-bold uppercase rounded-full border border-secondary-container">Intermediate</span>
+</td>
+<td class="px-6 py-5">
+<div class="flex items-end justify-center gap-[2px] h-8">
+<div class="w-2 bg-slate-800 h-3 rounded-t-sm"></div>
+<div class="w-2 bg-teal-500/40 h-5 rounded-t-sm"></div>
+<div class="w-2 bg-teal-500 h-7 rounded-t-sm"></div>
+<div class="w-2 bg-teal-500/60 h-8 rounded-t-sm"></div>
+<div class="w-2 bg-slate-800 h-4 rounded-t-sm"></div>
+<div class="w-2 bg-slate-800 h-2 rounded-t-sm"></div>
+</div>
+</td>
+</tr>
+<!-- Row 3 -->
+<tr class="hover:bg-teal-500/[0.02] transition-colors group">
+<td class="px-6 py-5 text-sm font-medium text-slate-500">03</td>
+<td class="px-6 py-5">
+<div class="flex items-center gap-3">
+<div class="w-8 h-10 bg-slate-800 rounded flex items-center justify-center border border-slate-700">
+<span class="text-xs font-bold text-slate-300">25</span>
+</div>
+<span class="text-sm font-semibold text-white">Page 25</span>
+</div>
+</td>
+<td class="px-6 py-5 text-sm text-slate-400 italic">Al-Baqarah</td>
+<td class="px-6 py-5">
+<span class="text-sm font-bold text-white">1,720</span>
+</td>
+<td class="px-6 py-5">
+<span class="px-3 py-1 bg-secondary-container/20 text-secondary text-[10px] font-bold uppercase rounded-full border border-secondary-container">Intermediate</span>
+</td>
+<td class="px-6 py-5">
+<div class="flex items-end justify-center gap-[2px] h-8">
+<div class="w-2 bg-slate-800 h-5 rounded-t-sm"></div>
+<div class="w-2 bg-teal-500 h-7 rounded-t-sm"></div>
+<div class="w-2 bg-teal-500/50 h-8 rounded-t-sm"></div>
+<div class="w-2 bg-slate-800 h-4 rounded-t-sm"></div>
+<div class="w-2 bg-slate-800 h-3 rounded-t-sm"></div>
+<div class="w-2 bg-slate-800 h-2 rounded-t-sm"></div>
+</div>
+</td>
+</tr>
+<!-- Row 4 -->
+<tr class="hover:bg-teal-500/[0.02] transition-colors group">
+<td class="px-6 py-5 text-sm font-medium text-slate-500">04</td>
+<td class="px-6 py-5">
+<div class="flex items-center gap-3">
+<div class="w-8 h-10 bg-slate-800 rounded flex items-center justify-center border border-slate-700">
+<span class="text-xs font-bold text-slate-300">281</span>
+</div>
+<span class="text-sm font-semibold text-white">Page 281</span>
+</div>
+</td>
+<td class="px-6 py-5 text-sm text-slate-400 italic">An-Nahl</td>
+<td class="px-6 py-5">
+<span class="text-sm font-bold text-white">940</span>
+</td>
+<td class="px-6 py-5">
+<span class="px-3 py-1 bg-slate-800 text-slate-500 text-[10px] font-bold uppercase rounded-full border border-slate-700">Beginner</span>
+</td>
+<td class="px-6 py-5">
+<div class="flex items-end justify-center gap-[2px] h-8">
+<div class="w-2 bg-error h-8 rounded-t-sm opacity-50"></div>
+<div class="w-2 bg-error h-6 rounded-t-sm opacity-30"></div>
+<div class="w-2 bg-slate-800 h-4 rounded-t-sm"></div>
+<div class="w-2 bg-slate-800 h-3 rounded-t-sm"></div>
+<div class="w-2 bg-slate-800 h-2 rounded-t-sm"></div>
+<div class="w-2 bg-slate-800 h-1 rounded-t-sm"></div>
+</div>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="p-6 bg-slate-950/40 border-t border-teal-500/10 flex items-center justify-between">
+<span class="text-sm text-slate-500">Showing 4 of 604 pages</span>
+<div class="flex gap-4">
+<button class="text-slate-500 hover:text-teal-400 transition-colors">
+<span class="material-symbols-outlined">arrow_back_ios</span>
+</button>
+<button class="text-teal-400 transition-colors">
+<span class="material-symbols-outlined">arrow_forward_ios</span>
+</button>
+</div>
+</div>
+</div>
+</div>
+</main>
+<!-- Contextual Sidebar: ELO Explanation -->
+<aside class="hidden lg:flex flex-col w-80 bg-slate-900/50 border-l border-teal-500/10 p-8 overflow-y-auto">
+<h2 class="text-headline-md font-bold text-white mb-6">Page-Level ELO</h2>
+<div class="space-y-6">
+<section class="space-y-3">
+<h3 class="text-xs font-bold text-teal-500 uppercase tracking-widest flex items-center gap-2">
+<span class="material-symbols-outlined text-sm">info</span> The Algorithm
+                    </h3>
+<p class="text-sm text-slate-400 leading-relaxed">
+                        Unlike Surah-level tracking, Page ELO provides a <span class="text-teal-400">granular heat-map</span> of your memorization. Each page is treated as a unique "node" in your learning graph.
+                    </p>
+</section>
+<div class="h-px bg-teal-500/10"></div>
+<section class="space-y-4">
+<h3 class="text-xs font-bold text-slate-500 uppercase tracking-widest">Mastery Thresholds</h3>
+<div class="space-y-3">
+<div class="flex items-center gap-3">
+<div class="w-2 h-2 rounded-full bg-teal-500"></div>
+<div>
+<p class="text-xs font-bold text-white">Master (1,800+)</p>
+<p class="text-[11px] text-slate-500">Flawless recitation under 3 minutes.</p>
+</div>
+</div>
+<div class="flex items-center gap-3">
+<div class="w-2 h-2 rounded-full bg-secondary"></div>
+<div>
+<p class="text-xs font-bold text-white">Intermediate (1,200 - 1,799)</p>
+<p class="text-[11px] text-slate-500">Minor hesitations, stable recall.</p>
+</div>
+</div>
+<div class="flex items-center gap-3">
+<div class="w-2 h-2 rounded-full bg-slate-600"></div>
+<div>
+<p class="text-xs font-bold text-white">Beginner (&lt; 1,200)</p>
+<p class="text-[11px] text-slate-500">Recent entry or low retention rate.</p>
+</div>
+</div>
+</div>
+</section>
+<div class="mt-8 p-5 bg-teal-500/5 border border-teal-500/20 rounded-2xl">
+<img alt="Quran pages background" class="w-full h-32 object-cover rounded-xl mb-4 opacity-60" data-alt="A macro close-up of a beautifully bound Mushaf with thick cream pages and elegant Arabic calligraphy. The image focus is shallow, blurring the background into soft shadows and highlights of gold leaf. The lighting is low and cinematic, with a single warm light source emphasizing the texture of the paper and the ink." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCzVNydmKB58bxdb3OgfahabJW6_eKMkRj-2ha0GCVRSg1Rg3ropPXtIRH0Ml1Hg7Dzu-QUmEG8Od9OEGVcwTKkjL0IEC_yy1KydgOKxpekv-0JKFqumAlW0wltQgSF540z1vHvKHEtWPZniH6AQQrbipbTEOnokmEkwgklimClc2iGsE5eDnjKM6GM-KqqKtNtrZKiFRIRMxiJWIUOs4j33vbcPAO1bUtw2Vt-hYFaVP2MkN4dkI08C7hyzi1l2mLO5ZClvq1a3USk"/>
+<p class="text-xs text-teal-400/80 italic text-center">"The best of you are those who learn the Quran and teach it."</p>
+</div>
+</div>
+</aside>
+</div>
+<!-- Mobile BottomNavBar -->
+<nav class="md:hidden fixed bottom-0 w-full rounded-t-2xl z-50 bg-slate-900/90 backdrop-blur-lg border-t border-teal-500/10 shadow-[0_-4px_12px_rgba(0,0,0,0.5)] flex justify-around items-center h-20 px-6 pb-safe">
+<button class="flex flex-col items-center justify-center text-slate-500 hover:bg-slate-800/50 active:scale-90 transition-all duration-300 ease-out">
+<span class="material-symbols-outlined" data-icon="quiz">quiz</span>
+<span class="text-[11px] font-medium font-inter mt-1">Quiz</span>
+</button>
+<button class="flex flex-col items-center justify-center text-teal-400 bg-teal-500/10 rounded-xl px-4 py-1 active:scale-90 transition-all duration-300 ease-out">
+<span class="material-symbols-outlined" data-icon="leaderboard">leaderboard</span>
+<span class="text-[11px] font-medium font-inter mt-1">Rankings</span>
+</button>
+<button class="flex flex-col items-center justify-center text-slate-500 hover:bg-slate-800/50 active:scale-90 transition-all duration-300 ease-out">
+<span class="material-symbols-outlined" data-icon="person">person</span>
+<span class="text-[11px] font-medium font-inter mt-1">Profile</span>
+</button>
+</nav>
+</body></html>
