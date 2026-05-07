@@ -113,11 +113,8 @@ export async function getRandomQuestion(targetPageNumber?: number): Promise<Ques
     }
 
     const pageNumber = words[0]?.page_number ?? 1;
-    const pageEloRecord = await prisma.pageElo.upsert({
-      where: { pageNumber },
-      update: {},
-      create: { pageNumber, elo: 1200 },
-    });
+    // Read-only: never write here so we don't overwrite stats recorded by submitAnswer.
+    const pageEloRecord = await prisma.pageElo.findUnique({ where: { pageNumber } });
 
     return {
       encryptedVerseKey: encryptVerseKey(verse.verse_key),
@@ -125,7 +122,7 @@ export async function getRandomQuestion(targetPageNumber?: number): Promise<Ques
       answerToken: signAnswer(verse.verse_key, missingCount, pageNumber),
       encryptedHiddenWords: encryptHiddenWords(hiddenWords),
       totalWords: wordCount,
-      pageElo: Math.round(pageEloRecord.elo),
+      pageElo: pageEloRecord ? Math.round(pageEloRecord.elo) : 1200,
     };
   }
 

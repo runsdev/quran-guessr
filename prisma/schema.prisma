@@ -17,6 +17,11 @@ model User {
   image         String?
   elo           Float     @default(1000)
   gamesPlayed   Int       @default(0)
+  mwcCorrect    Int       @default(0)
+  lvGames       Int       @default(0)
+  lvCorrect     Int       @default(0)
+  nvGames       Int       @default(0)
+  nvCorrect     Int       @default(0)
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
 
@@ -76,8 +81,10 @@ model DailyAttempt {
 }
 
 model PageElo {
-  id         String   @id @default(auto()) @map("_id") @db.ObjectId
-  pageNumber Int      @unique
-  elo        Float    @default(1000)
-  updatedAt  DateTime @updatedAt
+  id              String   @id @default(auto()) @map("_id") @db.ObjectId
+  pageNumber      Int      @unique
+  elo             Float    @default(1000)
+  totalAttempts   Int      @default(0)
+  correctAttempts Int      @default(0)
+  updatedAt       DateTime @updatedAt
 }

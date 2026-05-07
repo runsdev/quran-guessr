@@ -46,6 +46,12 @@ export function PageEloTable({ paged }: PageTableProps) {
             <th className="px-6 py-4 text-[11px] font-bold text-on-surface-variant uppercase tracking-widest">
               Difficulty
             </th>
+            <th className="px-6 py-4 text-[11px] font-bold text-on-surface-variant uppercase tracking-widest text-center">
+              Attempts
+            </th>
+            <th className="px-6 py-4 text-[11px] font-bold text-on-surface-variant uppercase tracking-widest text-center">
+              Correct %
+            </th>
             <th className="px-6 py-4 text-[11px] font-bold text-on-surface-variant uppercase tracking-widest">
               Last Updated
             </th>
@@ -99,6 +105,14 @@ export function PageEloTable({ paged }: PageTableProps) {
                   >
                     {difficulty.label}
                   </span>
+                </td>
+                <td className="px-6 py-5 text-sm text-on-surface-variant text-center tabular-nums">
+                  {entry.totalAttempts > 0 ? entry.totalAttempts.toLocaleString() : '—'}
+                </td>
+                <td className="px-6 py-5 text-sm font-semibold text-on-surface text-center tabular-nums">
+                  {entry.totalAttempts > 0
+                    ? `${Math.round((entry.correctAttempts / entry.totalAttempts) * 100)}%`
+                    : '—'}
                 </td>
                 <td className="px-6 py-5 text-sm text-on-surface-variant">
                   {new Date(entry.updatedAt).toLocaleDateString()}

@@ -17,7 +17,18 @@ export default async function LeaderboardPage() {
     where: { elo: { not: 1000 } },
     orderBy: { elo: 'desc' },
     take: 50,
-    select: { id: true, name: true, image: true, elo: true, gamesPlayed: true },
+    select: {
+      id: true,
+      name: true,
+      image: true,
+      elo: true,
+      gamesPlayed: true,
+      mwcCorrect: true,
+      lvGames: true,
+      lvCorrect: true,
+      nvGames: true,
+      nvCorrect: true,
+    },
   });
 
   const playerEntries = topUsers.map((u, idx) => ({
@@ -28,6 +39,11 @@ export default async function LeaderboardPage() {
     elo: Math.round(u.elo),
     eloChange: 0,
     gamesPlayed: u.gamesPlayed,
+    mwcCorrect: u.mwcCorrect,
+    lvGames: u.lvGames,
+    lvCorrect: u.lvCorrect,
+    nvGames: u.nvGames,
+    nvCorrect: u.nvCorrect,
   }));
 
   // ── Page ELO leaderboard (hardest pages first) ────────────────────────────
@@ -42,6 +58,8 @@ export default async function LeaderboardPage() {
     updatedAt: p.updatedAt,
     juz: getJuzForPage(p.pageNumber),
     surah: getSurahsForPage(p.pageNumber),
+    totalAttempts: p.totalAttempts,
+    correctAttempts: p.correctAttempts,
   }));
 
   // ── Stats ─────────────────────────────────────────────────────────────────

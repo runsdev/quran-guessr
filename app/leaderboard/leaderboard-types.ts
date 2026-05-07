@@ -8,6 +8,11 @@ export interface LeaderboardEntry {
   elo: number;
   eloChange: number;
   gamesPlayed: number;
+  mwcCorrect: number;
+  lvGames: number;
+  lvCorrect: number;
+  nvGames: number;
+  nvCorrect: number;
 }
 
 export interface PageEloEntry {
@@ -17,6 +22,8 @@ export interface PageEloEntry {
   updatedAt: Date;
   juz: number;
   surah: string;
+  totalAttempts: number;
+  correctAttempts: number;
 }
 
 export interface LeaderboardStats {
