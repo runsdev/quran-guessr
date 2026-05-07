@@ -3,7 +3,7 @@
  * Starting page (Medina Mushaf, King Fahad Complex edition) for each surah.
  * Index 0 is unused; index n corresponds to Surah n (1–114).
  */
-const SURAH_START_PAGES: readonly number[] = [
+export const SURAH_START_PAGES: readonly number[] = [
   0,                                                   // (unused)
   1,   2,   50,  77,  106, 128, 151, 177, 187, 208, // 1–10
   221, 235, 249, 255, 262, 267, 282, 293, 305, 312, // 11–20
@@ -20,7 +20,7 @@ const SURAH_START_PAGES: readonly number[] = [
 ];
 
 // prettier-ignore
-const SURAH_NAMES: readonly string[] = [
+export const SURAH_NAMES: readonly string[] = [
   '',
   'Al-Fatihah',    'Al-Baqarah',    "Ali 'Imran",    "An-Nisa'",      "Al-Ma'idah",   // 1–5
   "Al-An'am",      "Al-A'raf",      'Al-Anfal',      'At-Tawbah',     'Yunus',        // 6–10

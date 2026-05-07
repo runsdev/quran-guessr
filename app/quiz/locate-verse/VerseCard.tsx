@@ -4,7 +4,6 @@ interface VerseCardProps {
   verseWords: VerseWord[] | null;
   loading: boolean;
   error: boolean;
-  verseKey: string | null;
   loadedPages: Set<number>;
   onRetry: () => void;
 }
@@ -13,7 +12,6 @@ export default function VerseCard({
   verseWords,
   loading,
   error,
-  verseKey,
   loadedPages,
   onRetry,
 }: VerseCardProps) {
@@ -52,7 +50,6 @@ export default function VerseCard({
                 ) : (
                   <span
                     style={{ fontFamily: `p${word.page_number}-v2` }}
-                    // QCF glyph codes are private-use Unicode chars — safe to set via innerHTML
                     dangerouslySetInnerHTML={{ __html: word.code_v2 }}
                   />
                 )}{' '}
@@ -60,12 +57,6 @@ export default function VerseCard({
             );
           })}
         </p>
-      )}
-
-      {verseKey && (
-        <span className="absolute bottom-3 left-4 text-xs text-on-surface-variant/50 font-mono z-10">
-          {verseKey}
-        </span>
       )}
     </div>
   );

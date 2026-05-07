@@ -3,7 +3,7 @@ import React from 'react';
 import Image from 'next/image';
 
 const navItems = [
-  { label: 'Quiz', href: '/quiz/missing-word-count' },
+  { label: 'Quiz', href: '/quiz' },
   { label: 'Rankings', href: '/leaderboard' },
   { label: 'Profile', href: '/profile' },
 ];

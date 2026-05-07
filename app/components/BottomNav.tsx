@@ -1,7 +1,7 @@
 import React from 'react';
 
 const navItems = [
-  { icon: 'quiz', label: 'Quiz', active: true, href: '/quiz/missing-word-count' },
+  { icon: 'quiz', label: 'Quiz', active: true, href: '/quiz' },
   { icon: 'leaderboard', label: 'Rankings', active: false, href: '/leaderboard' },
   { icon: 'person', label: 'Profile', active: false, href: '/profile' },
 ];

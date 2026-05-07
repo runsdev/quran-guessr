@@ -48,20 +48,25 @@ export default function ChoicesGrid({
               className="quran-text text-on-background w-full"
               style={{ fontSize: '1.6rem', lineHeight: '2.8rem' }}
             >
-              {choice.words.map((word, wi) => (
-                <span key={word.id || wi}>
-                  {word.char_type_name === 'end' || !loadedPages.has(word.page_number) ? (
-                    <span style={{ fontFamily: "UthmanicHafs, 'Traditional Arabic', serif" }}>
-                      {word.text_qpc_hafs}
-                    </span>
-                  ) : (
-                    <span
-                      style={{ fontFamily: `p${word.page_number}-v2` }}
-                      dangerouslySetInnerHTML={{ __html: word.code_v2 }}
-                    />
-                  )}{' '}
-                </span>
-              ))}
+              {choice.words.map((word, wi) => {
+                if (word.char_type_name === 'end') {
+                  return null;
+                }
+                return (
+                  <span key={word.id || wi}>
+                    {!loadedPages.has(word.page_number) ? (
+                      <span style={{ fontFamily: "UthmanicHafs, 'Traditional Arabic', serif" }}>
+                        {word.text_qpc_hafs}
+                      </span>
+                    ) : (
+                      <span
+                        style={{ fontFamily: `p${word.page_number}-v2` }}
+                        dangerouslySetInnerHTML={{ __html: word.code_v2 }}
+                      />
+                    )}{' '}
+                  </span>
+                );
+              })}
             </p>
           </button>
         );

@@ -20,32 +20,41 @@ export function useQcfFontLoader(pageNumbers: number[]): Set<number> {
     }
     const pages = pageKey.split(',').map(Number);
 
-    Promise.all(
-      pages.map(async (page) => {
-        const fontName = `p${page}-v2`;
-        if (globalLoadedFonts.has(fontName)) {
-          return page;
-        }
-        try {
-          const fontFace = new FontFace(
-            fontName,
-            `url('${CDN_BASE}/fonts/quran/hafs/v2/woff2/p${page}.woff2')`,
-          );
-          fontFace.display = 'block';
-          await fontFace.load();
-          document.fonts.add(fontFace);
-          globalLoadedFonts.add(fontName);
-        } catch {
-          // silently fall back to Unicode rendering
-        }
-        return page;
-      }),
-    ).then((loaded) => {
-      setLoadedPages((prev) => {
-        const next = new Set(prev);
-        loaded.forEach((p) => next.add(p));
-        return next;
-      });
+    // Load each page font independently so each verse switches to QCF as soon
+    // as its own font is ready, rather than waiting for the slowest font.
+    pages.forEach(async (page) => {
+      const fontName = `p${page}-v2`;
+      if (globalLoadedFonts.has(fontName)) {
+        setLoadedPages((prev) => {
+          if (prev.has(page)) {
+            return prev;
+          }
+          const next = new Set(prev);
+          next.add(page);
+          return next;
+        });
+        return;
+      }
+      try {
+        const fontFace = new FontFace(
+          fontName,
+          `url('${CDN_BASE}/fonts/quran/hafs/v2/woff2/p${page}.woff2')`,
+        );
+        fontFace.display = 'block';
+        await fontFace.load();
+        document.fonts.add(fontFace);
+        globalLoadedFonts.add(fontName);
+        // Only mark as loaded after a successful load — failed fonts stay out
+        // of loadedPages so words fall back to UthmanicHafs rather than
+        // inheriting the parent .quran-text Scheherazade New font.
+        setLoadedPages((prev) => {
+          const next = new Set(prev);
+          next.add(page);
+          return next;
+        });
+      } catch {
+        // silently fall back to Unicode rendering for this page
+      }
     });
   }, [pageKey]);
 
