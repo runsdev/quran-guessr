@@ -1,4 +1,4 @@
-export type LeaderboardTab = 'player' | 'page';
+export type LeaderboardTab = 'player' | 'page' | 'daily';
 
 export interface LeaderboardEntry {
   rank: number;
@@ -38,4 +38,18 @@ export interface LeaderboardStats {
   hardestPageNumber: number | null;
   easiestPageNumber: number | null;
   totalPageEntries: number;
+  // Daily challenge stats
+  dailyDate: string;
+  dailyTopScore: number | null;
+  dailyCompletions: number;
+  currentUserDailyScore: number | null;
+}
+
+export interface DailyChallengeEntry {
+  rank: number;
+  userId: string;
+  name: string;
+  image: string | null;
+  totalScore: number;
+  completedAt: Date;
 }

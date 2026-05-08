@@ -1,3 +1,4 @@
+import { DailyStatsCards } from './leaderboard-daily-stats';
 import type { LeaderboardStats, LeaderboardTab } from './leaderboard-types';
 
 interface StatsCardsProps {
@@ -5,7 +6,7 @@ interface StatsCardsProps {
   tab: LeaderboardTab;
 }
 
-export default function LeaderboardStatsCards({ stats, tab }: StatsCardsProps) {
+function PlayerPageStatsCards({ stats, tab }: StatsCardsProps) {
   if (tab === 'player') {
     return (
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -98,4 +99,11 @@ export default function LeaderboardStatsCards({ stats, tab }: StatsCardsProps) {
       </div>
     </div>
   );
+}
+
+export default function LeaderboardStatsCards({ stats, tab }: StatsCardsProps) {
+  if (tab === 'daily') {
+    return <DailyStatsCards stats={stats} />;
+  }
+  return <PlayerPageStatsCards stats={stats} tab={tab} />;
 }

@@ -25,9 +25,10 @@ model User {
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
 
-  accounts      Account[]
-  sessions      Session[]
-  dailyAttempts DailyAttempt[]
+  accounts              Account[]
+  sessions              Session[]
+  dailyAttempts         DailyAttempt[]
+  dailyChallengeResults DailyChallengeResult[]
 }
 
 model Account {
@@ -87,4 +88,28 @@ model PageElo {
   totalAttempts   Int      @default(0)
   correctAttempts Int      @default(0)
   updatedAt       DateTime @updatedAt
+}
+
+model DailyChallenge {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  date      String   @unique // YYYY-MM-DD UTC
+  verseKeys String[] // exactly 5 verse keys
+  createdAt DateTime @default(now())
+
+  results DailyChallengeResult[]
+}
+
+model DailyChallengeResult {
+  id          String    @id @default(auto()) @map("_id") @db.ObjectId
+  challengeId String    @db.ObjectId
+  userId      String    @db.ObjectId
+  scores      Int[]     // server-computed score per question (grows 0→5)
+  totalScore  Int       @default(0)
+  completed   Boolean   @default(false)
+  completedAt DateTime?
+
+  challenge DailyChallenge @relation(fields: [challengeId], references: [id])
+  user      User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([challengeId, userId])
 }

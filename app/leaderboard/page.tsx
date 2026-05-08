@@ -3,6 +3,7 @@ import LeaderboardClient from './LeaderboardClient';
 import BottomNav from '@/app/components/BottomNav';
 import TopAppBar from '@/app/components/TopAppBar';
 import { auth } from '@/auth';
+import { getOrCreateDailyChallenge, getUtcDateStr } from '@/lib/daily-challenge';
 import { prisma } from '@/lib/prisma';
 import { getJuzForPage, getSurahsForPage } from '@/lib/quran-pages';
 
@@ -62,6 +63,28 @@ export default async function LeaderboardPage() {
     correctAttempts: p.correctAttempts,
   }));
 
+  // ── Daily Challenge leaderboard ───────────────────────────────────────────
+  const today = getUtcDateStr();
+  const dailyChallenge = await getOrCreateDailyChallenge(today);
+
+  const dailyResults = await prisma.dailyChallengeResult.findMany({
+    where: { challengeId: dailyChallenge.id, completed: true },
+    orderBy: [{ totalScore: 'desc' }, { completedAt: 'asc' }],
+    take: 50,
+    include: {
+      user: { select: { name: true, image: true } },
+    },
+  });
+
+  const dailyEntries = dailyResults.map((r, idx) => ({
+    rank: idx + 1,
+    userId: r.userId,
+    name: r.user.name ?? 'Anonymous',
+    image: r.user.image ?? null,
+    totalScore: r.totalScore,
+    completedAt: r.completedAt!,
+  }));
+
   // ── Stats ─────────────────────────────────────────────────────────────────
   const currentEntry = currentUserId
     ? playerEntries.find((e) => e.userId === currentUserId)
@@ -91,6 +114,12 @@ export default async function LeaderboardPage() {
     hardestPageNumber: pageEntries[0]?.pageNumber ?? null,
     easiestPageNumber: pageEntries[pageEntries.length - 1]?.pageNumber ?? null,
     totalPageEntries: pageEntries.length,
+    dailyDate: today,
+    dailyTopScore: dailyEntries[0]?.totalScore ?? null,
+    dailyCompletions: dailyEntries.length,
+    currentUserDailyScore: currentUserId
+      ? (dailyEntries.find((e) => e.userId === currentUserId)?.totalScore ?? null)
+      : null,
   };
 
   return (
@@ -99,6 +128,7 @@ export default async function LeaderboardPage() {
       <LeaderboardClient
         playerEntries={playerEntries}
         pageEntries={pageEntries}
+        dailyEntries={dailyEntries}
         currentUserId={currentUserId}
         stats={stats}
       />

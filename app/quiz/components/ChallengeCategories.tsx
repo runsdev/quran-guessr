@@ -14,6 +14,27 @@ export default function ChallengeCategories({ rankedLimitReached, openModal }: P
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 md:gap-8 relative z-10">
+        {/* Daily Challenge */}
+        <a
+          href="/quiz/locate-verse/daily"
+          className="bg-surface-container/50 border border-primary/20 p-6 rounded-2xl hover:bg-surface-container hover:border-primary/40 transition-all duration-300 group hover:-translate-y-1 text-left w-full relative overflow-hidden"
+        >
+          <div className="absolute top-2 right-2">
+            <span className="text-[10px] font-bold uppercase tracking-widest text-primary bg-primary/10 border border-primary/20 px-2 py-0.5 rounded-full">
+              Daily
+            </span>
+          </div>
+          <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center mb-5 group-hover:bg-primary/20 transition-colors duration-300">
+            <span className="material-symbols-outlined text-primary">calendar_today</span>
+          </div>
+          <h5 className="font-bold text-white mb-2 group-hover:text-primary transition-colors">
+            Daily Verse Quest
+          </h5>
+          <p className="text-sm text-on-surface-variant leading-relaxed">
+            5 verses · same for everyone · new challenge each day.
+          </p>
+        </a>
+
         {/* Verse Quest */}
         <button
           onClick={() => openModal('/quiz/next-verse')}
