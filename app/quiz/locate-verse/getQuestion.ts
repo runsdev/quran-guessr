@@ -3,15 +3,22 @@ import type { Question, VerseWord } from './types';
 
 import { SURAH_NAMES } from '@/lib/quran-pages';
 
+interface RawWord extends VerseWord {
+  // eslint-disable-next-line @typescript-eslint/naming-convention
+  page_number: number;
+  // eslint-disable-next-line @typescript-eslint/naming-convention
+  line_number: number;
+}
+
 interface QuranVerseResponse {
   verse: {
     // eslint-disable-next-line @typescript-eslint/naming-convention
     verse_key: string;
-    words: VerseWord[];
+    words: RawWord[];
   };
 }
 
-async function fetchRandomVerse(): Promise<{ verseKey: string; words: VerseWord[] }> {
+async function fetchRandomVerse(): Promise<{ verseKey: string; words: RawWord[] }> {
   const { signal } = new AbortController();
   const res = await fetch(
     'https://api.quran.com/api/v4/verses/random?words=true' +
@@ -33,14 +40,23 @@ export async function getRandomQuestion(): Promise<Question> {
   const correctPage = firstWord?.page_number ?? words[0].page_number;
   const correctLine = firstWord?.line_number ?? 1;
 
+  const fontPages = [...new Set(words.map((w) => w.page_number))];
+
+  // Strip page_number and line_number before sending to the client — they reveal the answer.
+  const verseWords: VerseWord[] = words.map(
+    // eslint-disable-next-line @typescript-eslint/naming-convention, @typescript-eslint/no-unused-vars
+    ({ page_number: _p, line_number: _l, ...word }) => word,
+  );
+
   const [surahStr] = verseKey.split(':');
   const surahNum = parseInt(surahStr, 10);
   const surahName = SURAH_NAMES[surahNum] ?? `Surah ${surahNum}`;
 
   return {
     encryptedVerseKey: encryptVerseKey(verseKey),
-    verseWords: words,
+    verseWords,
     verseReference: `${surahName} · ${verseKey}`,
     answerToken: signAnswer(verseKey, correctPage, correctLine),
+    fontPages,
   };
 }

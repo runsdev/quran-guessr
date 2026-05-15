@@ -35,3 +35,12 @@ export interface SubmitResult {
   /** Whether this attempt counted as ranked (false for anonymous or daily-limit exceeded). */
   ranked: boolean;
 }
+
+export interface SessionInitResult {
+  sessionToken: string;
+  question: Question;
+  questionNumber: number;
+  totalScore: number;
+  initialTimeLeft: number;
+  submitResult: SubmitResult | null;
+}

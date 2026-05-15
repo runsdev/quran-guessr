@@ -1,11 +1,15 @@
-import { useState, useTransition, useMemo, useEffect } from 'react';
+'use client';
 
-import { initSession, fetchNextQuestion, submitAnswer, TIMER_LIMIT } from './actions';
+import { useTransition, useState, useMemo, useEffect } from 'react';
+
+import { initSession, fetchNextQuestion, submitAnswer } from './actions';
+import type { Option } from './AnswerGrid';
 import type { Question, SubmitResult } from './types';
 
-const SESSION_KEY = 'quizSession:locate-verse';
+const SESSION_KEY = 'quizSession:missing-word-count';
+const TIMER_LIMIT = 90;
 
-export function useQuizState() {
+export function useMissingWordCountState() {
   const [sessionToken, setSessionToken] = useState<string | null>(null);
   const [isInitializing, setIsInitializing] = useState(true);
   const [initError, setInitError] = useState(false);
@@ -13,11 +17,9 @@ export function useQuizState() {
   const [question, setQuestion] = useState<Question | null>(null);
   const [isPending, startTransition] = useTransition();
   const [fetchError, setFetchError] = useState(false);
-  const [selectedPage, setSelectedPage] = useState<number | null>(null);
-  const [selectedLine, setSelectedLine] = useState<number | null>(null);
+  const [selected, setSelected] = useState<Option | null>(null);
   const [submitResult, setSubmitResult] = useState<SubmitResult | null>(null);
   const [questionNumber, setQuestionNumber] = useState(1);
-  const [totalScore, setTotalScore] = useState(0);
   const [initialTimeLeft, setInitialTimeLeft] = useState(TIMER_LIMIT);
 
   useEffect(() => {
@@ -28,7 +30,6 @@ export function useQuizState() {
         setSessionToken(data.sessionToken);
         setQuestion(data.question);
         setQuestionNumber(data.questionNumber);
-        setTotalScore(data.totalScore);
         setInitialTimeLeft(data.initialTimeLeft);
         if (data.submitResult) {
           setSubmitResult(data.submitResult);
@@ -41,14 +42,27 @@ export function useQuizState() {
       });
   }, []);
 
-  const handleSubmit = () => {
-    if (
-      !sessionToken ||
-      selectedPage === null ||
-      selectedLine === null ||
-      !question ||
-      submitResult !== null
-    ) {
+  const submitted = submitResult !== null;
+  const isCorrect = submitResult?.isCorrect ?? false;
+  const timedOut = selected === null && submitted;
+  const displayPageElo = submitResult?.newPageElo ?? question?.pageElo ?? null;
+
+  const pageNumbers = useMemo(() => {
+    const nums: number[] = [];
+    question?.segments.forEach((seg) => {
+      if (seg.type === 'words') {
+        seg.words.forEach((w) => {
+          if (w.page_number !== undefined) {
+            nums.push(w.page_number);
+          }
+        });
+      }
+    });
+    return [...new Set(nums)];
+  }, [question]);
+
+  const doSubmit = (guess: number) => {
+    if (!sessionToken || !question || submitted) {
       return;
     }
     startTransition(async () => {
@@ -57,44 +71,24 @@ export function useQuizState() {
           sessionToken,
           question.encryptedVerseKey,
           question.answerToken,
-          selectedPage,
-          selectedLine,
+          guess,
+          question.encryptedHiddenWords,
         );
         setSubmitResult(result);
-        setTotalScore((s) => s + result.roundScore);
       } catch {
         setFetchError(true);
       }
     });
   };
 
-  const handleTimerExpire = () => {
-    if (!sessionToken || !question || submitResult !== null) {
-      return;
-    }
-    startTransition(async () => {
-      try {
-        const result = await submitAnswer(
-          sessionToken,
-          question.encryptedVerseKey,
-          question.answerToken,
-          selectedPage ?? 0,
-          selectedLine ?? 0,
-        );
-        setSubmitResult(result);
-        setTotalScore((s) => s + result.roundScore);
-      } catch {
-        setFetchError(true);
-      }
-    });
-  };
+  const handleTimerExpire = () => doSubmit(0);
+  const handleSubmit = () => doSubmit(selected ?? 0);
 
   const handleNext = () => {
     if (!sessionToken) {
       return;
     }
-    setSelectedPage(null);
-    setSelectedLine(null);
+    setSelected(null);
     setSubmitResult(null);
     setQuestion(null);
     startTransition(async () => {
@@ -126,27 +120,24 @@ export function useQuizState() {
     });
   };
 
-  const submitted = submitResult !== null;
-  const pageNumbers = useMemo(() => question?.fontPages ?? [], [question]);
-
   return {
     isInitializing,
     initError,
     question,
     isPending,
     fetchError,
-    selectedPage,
-    selectedLine,
+    selected,
+    setSelected,
     submitResult,
     questionNumber,
-    totalScore,
-    submitted,
-    pageNumbers,
     initialTimeLeft,
-    setSelectedPage,
-    setSelectedLine,
-    handleSubmit,
+    submitted,
+    isCorrect,
+    timedOut,
+    displayPageElo,
+    pageNumbers,
     handleTimerExpire,
+    handleSubmit,
     handleNext,
     handleRetry,
   };

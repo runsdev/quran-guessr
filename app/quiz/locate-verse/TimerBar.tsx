@@ -11,10 +11,16 @@ function formatTime(seconds: number): string {
 interface TimerBarProps {
   submitted: boolean;
   onExpire: () => void;
+  /** Remaining seconds when the timer is first mounted. Defaults to TIMER_LIMIT. */
+  initialTimeLeft?: number;
 }
 
-export default function TimerBar({ submitted, onExpire }: TimerBarProps) {
-  const [timeLeft, setTimeLeft] = useState(TIMER_LIMIT);
+export default function TimerBar({
+  submitted,
+  onExpire,
+  initialTimeLeft = TIMER_LIMIT,
+}: TimerBarProps) {
+  const [timeLeft, setTimeLeft] = useState(initialTimeLeft);
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const onExpireRef = useRef(onExpire);
 
