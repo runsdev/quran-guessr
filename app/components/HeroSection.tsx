@@ -24,12 +24,6 @@ const HeroSection = (): React.JSX.Element => (
 
     {/* Content */}
     <div className="relative z-10 max-w-4xl w-full text-center space-y-(--spacing-lg)">
-      {/* Badge */}
-      <div className="inline-flex items-center px-4 py-1.5 rounded-full bg-primary-container/10 border border-primary-container/20 text-primary text-sm mb-(--spacing-xs)">
-        <span className="material-symbols-outlined text-[18px] mr-2">stars</span>
-        Newly Updated Challenges
-      </div>
-
       <h1 className="text-4xl lg:text-6xl font-bold tracking-tight text-on-surface leading-tight">
         Master the <span className="text-primary">Holy Quran</span> Through Interactive Learning
       </h1>

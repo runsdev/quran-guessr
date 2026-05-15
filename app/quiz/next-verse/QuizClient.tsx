@@ -5,6 +5,7 @@ import { useTransition, useState, useMemo } from 'react';
 import ActionRow from './ActionRow';
 import { fetchNextQuestion, submitAnswer } from './actions';
 import ChoicesGrid from './ChoicesGrid';
+import QuizProgressHeader from './QuizProgressHeader';
 import type { Question, SubmitResult } from './types';
 import VerseCard from './VerseCard';
 
@@ -75,8 +76,18 @@ export default function QuizClient({ initialQuestion }: QuizClientProps) {
 
   const pageNumbers = useMemo(() => {
     const nums: number[] = [];
-    question?.verseWords.forEach((w) => nums.push(w.page_number));
-    question?.choices.forEach((c) => c.words.forEach((w) => nums.push(w.page_number)));
+    question?.verseWords.forEach((w) => {
+      if (w.page_number !== undefined) {
+        nums.push(w.page_number);
+      }
+    });
+    question?.choices.forEach((c) =>
+      c.words.forEach((w) => {
+        if (w.page_number !== undefined) {
+          nums.push(w.page_number);
+        }
+      }),
+    );
     return [...new Set(nums)];
   }, [question]);
   const loadedPages = useQcfFontLoader(pageNumbers);
@@ -85,31 +96,12 @@ export default function QuizClient({ initialQuestion }: QuizClientProps) {
     <>
       <TopAppBar activeTab="Quiz" />
       <main className="flex-1 flex flex-col px-5 max-w-3xl mx-auto w-full gap-6 justify-center min-h-screen pt-16 pb-24 md:pb-8">
-        {/* Header row */}
-        <div className="w-full flex justify-between items-center">
-          <div className="flex flex-col gap-1">
-            <span className="text-xs font-medium text-on-surface-variant uppercase tracking-wider">
-              {question?.verseReference ?? 'Next Verse'}
-            </span>
-            <span className="text-base font-medium text-on-background">
-              Question {questionNumber}
-            </span>
-          </div>
-          <div className="flex items-center gap-2 bg-surface-container-high rounded-full px-4 py-2 border border-outline-variant">
-            <span className="material-symbols-outlined text-primary" style={{ fontSize: 18 }}>
-              workspace_premium
-            </span>
-            <span className="text-sm font-semibold text-primary">{masteryPercent}% Mastery</span>
-          </div>
-        </div>
-
-        {/* Progress bar */}
-        <div className="w-full h-2 bg-surface-container-highest rounded-full overflow-hidden">
-          <div
-            className="h-full bg-primary-container rounded-full transition-all duration-500"
-            style={{ width: progressWidth }}
-          />
-        </div>
+        <QuizProgressHeader
+          verseReference={question?.verseReference ?? null}
+          questionNumber={questionNumber}
+          masteryPercent={masteryPercent}
+          progressWidth={progressWidth}
+        />
 
         {/* Verse display */}
         <VerseCard

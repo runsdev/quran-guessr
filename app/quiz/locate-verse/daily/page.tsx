@@ -37,8 +37,11 @@ async function fetchVerseByKey(
 async function buildQuestion(verseKey: string): Promise<Question> {
   const { words } = await fetchVerseByKey(verseKey);
   const firstWord = words.find((w) => w.char_type_name !== 'end');
-  const correctPage = firstWord?.page_number ?? words[0].page_number;
+  const correctPage = firstWord?.page_number ?? words[0]?.page_number ?? 1;
   const correctLine = firstWord?.line_number ?? 1;
+  const fontPages = [
+    ...new Set(words.map((w) => w.page_number).filter((p): p is number => p !== undefined)),
+  ];
   const [surahStr] = verseKey.split(':');
   const surahNum = parseInt(surahStr, 10);
   const surahName = SURAH_NAMES[surahNum] ?? `Surah ${surahNum}`;
@@ -46,6 +49,7 @@ async function buildQuestion(verseKey: string): Promise<Question> {
     encryptedVerseKey: encryptVerseKey(verseKey),
     verseWords: words,
     verseReference: `${surahName} · ${verseKey}`,
+    fontPages,
     answerToken: signAnswer(verseKey, correctPage, correctLine),
   };
 }

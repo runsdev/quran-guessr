@@ -6,8 +6,8 @@ interface TimerBarProps {
   onExpire: () => void;
 }
 
-function timeLimitFor(totalWords: number): number {
-  return 60 + (totalWords > 10 ? 5 * totalWords : 0);
+function timeLimitFor(): number {
+  return 90;
 }
 
 function formatTime(seconds: number): string {
@@ -16,8 +16,8 @@ function formatTime(seconds: number): string {
   return `${m}:${String(s).padStart(2, '0')}`;
 }
 
-export default function TimerBar({ totalWords, submitted, onExpire }: TimerBarProps) {
-  const limit = timeLimitFor(totalWords);
+export default function TimerBar({ submitted, onExpire }: TimerBarProps) {
+  const limit = timeLimitFor();
   const [timeLeft, setTimeLeft] = useState(limit);
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const onExpireRef = useRef(onExpire);

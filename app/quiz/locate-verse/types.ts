@@ -3,12 +3,14 @@ import type { VerseWord } from '@/app/quiz/types';
 
 export interface Question {
   encryptedVerseKey: string;
-  /** QCF V2 word objects for the verse to display. */
+  /** QCF V2 word objects for the verse to display (page_number and line_number stripped). */
   verseWords: VerseWord[];
   /** Human-readable reference revealed after submission (e.g. "Al-Baqarah · 2:255"). */
   verseReference: string;
   /** HMAC-signed token encoding the correct page and line. */
   answerToken: string;
+  /** Unique page numbers the verse spans — used only to load QCF fonts. */
+  fontPages: number[];
 }
 
 export interface SubmitResult {

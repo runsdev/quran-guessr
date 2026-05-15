@@ -77,7 +77,11 @@ export default function QuizClient({ initialQuestion }: QuizClientProps) {
     const nums: number[] = [];
     question?.segments.forEach((seg) => {
       if (seg.type === 'words') {
-        seg.words.forEach((w) => nums.push(w.page_number));
+        seg.words.forEach((w) => {
+          if (w.page_number !== undefined) {
+            nums.push(w.page_number);
+          }
+        });
       }
     });
     return [...new Set(nums)];

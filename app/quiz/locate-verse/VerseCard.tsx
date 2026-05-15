@@ -43,7 +43,7 @@ export default function VerseCard({
             }
             return (
               <span key={word.id || i}>
-                {!loadedPages.has(word.page_number) ? (
+                {word.page_number == null || !loadedPages.has(word.page_number) ? (
                   <span style={{ fontFamily: "UthmanicHafs, 'Traditional Arabic', serif" }}>
                     {word.text_qpc_hafs}
                   </span>

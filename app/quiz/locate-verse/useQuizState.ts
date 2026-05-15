@@ -77,10 +77,7 @@ export function useQuizState(initialQuestion: Question) {
 
   const submitted = submitResult !== null;
 
-  const pageNumbers = useMemo(() => {
-    const nums = question?.verseWords.map((w) => w.page_number).filter(Boolean) ?? [];
-    return [...new Set(nums)] as number[];
-  }, [question]);
+  const pageNumbers = useMemo(() => question?.fontPages ?? [], [question]);
 
   return {
     question,
