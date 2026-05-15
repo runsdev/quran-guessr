@@ -1,6 +1,7 @@
 import { useState, useTransition, useMemo, useEffect } from 'react';
 
-import { initSession, fetchNextQuestion, submitAnswer, TIMER_LIMIT } from './actions';
+import { initSession, fetchNextQuestion, submitAnswer } from './actions';
+import { TIMER_LIMIT } from './types';
 import type { Question, SubmitResult } from './types';
 
 const SESSION_KEY = 'quizSession:locate-verse';

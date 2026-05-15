@@ -3,6 +3,7 @@
 import { decryptVerseKey, verifyAnswer } from './answerToken';
 import { getRandomQuestion } from './getQuestion';
 import type { Question, SubmitResult } from './types';
+import { TIMER_LIMIT } from './types';
 
 import { auth } from '@/auth';
 import { prisma } from '@/lib/prisma';
@@ -13,7 +14,6 @@ import {
   saveQuizSubmitResult,
 } from '@/lib/quiz-session';
 
-export const TIMER_LIMIT = 90;
 const GAME_MODE = 'locate-verse' as const;
 
 export interface SessionInitResult {

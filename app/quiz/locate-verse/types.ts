@@ -1,3 +1,5 @@
+export const TIMER_LIMIT = 90;
+
 export type { VerseWord } from '@/app/quiz/types';
 import type { VerseWord } from '@/app/quiz/types';
 
