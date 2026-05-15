@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 interface Props {
   userName: string;
   elo: number;
@@ -6,7 +7,7 @@ interface Props {
   dailyRankedLimit: number;
 }
 
-const STREAK_GOAL = 16;
+const STREAK_GOAL = 1;
 
 export default function DashboardHeader({
   userName,
@@ -17,7 +18,6 @@ export default function DashboardHeader({
 }: Props) {
   const circumference = 2 * Math.PI * 20;
   const streakOffset = circumference - circumference * Math.min(streak / STREAK_GOAL, 1);
-  const dailyFull = dailyRankedCount >= dailyRankedLimit;
 
   return (
     <section
@@ -96,34 +96,6 @@ export default function DashboardHeader({
                 {streak >= STREAK_GOAL
                   ? 'Goal reached!'
                   : `${STREAK_GOAL - streak} sessions to goal`}
-              </p>
-            </div>
-          </div>
-
-          <div className="w-px h-12 bg-white/10 hidden md:block" />
-
-          {/* Daily Ranked */}
-          <div className="flex items-center gap-4 px-4">
-            <div
-              className={`w-12 h-12 rounded-full flex items-center justify-center border ${
-                dailyFull ? 'bg-error/20 border-error/30' : 'bg-secondary/20 border-secondary/30'
-              }`}
-            >
-              <span
-                className={`material-symbols-outlined ${dailyFull ? 'text-error' : 'text-secondary'}`}
-              >
-                leaderboard
-              </span>
-            </div>
-            <div>
-              <p className="text-xs text-on-surface-variant uppercase tracking-wider font-semibold mb-1">
-                Ranked Today
-              </p>
-              <p className={`text-2xl font-bold ${dailyFull ? 'text-error' : 'text-white'}`}>
-                {dailyRankedCount}
-                <span className="text-sm font-normal text-on-surface-variant">
-                  /{dailyRankedLimit}
-                </span>
               </p>
             </div>
           </div>

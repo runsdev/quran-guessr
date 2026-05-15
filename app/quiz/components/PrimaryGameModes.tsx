@@ -54,7 +54,7 @@ export default function PrimaryGameModes({
               </div>
             </div>
             <h4 className="text-2xl font-bold mb-3 text-white group-hover:text-primary transition-colors duration-300">
-              Ranked Match
+              Missing Word Count
             </h4>
             <p className="text-on-surface-variant mb-10 leading-relaxed">
               Climb the global leaderboard. Guess the missing word count — every answer affects your
@@ -72,15 +72,15 @@ export default function PrimaryGameModes({
                 </span>
               </div>
               <span className="bg-primary text-on-primary-container px-6 py-2.5 rounded-lg font-bold text-sm group-hover:shadow-[0_0_20px_rgba(106,215,222,0.4)] group-hover:scale-105 transition-all duration-300 inline-block">
-                {rankedLimitReached ? 'Limit Reached' : 'Enter Arena'}
+                {rankedLimitReached ? 'Limit Reached' : 'Start'}
               </span>
             </div>
           </div>
         </button>
 
-        {/* Next Verse */}
+        {/* Daily */}
         <button
-          onClick={() => openModal('/quiz/next-verse')}
+          onClick={() => openModal('/quiz/locate-verse/daily')}
           className="group relative bg-linear-to-br from-surface-container to-surface-container-lowest border border-white/5 hover:border-tertiary/40 rounded-2xl p-8 transition-all duration-500 hover:shadow-[0_10px_40px_-10px_rgba(188,199,222,0.15)] hover:-translate-y-1 overflow-hidden flex flex-col text-left w-full"
         >
           <div className="absolute inset-0 bg-linear-to-br from-tertiary/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
@@ -96,25 +96,25 @@ export default function PrimaryGameModes({
                 </span>
               </div>
               <span className="bg-slate-800/80 border border-slate-700 text-slate-300 px-3 py-1.5 rounded-full text-[11px] font-bold uppercase tracking-widest backdrop-blur-sm">
-                Casual
+                Daily Casual
               </span>
             </div>
             <h4 className="text-2xl font-bold mb-3 text-white group-hover:text-tertiary transition-colors duration-300">
-              Next Verse
+              Locate the Verse
             </h4>
             <p className="text-on-surface-variant mb-10 leading-relaxed">
-              Given an Ayah, identify which verse comes next. A pure memory test with no ELO
-              pressure.
+              Given an Ayah, identify where it appears in the Quran. No pressure — just a daily
+              challenge to sharpen your skills.
             </p>
             <div className="mt-auto flex items-center justify-between bg-black/20 rounded-xl p-4 border border-white/5 backdrop-blur-sm">
               <div className="flex items-center gap-3">
                 <span className="material-symbols-outlined text-tertiary/70">shuffle</span>
                 <span className="text-sm font-medium text-white">
-                  Mode: <span className="text-tertiary font-bold">Free Play</span>
+                  Mode: <span className="text-tertiary font-bold">Daily Free Play</span>
                 </span>
               </div>
               <span className="border border-tertiary/50 text-tertiary px-6 py-2.5 rounded-lg font-bold text-sm group-hover:bg-tertiary/10 group-hover:border-tertiary group-hover:scale-105 transition-all duration-300 inline-block">
-                Start Session
+                Start
               </span>
             </div>
           </div>
