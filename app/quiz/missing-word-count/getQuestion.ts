@@ -128,3 +128,24 @@ export async function getRandomQuestion(targetPageNumber?: number): Promise<Ques
 
   throw new Error('Could not find a suitable verse after multiple attempts');
 }
+
+export async function getAdaptiveQuestion(userId: string | null): Promise<Question> {
+  if (!userId) {
+    return getRandomQuestion();
+  }
+
+  const user = await prisma.user.findUnique({ where: { id: userId }, select: { elo: true } });
+  const userElo = user?.elo ?? 1000;
+
+  const matchingPages = await prisma.pageElo.findMany({
+    where: { elo: { gte: userElo - 200, lte: userElo + 200 } },
+    select: { pageNumber: true },
+  });
+
+  const targetPage =
+    matchingPages.length > 0
+      ? matchingPages[Math.floor(Math.random() * matchingPages.length)].pageNumber
+      : undefined;
+
+  return getRandomQuestion(targetPage);
+}

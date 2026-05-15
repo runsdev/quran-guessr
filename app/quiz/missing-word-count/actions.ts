@@ -1,46 +1,86 @@
 'use server';
 
 import { verifyAnswer, decryptVerseKey, decryptHiddenWords } from './answerToken';
-import { getRandomQuestion } from './getQuestion';
-import type { Question, SubmitResult } from './types';
+import { getAdaptiveQuestion } from './getQuestion';
+import type { Question, SubmitResult, SessionInitResult } from './types';
+import { updateRankedElo } from './updateRankedElo';
 
 import type { VerseWord } from '@/app/quiz/types';
 import { auth } from '@/auth';
-import { computeElo } from '@/lib/elo';
 import { prisma } from '@/lib/prisma';
+import {
+  createQuizSession,
+  getActiveQuizSession,
+  advanceQuizSession,
+  saveQuizSubmitResult,
+} from '@/lib/quiz-session';
 
 const DAILY_RANKED_LIMIT = 20;
+const TIMER_LIMIT = 90;
+const GAME_MODE = 'missing-word-count' as const;
 
-/** UTC date string YYYY-MM-DD */
-function todayUtc(): string {
-  return new Date().toISOString().slice(0, 10);
-}
-
-export async function fetchNextQuestion(): Promise<Question> {
+export async function initSession(sessionToken?: string): Promise<SessionInitResult> {
   const session = await auth();
   const userId = (session?.user as { id?: string } | undefined)?.id ?? null;
 
-  let targetPageNumber: number | undefined;
+  if (sessionToken) {
+    const existing = await getActiveQuizSession(sessionToken);
+    if (existing) {
+      const elapsed = Math.floor((Date.now() - existing.questionStartedAt.getTime()) / 1000);
+      const submitResult = existing.submitResult as SubmitResult | null;
+      const initialTimeLeft =
+        submitResult !== null ? existing.timerLimit : Math.max(0, existing.timerLimit - elapsed);
 
-  if (userId) {
-    const user = await prisma.user.findUnique({ where: { id: userId }, select: { elo: true } });
-    const userElo = user?.elo ?? 1000;
-
-    // Adaptive selection: find a page within ±200 ELO of the player
-    const matchingPages = await prisma.pageElo.findMany({
-      where: { elo: { gte: userElo - 200, lte: userElo + 200 } },
-      select: { pageNumber: true },
-    });
-
-    if (matchingPages.length > 0) {
-      targetPageNumber = matchingPages[Math.floor(Math.random() * matchingPages.length)].pageNumber;
+      return {
+        sessionToken,
+        question: existing.currentQuestion as unknown as Question,
+        questionNumber: existing.questionNumber,
+        totalScore: existing.totalScore,
+        initialTimeLeft,
+        submitResult,
+      };
     }
   }
 
-  return getRandomQuestion(targetPageNumber);
+  const question = await getAdaptiveQuestion(userId);
+  const record = await createQuizSession({
+    userId,
+    gameMode: GAME_MODE,
+    question,
+    timerLimit: TIMER_LIMIT,
+  });
+
+  return {
+    sessionToken: record.token,
+    question,
+    questionNumber: 1,
+    totalScore: 0,
+    initialTimeLeft: TIMER_LIMIT,
+    submitResult: null,
+  };
+}
+
+export async function fetchNextQuestion(
+  sessionToken: string,
+): Promise<{ question: Question; questionNumber: number }> {
+  const session = await auth();
+  const userId = (session?.user as { id?: string } | undefined)?.id ?? null;
+
+  const existing = await getActiveQuizSession(sessionToken);
+  if (!existing) {
+    throw new Error('Session not found or expired');
+  }
+
+  const question = await getAdaptiveQuestion(userId);
+  const questionNumber = existing.questionNumber + 1;
+
+  await advanceQuizSession(sessionToken, { question, questionNumber, timerLimit: TIMER_LIMIT });
+
+  return { question, questionNumber };
 }
 
 export async function submitAnswer(
+  sessionToken: string,
   encryptedVerseKey: string,
   answerToken: string,
   guess: number,
@@ -55,30 +95,29 @@ export async function submitAnswer(
   const { missingCount: correctAnswer, pageNumber } = verified;
   const isCorrect = guess === correctAnswer;
 
-  // Read the page ELO record (created lazily on first ranked submit below).
-  // Using findUnique here avoids any upsert that could overwrite accumulated stats.
   const existingPageElo = await prisma.pageElo.findUnique({ where: { pageNumber } });
   const currentPageElo = existingPageElo?.elo ?? 1200;
 
   const session = await auth();
   const userId = (session?.user as { id?: string } | undefined)?.id ?? null;
 
-  // ── Anonymous: no ELO updates at all (fix #1) ───────────────────────────
+  const unranked: SubmitResult = {
+    isCorrect,
+    correctAnswer,
+    verseKey,
+    hiddenWords,
+    userEloDelta: null,
+    newUserElo: null,
+    newPageElo: currentPageElo,
+    ranked: false,
+  };
+
   if (!userId) {
-    return {
-      isCorrect,
-      correctAnswer,
-      verseKey,
-      hiddenWords,
-      userEloDelta: null,
-      newUserElo: null,
-      newPageElo: currentPageElo,
-      ranked: false,
-    };
+    await saveQuizSubmitResult(sessionToken, unranked, isCorrect ? 1 : 0);
+    return unranked;
   }
 
-  // ── Authenticated: check daily rate limit (fix #8) ───────────────────────
-  const today = todayUtc();
+  const today = new Date().toISOString().slice(0, 10);
   const daily = await prisma.dailyAttempt.upsert({
     // eslint-disable-next-line @typescript-eslint/naming-convention
     where: { userId_date: { userId, date: today } },
@@ -87,67 +126,22 @@ export async function submitAnswer(
   });
 
   if (daily.count >= DAILY_RANKED_LIMIT) {
-    return {
-      isCorrect,
-      correctAnswer,
-      verseKey,
-      hiddenWords,
-      userEloDelta: null,
-      newUserElo: null,
-      newPageElo: currentPageElo,
-      ranked: false,
-    };
+    await saveQuizSubmitResult(sessionToken, unranked, isCorrect ? 1 : 0);
+    return unranked;
   }
 
-  // ── Ranked attempt: compute and persist ELO (fixes #1, #4) ──────────────
-  const user = await prisma.user.findUnique({
-    where: { id: userId },
-    select: { elo: true, gamesPlayed: true },
-  });
-  const currentUserElo = user?.elo ?? 1000;
-  const gamesPlayed = user?.gamesPlayed ?? 0;
+  const eloResult = await updateRankedElo(userId, pageNumber, isCorrect, today, currentPageElo);
 
-  const result = computeElo(currentUserElo, currentPageElo, isCorrect, gamesPlayed);
-
-  await prisma.$transaction([
-    prisma.user.update({
-      where: { id: userId },
-      data: {
-        elo: result.newUserElo,
-        gamesPlayed: { increment: 1 },
-        ...(isCorrect ? { mwcCorrect: { increment: 1 } } : {}),
-      },
-    }),
-    // upsert so the record is created on first ranked attempt (getQuestion.ts no longer writes)
-    prisma.pageElo.upsert({
-      where: { pageNumber },
-      create: {
-        pageNumber,
-        elo: result.newPageElo,
-        totalAttempts: 1,
-        correctAttempts: isCorrect ? 1 : 0,
-      },
-      update: {
-        elo: result.newPageElo,
-        totalAttempts: { increment: 1 },
-        ...(isCorrect ? { correctAttempts: { increment: 1 } } : {}),
-      },
-    }),
-    prisma.dailyAttempt.update({
-      // eslint-disable-next-line @typescript-eslint/naming-convention
-      where: { userId_date: { userId, date: today } },
-      data: { count: { increment: 1 } },
-    }),
-  ]);
-
-  return {
+  const submitResult: SubmitResult = {
     isCorrect,
     correctAnswer,
     verseKey,
     hiddenWords,
-    userEloDelta: result.userDelta,
-    newUserElo: result.newUserElo,
-    newPageElo: result.newPageElo,
+    userEloDelta: eloResult.userDelta,
+    newUserElo: eloResult.newUserElo,
+    newPageElo: eloResult.newPageElo,
     ranked: true,
   };
+  await saveQuizSubmitResult(sessionToken, submitResult, isCorrect ? 1 : 0);
+  return submitResult;
 }

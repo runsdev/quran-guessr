@@ -4,10 +4,14 @@ interface TimerBarProps {
   totalWords: number;
   submitted: boolean;
   onExpire: () => void;
+  /** Remaining seconds when the timer is first mounted. Defaults to 90. */
+  initialTimeLeft?: number;
 }
 
+const DEFAULT_LIMIT = 90;
+
 function timeLimitFor(): number {
-  return 90;
+  return DEFAULT_LIMIT;
 }
 
 function formatTime(seconds: number): string {
@@ -16,9 +20,9 @@ function formatTime(seconds: number): string {
   return `${m}:${String(s).padStart(2, '0')}`;
 }
 
-export default function TimerBar({ submitted, onExpire }: TimerBarProps) {
+export default function TimerBar({ submitted, onExpire, initialTimeLeft }: TimerBarProps) {
   const limit = timeLimitFor();
-  const [timeLeft, setTimeLeft] = useState(limit);
+  const [timeLeft, setTimeLeft] = useState(initialTimeLeft ?? limit);
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const onExpireRef = useRef(onExpire);
 
