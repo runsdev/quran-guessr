@@ -4,13 +4,14 @@ import { initSession, fetchNextQuestion, submitAnswer } from './actions';
 import { TIMER_LIMIT } from './types';
 import type { Question, SubmitResult } from './types';
 
+import { loadJuzFilter } from '@/app/quiz/components/JuzFilterSettings';
+
 const SESSION_KEY = 'quizSession:locate-verse';
 
 export function useQuizState() {
   const [sessionToken, setSessionToken] = useState<string | null>(null);
   const [isInitializing, setIsInitializing] = useState(true);
   const [initError, setInitError] = useState(false);
-
   const [question, setQuestion] = useState<Question | null>(null);
   const [isPending, startTransition] = useTransition();
   const [fetchError, setFetchError] = useState(false);
@@ -20,10 +21,13 @@ export function useQuizState() {
   const [questionNumber, setQuestionNumber] = useState(1);
   const [totalScore, setTotalScore] = useState(0);
   const [initialTimeLeft, setInitialTimeLeft] = useState(TIMER_LIMIT);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   useEffect(() => {
-    const stored = localStorage.getItem(SESSION_KEY) ?? undefined;
-    initSession(stored)
+    const filter = loadJuzFilter();
+    const urlToken = new URLSearchParams(window.location.search).get('token') ?? undefined;
+    const stored = urlToken ?? localStorage.getItem(SESSION_KEY) ?? undefined;
+    initSession(stored, filter.length > 0 ? filter : undefined)
       .then((data) => {
         localStorage.setItem(SESSION_KEY, data.sessionToken);
         setSessionToken(data.sessionToken);
@@ -42,54 +46,37 @@ export function useQuizState() {
       });
   }, []);
 
+  const doSubmit = (page: number | null, line: number | null) => {
+    if (!sessionToken || !question || isSubmitting || submitResult !== null) {
+      return;
+    }
+    setIsSubmitting(true);
+    startTransition(async () => {
+      try {
+        const result = await submitAnswer(
+          sessionToken,
+          question.encryptedVerseKey,
+          question.answerToken,
+          page ?? 0,
+          line ?? 0,
+        );
+        setSubmitResult(result);
+        setTotalScore((s) => s + result.roundScore);
+      } catch {
+        setFetchError(true);
+        setIsSubmitting(false);
+      }
+    });
+  };
   const handleSubmit = () => {
-    if (
-      !sessionToken ||
-      selectedPage === null ||
-      selectedLine === null ||
-      !question ||
-      submitResult !== null
-    ) {
+    if (selectedPage === null || selectedLine === null) {
       return;
     }
-    startTransition(async () => {
-      try {
-        const result = await submitAnswer(
-          sessionToken,
-          question.encryptedVerseKey,
-          question.answerToken,
-          selectedPage,
-          selectedLine,
-        );
-        setSubmitResult(result);
-        setTotalScore((s) => s + result.roundScore);
-      } catch {
-        setFetchError(true);
-      }
-    });
+    doSubmit(selectedPage, selectedLine);
   };
-
   const handleTimerExpire = () => {
-    if (!sessionToken || !question || submitResult !== null) {
-      return;
-    }
-    startTransition(async () => {
-      try {
-        const result = await submitAnswer(
-          sessionToken,
-          question.encryptedVerseKey,
-          question.answerToken,
-          selectedPage ?? 0,
-          selectedLine ?? 0,
-        );
-        setSubmitResult(result);
-        setTotalScore((s) => s + result.roundScore);
-      } catch {
-        setFetchError(true);
-      }
-    });
+    doSubmit(selectedPage, selectedLine);
   };
-
   const handleNext = () => {
     if (!sessionToken) {
       return;
@@ -97,10 +84,15 @@ export function useQuizState() {
     setSelectedPage(null);
     setSelectedLine(null);
     setSubmitResult(null);
+    setIsSubmitting(false);
     setQuestion(null);
     startTransition(async () => {
       try {
-        const { question: q, questionNumber: qn } = await fetchNextQuestion(sessionToken);
+        const juzFilter = loadJuzFilter();
+        const { question: q, questionNumber: qn } = await fetchNextQuestion(
+          sessionToken,
+          juzFilter.length > 0 ? juzFilter : undefined,
+        );
         setQuestion(q);
         setQuestionNumber(qn);
         setInitialTimeLeft(TIMER_LIMIT);
@@ -117,7 +109,11 @@ export function useQuizState() {
     setFetchError(false);
     startTransition(async () => {
       try {
-        const { question: q, questionNumber: qn } = await fetchNextQuestion(sessionToken);
+        const juzFilter = loadJuzFilter();
+        const { question: q, questionNumber: qn } = await fetchNextQuestion(
+          sessionToken,
+          juzFilter.length > 0 ? juzFilter : undefined,
+        );
         setQuestion(q);
         setQuestionNumber(qn);
         setInitialTimeLeft(TIMER_LIMIT);
@@ -127,7 +123,7 @@ export function useQuizState() {
     });
   };
 
-  const submitted = submitResult !== null;
+  const submitted = isSubmitting || submitResult !== null;
   const pageNumbers = useMemo(() => question?.fontPages ?? [], [question]);
 
   return {

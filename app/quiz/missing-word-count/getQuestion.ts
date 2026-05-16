@@ -3,6 +3,7 @@ import type { Question, Segment } from './types';
 
 import type { VerseWord } from '@/app/quiz/types';
 import { prisma } from '@/lib/prisma';
+import { pickRandomJuz, getPageRangeForJuz } from '@/lib/quran-pages';
 
 interface QuranWord {
   id: number;
@@ -31,7 +32,7 @@ interface QuranApiPageResponse {
   verses: QuranVerse[];
 }
 
-async function fetchVerse(targetPageNumber?: number): Promise<QuranVerse> {
+async function fetchVerse(targetPageNumber?: number, juzFilter?: number[]): Promise<QuranVerse> {
   if (targetPageNumber !== undefined) {
     const res = await fetch(
       `https://api.quran.com/api/v4/verses/by_page/${targetPageNumber}?words=true&word_fields=code_v2,text_qpc_hafs&fields=verse_key`,
@@ -47,8 +48,10 @@ async function fetchVerse(targetPageNumber?: number): Promise<QuranVerse> {
     return verses[Math.floor(Math.random() * verses.length)];
   }
 
+  const juzParam =
+    juzFilter && juzFilter.length > 0 ? `&juz_number=${pickRandomJuz(juzFilter)}` : '';
   const res = await fetch(
-    'https://api.quran.com/api/v4/verses/random?words=true&word_fields=code_v2,text_qpc_hafs&fields=verse_key',
+    `https://api.quran.com/api/v4/verses/random?words=true&word_fields=code_v2,text_qpc_hafs&fields=verse_key${juzParam}`,
     { cache: 'no-store' },
   );
   if (!res.ok) {
@@ -60,12 +63,16 @@ async function fetchVerse(targetPageNumber?: number): Promise<QuranVerse> {
 /**
  * @param targetPageNumber - when provided, fetches a verse from that specific
  *   Mushaf page (adaptive difficulty); otherwise selects a fully random verse.
+ * @param juzFilter - when provided, restricts random selection to these juz.
  */
-export async function getRandomQuestion(targetPageNumber?: number): Promise<Question> {
+export async function getRandomQuestion(
+  targetPageNumber?: number,
+  juzFilter?: number[],
+): Promise<Question> {
   // Retry up to 5 times to find a verse with at least 4 words (so at least 1
   // can be hidden without leaving fewer than 3 visible).
   for (let attempt = 0; attempt < 5; attempt++) {
-    const verse = await fetchVerse(targetPageNumber);
+    const verse = await fetchVerse(targetPageNumber, juzFilter);
 
     const words = verse.words
       .filter((w) => w.char_type_name === 'word')
@@ -129,16 +136,32 @@ export async function getRandomQuestion(targetPageNumber?: number): Promise<Ques
   throw new Error('Could not find a suitable verse after multiple attempts');
 }
 
-export async function getAdaptiveQuestion(userId: string | null): Promise<Question> {
+export async function getAdaptiveQuestion(
+  userId: string | null,
+  juzFilter?: number[],
+): Promise<Question> {
   if (!userId) {
-    return getRandomQuestion();
+    return getRandomQuestion(undefined, juzFilter);
   }
 
   const user = await prisma.user.findUnique({ where: { id: userId }, select: { elo: true } });
   const userElo = user?.elo ?? 1000;
 
+  // Build page range constraints from juz filter
+  const juzPageRanges =
+    juzFilter && juzFilter.length > 0 ? juzFilter.map((j) => getPageRangeForJuz(j)) : null;
+
   const matchingPages = await prisma.pageElo.findMany({
-    where: { elo: { gte: userElo - 200, lte: userElo + 200 } },
+    where: {
+      elo: { gte: userElo - 200, lte: userElo + 200 },
+      ...(juzPageRanges
+        ? {
+            OR: juzPageRanges.map(({ start, end }) => ({
+              pageNumber: { gte: start, lte: end },
+            })),
+          }
+        : {}),
+    },
     select: { pageNumber: true },
   });
 
@@ -147,5 +170,5 @@ export async function getAdaptiveQuestion(userId: string | null): Promise<Questi
       ? matchingPages[Math.floor(Math.random() * matchingPages.length)].pageNumber
       : undefined;
 
-  return getRandomQuestion(targetPage);
+  return getRandomQuestion(targetPage, juzFilter);
 }

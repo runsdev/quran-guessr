@@ -5,34 +5,32 @@ import BottomNav from '@/app/components/BottomNav';
 import TopAppBar from '@/app/components/TopAppBar';
 import { auth } from '@/auth';
 import { prisma } from '@/lib/prisma';
+import { fetchQfStreak } from '@/lib/qf-api';
 
 export const dynamic = 'force-dynamic';
 
 const DAILY_RANKED_LIMIT = 20;
 
+export interface ActiveSession {
+  token: string;
+  gameMode: string;
+  questionNumber: number;
+  totalScore: number;
+  updatedAt: Date;
+}
+
 function dateStr(d: Date): string {
   return d.toISOString().split('T')[0];
 }
 
-async function getUserStats(userId: string): Promise<{ streak: number; dailyRankedCount: number }> {
-  const today = new Date();
-  const todayStr = dateStr(today);
-  const attempts = await prisma.dailyAttempt.findMany({
-    where: { userId },
-    select: { date: true, count: true },
+async function getDailyRankedCount(userId: string): Promise<number> {
+  const today = dateStr(new Date());
+  const attempt = await prisma.dailyAttempt.findUnique({
+    // eslint-disable-next-line @typescript-eslint/naming-convention
+    where: { userId_date: { userId, date: today } },
+    select: { count: true },
   });
-  const datesWithActivity = new Set(attempts.filter((a) => a.count > 0).map((a) => a.date));
-  const dailyRankedCount = attempts.find((a) => a.date === todayStr)?.count ?? 0;
-  let streak = 0;
-  const cursor = new Date(today);
-  if (!datesWithActivity.has(todayStr)) {
-    cursor.setDate(cursor.getDate() - 1);
-  }
-  while (datesWithActivity.has(dateStr(cursor))) {
-    streak++;
-    cursor.setDate(cursor.getDate() - 1);
-  }
-  return { streak, dailyRankedCount };
+  return attempt?.count ?? 0;
 }
 
 export default async function QuizHubPage() {
@@ -43,18 +41,32 @@ export default async function QuizHubPage() {
   let streak = 0;
   let userName = 'Scholar';
   let dailyRankedCount = 0;
+  let activeSessions: ActiveSession[] = [];
 
   if (userId) {
-    const [user, stats] = await Promise.all([
+    const [user, rankedCount, qfStreak, sessions] = await Promise.all([
       prisma.user.findUnique({ where: { id: userId }, select: { elo: true, name: true } }),
-      getUserStats(userId),
+      getDailyRankedCount(userId),
+      fetchQfStreak(userId),
+      prisma.quizSession.findMany({
+        where: { userId, status: 'active', expiresAt: { gt: new Date() } },
+        select: {
+          token: true,
+          gameMode: true,
+          questionNumber: true,
+          totalScore: true,
+          updatedAt: true,
+        },
+        orderBy: { updatedAt: 'desc' },
+      }),
     ]);
     if (user) {
       elo = Math.round(user.elo);
       userName = user.name?.split(' ')[0] ?? 'Scholar';
     }
-    streak = stats.streak;
-    dailyRankedCount = stats.dailyRankedCount;
+    streak = qfStreak;
+    dailyRankedCount = rankedCount;
+    activeSessions = sessions;
   }
 
   return (
@@ -76,6 +88,7 @@ export default async function QuizHubPage() {
           elo={elo}
           dailyRankedCount={dailyRankedCount}
           dailyRankedLimit={DAILY_RANKED_LIMIT}
+          activeSessions={activeSessions}
         />
       </main>
 

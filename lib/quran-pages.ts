@@ -88,3 +88,31 @@ export function getSurahsForPage(page: number): string {
   }
   return `${primary}. ${SURAH_NAMES[primary]}`;
 }
+
+/**
+ * Returns the first and last Mushaf page numbers for a given juz (1–30).
+ *
+ * Juz 1 → pages 1–21
+ * Juz 2–29 → 20 pages each starting at page 22
+ * Juz 30 → pages 582–604
+ */
+export function getPageRangeForJuz(juz: number): { start: number; end: number } {
+  if (juz === 1) {
+    return { start: 1, end: 21 };
+  }
+  if (juz === 30) {
+    return { start: 582, end: 604 };
+  }
+  const start = 22 + (juz - 2) * 20;
+  return { start, end: start + 19 };
+}
+
+/**
+ * Given an array of selected juz numbers, returns a random juz from the selection.
+ * Falls back to picking any juz 1–30 if the array is empty.
+ */
+export function pickRandomJuz(juzList: number[]): number {
+  // eslint-disable-next-line @typescript-eslint/naming-convention
+  const list = juzList.length > 0 ? juzList : Array.from({ length: 30 }, (_, i) => i + 1);
+  return list[Math.floor(Math.random() * list.length)];
+}

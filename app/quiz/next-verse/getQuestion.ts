@@ -3,6 +3,8 @@ import { encryptVerseKey, signAnswer } from './answerToken';
 import { SURAH_NAMES, SURAH_VERSE_COUNTS } from './surahData';
 import type { Question, VerseWord } from './types';
 
+import { pickRandomJuz } from '@/lib/quran-pages';
+
 /** Raw word shape returned by the Quran API — includes fields we must not forward to clients. */
 interface RawWord extends VerseWord {
   audio_url: string | null;
@@ -32,12 +34,16 @@ function sanitizeWords(words: RawWord[]): VerseWord[] {
   }));
 }
 
-async function fetchRandomVerse(): Promise<{ verseKey: string; words: RawWord[] }> {
+async function fetchRandomVerse(
+  juzFilter?: number[],
+): Promise<{ verseKey: string; words: RawWord[] }> {
   // Each call gets its own AbortController signal to opt out of Next.js
   // per-render-pass fetch memoization (same URL would otherwise be deduplicated).
   const { signal } = new AbortController();
+  const juzParam =
+    juzFilter && juzFilter.length > 0 ? `&juz_number=${pickRandomJuz(juzFilter)}` : '';
   const res = await fetch(
-    'https://api.quran.com/api/v4/verses/random?words=true&word_fields=code_v2,text_qpc_hafs,page_number,char_type_name&fields=verse_key',
+    `https://api.quran.com/api/v4/verses/random?words=true&word_fields=code_v2,text_qpc_hafs,page_number,char_type_name&fields=verse_key${juzParam}`,
     { cache: 'no-store', signal },
   );
   if (!res.ok) {
@@ -90,12 +96,12 @@ async function fetchRandomVerseInSurahRange(
   return { verseKey, words };
 }
 
-export async function getRandomQuestion(): Promise<Question> {
+export async function getRandomQuestion(juzFilter?: number[]): Promise<Question> {
   // Keep retrying until we get a verse that has a next verse (avoids the final ayah 114:6)
   let current: { verseKey: string; words: RawWord[] };
   let nextKey: string | null;
   do {
-    current = await fetchRandomVerse();
+    current = await fetchRandomVerse(juzFilter);
     nextKey = nextVerseKey(current.verseKey);
   } while (nextKey === null);
 

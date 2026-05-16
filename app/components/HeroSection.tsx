@@ -29,8 +29,9 @@ const HeroSection = (): React.JSX.Element => (
       </h1>
 
       <p className="text-lg leading-7 text-on-surface-variant max-w-2xl mx-auto">
-        Challenge yourself with verse identification, word meanings, and surah sequences. A
-        meditative journey for the modern student of knowledge.
+        Challenge yourself with engaging quizzes that test your knowledge of the Quran. Track your
+        progress, compete with friends, and deepen your understanding of the Quran in a fun and
+        interactive way.
       </p>
 
       <div className="flex flex-col sm:flex-row gap-(--spacing-gutter) justify-center items-center pt-(--spacing-md)">

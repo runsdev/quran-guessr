@@ -8,6 +8,7 @@ import { updateRankedElo } from './updateRankedElo';
 import type { VerseWord } from '@/app/quiz/types';
 import { auth } from '@/auth';
 import { prisma } from '@/lib/prisma';
+import { recordQfActivityDay } from '@/lib/qf-api';
 import {
   createQuizSession,
   getActiveQuizSession,
@@ -19,7 +20,10 @@ const DAILY_RANKED_LIMIT = 20;
 const TIMER_LIMIT = 90;
 const GAME_MODE = 'missing-word-count' as const;
 
-export async function initSession(sessionToken?: string): Promise<SessionInitResult> {
+export async function initSession(
+  sessionToken?: string,
+  juzFilter?: number[],
+): Promise<SessionInitResult> {
   const session = await auth();
   const userId = (session?.user as { id?: string } | undefined)?.id ?? null;
 
@@ -42,7 +46,7 @@ export async function initSession(sessionToken?: string): Promise<SessionInitRes
     }
   }
 
-  const question = await getAdaptiveQuestion(userId);
+  const question = await getAdaptiveQuestion(userId, juzFilter);
   const record = await createQuizSession({
     userId,
     gameMode: GAME_MODE,
@@ -62,6 +66,7 @@ export async function initSession(sessionToken?: string): Promise<SessionInitRes
 
 export async function fetchNextQuestion(
   sessionToken: string,
+  juzFilter?: number[],
 ): Promise<{ question: Question; questionNumber: number }> {
   const session = await auth();
   const userId = (session?.user as { id?: string } | undefined)?.id ?? null;
@@ -71,7 +76,7 @@ export async function fetchNextQuestion(
     throw new Error('Session not found or expired');
   }
 
-  const question = await getAdaptiveQuestion(userId);
+  const question = await getAdaptiveQuestion(userId, juzFilter);
   const questionNumber = existing.questionNumber + 1;
 
   await advanceQuizSession(sessionToken, { question, questionNumber, timerLimit: TIMER_LIMIT });
@@ -131,6 +136,7 @@ export async function submitAnswer(
   }
 
   const eloResult = await updateRankedElo(userId, pageNumber, isCorrect, today, currentPageElo);
+  void recordQfActivityDay(userId, verseKey);
 
   const submitResult: SubmitResult = {
     isCorrect,

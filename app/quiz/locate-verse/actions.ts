@@ -7,6 +7,7 @@ import { TIMER_LIMIT } from './types';
 
 import { auth } from '@/auth';
 import { prisma } from '@/lib/prisma';
+import { recordQfActivityDay } from '@/lib/qf-api';
 import {
   createQuizSession,
   getActiveQuizSession,
@@ -26,7 +27,10 @@ export interface SessionInitResult {
   submitResult: SubmitResult | null;
 }
 
-export async function initSession(sessionToken?: string): Promise<SessionInitResult> {
+export async function initSession(
+  sessionToken?: string,
+  juzFilter?: number[],
+): Promise<SessionInitResult> {
   const session = await auth();
   const userId = (session?.user as { id?: string } | undefined)?.id ?? null;
 
@@ -49,7 +53,7 @@ export async function initSession(sessionToken?: string): Promise<SessionInitRes
     }
   }
 
-  const question = await getRandomQuestion();
+  const question = await getRandomQuestion(juzFilter);
   const record = await createQuizSession({
     userId,
     gameMode: GAME_MODE,
@@ -69,13 +73,14 @@ export async function initSession(sessionToken?: string): Promise<SessionInitRes
 
 export async function fetchNextQuestion(
   sessionToken: string,
+  juzFilter?: number[],
 ): Promise<{ question: Question; questionNumber: number }> {
   const existing = await getActiveQuizSession(sessionToken);
   if (!existing) {
     throw new Error('Session not found or expired');
   }
 
-  const question = await getRandomQuestion();
+  const question = await getRandomQuestion(juzFilter);
   const questionNumber = existing.questionNumber + 1;
 
   await advanceQuizSession(sessionToken, { question, questionNumber, timerLimit: TIMER_LIMIT });
@@ -104,13 +109,16 @@ export async function submitAnswer(
   const session = await auth();
   const userId = (session?.user as { id?: string } | undefined)?.id ?? null;
   if (userId) {
-    await prisma.user.update({
-      where: { id: userId },
-      data: {
-        lvGames: { increment: 1 },
-        ...(guessedPage === correctPage ? { lvCorrect: { increment: 1 } } : {}),
-      },
-    });
+    await Promise.all([
+      prisma.user.update({
+        where: { id: userId },
+        data: {
+          lvGames: { increment: 1 },
+          ...(guessedPage === correctPage ? { lvCorrect: { increment: 1 } } : {}),
+        },
+      }),
+      recordQfActivityDay(userId, verseKey),
+    ]);
   }
 
   const submitResult: SubmitResult = {

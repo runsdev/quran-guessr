@@ -6,6 +6,8 @@ import { initSession, fetchNextQuestion, submitAnswer } from './actions';
 import type { Option } from './AnswerGrid';
 import type { Question, SubmitResult } from './types';
 
+import { loadJuzFilter } from '@/app/quiz/components/JuzFilterSettings';
+
 const SESSION_KEY = 'quizSession:missing-word-count';
 const TIMER_LIMIT = 90;
 
@@ -13,6 +15,7 @@ export function useMissingWordCountState() {
   const [sessionToken, setSessionToken] = useState<string | null>(null);
   const [isInitializing, setIsInitializing] = useState(true);
   const [initError, setInitError] = useState(false);
+  const [juzFilter, setJuzFilter] = useState<number[]>([]);
 
   const [question, setQuestion] = useState<Question | null>(null);
   const [isPending, startTransition] = useTransition();
@@ -21,10 +24,15 @@ export function useMissingWordCountState() {
   const [submitResult, setSubmitResult] = useState<SubmitResult | null>(null);
   const [questionNumber, setQuestionNumber] = useState(1);
   const [initialTimeLeft, setInitialTimeLeft] = useState(TIMER_LIMIT);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   useEffect(() => {
-    const stored = localStorage.getItem(SESSION_KEY) ?? undefined;
-    initSession(stored)
+    const filter = loadJuzFilter();
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setJuzFilter(filter);
+    const urlToken = new URLSearchParams(window.location.search).get('token') ?? undefined;
+    const stored = urlToken ?? localStorage.getItem(SESSION_KEY) ?? undefined;
+    initSession(stored, filter.length > 0 ? filter : undefined)
       .then((data) => {
         localStorage.setItem(SESSION_KEY, data.sessionToken);
         setSessionToken(data.sessionToken);
@@ -42,7 +50,7 @@ export function useMissingWordCountState() {
       });
   }, []);
 
-  const submitted = submitResult !== null;
+  const submitted = isSubmitting || submitResult !== null;
   const isCorrect = submitResult?.isCorrect ?? false;
   const timedOut = selected === null && submitted;
   const displayPageElo = submitResult?.newPageElo ?? question?.pageElo ?? null;
@@ -62,9 +70,10 @@ export function useMissingWordCountState() {
   }, [question]);
 
   const doSubmit = (guess: number) => {
-    if (!sessionToken || !question || submitted) {
+    if (!sessionToken || !question || isSubmitting || submitResult !== null) {
       return;
     }
+    setIsSubmitting(true);
     startTransition(async () => {
       try {
         const result = await submitAnswer(
@@ -77,6 +86,7 @@ export function useMissingWordCountState() {
         setSubmitResult(result);
       } catch {
         setFetchError(true);
+        setIsSubmitting(false);
       }
     });
   };
@@ -90,10 +100,14 @@ export function useMissingWordCountState() {
     }
     setSelected(null);
     setSubmitResult(null);
+    setIsSubmitting(false);
     setQuestion(null);
     startTransition(async () => {
       try {
-        const { question: q, questionNumber: qn } = await fetchNextQuestion(sessionToken);
+        const { question: q, questionNumber: qn } = await fetchNextQuestion(
+          sessionToken,
+          juzFilter.length > 0 ? juzFilter : undefined,
+        );
         setQuestion(q);
         setQuestionNumber(qn);
         setInitialTimeLeft(TIMER_LIMIT);
@@ -110,7 +124,10 @@ export function useMissingWordCountState() {
     setFetchError(false);
     startTransition(async () => {
       try {
-        const { question: q, questionNumber: qn } = await fetchNextQuestion(sessionToken);
+        const { question: q, questionNumber: qn } = await fetchNextQuestion(
+          sessionToken,
+          juzFilter.length > 0 ? juzFilter : undefined,
+        );
         setQuestion(q);
         setQuestionNumber(qn);
         setInitialTimeLeft(TIMER_LIMIT);

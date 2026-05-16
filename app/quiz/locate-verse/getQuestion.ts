@@ -1,7 +1,7 @@
 import { encryptVerseKey, signAnswer } from './answerToken';
 import type { Question, VerseWord } from './types';
 
-import { SURAH_NAMES } from '@/lib/quran-pages';
+import { SURAH_NAMES, pickRandomJuz } from '@/lib/quran-pages';
 
 interface RawWord extends VerseWord {
   // eslint-disable-next-line @typescript-eslint/naming-convention
@@ -18,11 +18,16 @@ interface QuranVerseResponse {
   };
 }
 
-async function fetchRandomVerse(): Promise<{ verseKey: string; words: RawWord[] }> {
+async function fetchRandomVerse(
+  juzFilter?: number[],
+): Promise<{ verseKey: string; words: RawWord[] }> {
   const { signal } = new AbortController();
+  const juzParam =
+    juzFilter && juzFilter.length > 0 ? `&juz_number=${pickRandomJuz(juzFilter)}` : '';
   const res = await fetch(
     'https://api.quran.com/api/v4/verses/random?words=true' +
-      '&word_fields=code_v2,text_qpc_hafs,page_number,line_number,char_type_name&fields=verse_key',
+      '&word_fields=code_v2,text_qpc_hafs,page_number,line_number,char_type_name&fields=verse_key' +
+      juzParam,
     { cache: 'no-store', signal },
   );
   if (!res.ok) {
@@ -33,8 +38,8 @@ async function fetchRandomVerse(): Promise<{ verseKey: string; words: RawWord[] 
   return { verseKey: verse.verse_key, words };
 }
 
-export async function getRandomQuestion(): Promise<Question> {
-  const { verseKey, words } = await fetchRandomVerse();
+export async function getRandomQuestion(juzFilter?: number[]): Promise<Question> {
+  const { verseKey, words } = await fetchRandomVerse(juzFilter);
 
   const firstWord = words.find((w) => w.char_type_name !== 'end');
   const correctPage = firstWord?.page_number ?? words[0].page_number;

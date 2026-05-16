@@ -1,10 +1,13 @@
 import Image from 'next/image';
 import { redirect } from 'next/navigation';
 
+import GameStats from './GameStats';
+
 import BottomNav from '@/app/components/BottomNav';
 import TopAppBar from '@/app/components/TopAppBar';
 import { auth } from '@/auth';
 import { prisma } from '@/lib/prisma';
+import { fetchQfStreak } from '@/lib/qf-api';
 
 export const dynamic = 'force-dynamic';
 
@@ -25,10 +28,15 @@ export default async function ProfilePage() {
       image: true,
       elo: true,
       gamesPlayed: true,
+      mwcCorrect: true,
+      lvGames: true,
+      lvCorrect: true,
+      nvGames: true,
+      nvCorrect: true,
       createdAt: true,
       dailyAttempts: {
         orderBy: { date: 'desc' },
-        take: 7,
+        take: 30,
       },
     },
   });
@@ -37,12 +45,15 @@ export default async function ProfilePage() {
     redirect('/auth/signin');
   }
 
+  const [streak] = await Promise.all([fetchQfStreak(userId)]);
   const eloFormatted = Math.round(user.elo).toLocaleString();
   const joinDate = user.createdAt.toLocaleDateString('en-US', {
     year: 'numeric',
     month: 'long',
     day: 'numeric',
   });
+
+  const recentActivity = user.dailyAttempts.slice(0, 7);
 
   return (
     <>
@@ -78,29 +89,10 @@ export default async function ProfilePage() {
             </div>
           </div>
 
-          {/* Stats grid */}
-          <div className="grid grid-cols-2 gap-4">
-            <div className="bg-surface-container-low border border-primary/10 p-5 rounded-3xl">
-              <div className="p-2 bg-primary/10 rounded-lg w-fit mb-3">
-                <span className="material-symbols-outlined text-primary">trending_up</span>
-              </div>
-              <h4 className="text-3xl font-bold text-on-surface">{eloFormatted}</h4>
-              <p className="text-sm text-on-surface-variant mt-1">ELO Rating</p>
-            </div>
-
-            <div className="bg-surface-container-low border border-primary/10 p-5 rounded-3xl">
-              <div className="p-2 bg-secondary-container rounded-lg w-fit mb-3">
-                <span className="material-symbols-outlined text-secondary">sports_esports</span>
-              </div>
-              <h4 className="text-3xl font-bold text-on-surface">
-                {user.gamesPlayed.toLocaleString()}
-              </h4>
-              <p className="text-sm text-on-surface-variant mt-1">Games Played</p>
-            </div>
-          </div>
+          <GameStats streak={streak} eloFormatted={eloFormatted} user={user} />
 
           {/* Recent activity */}
-          {user.dailyAttempts.length > 0 && (
+          {recentActivity.length > 0 && (
             <div className="bg-surface-container-low border border-primary/10 rounded-3xl p-5">
               <h2 className="text-base font-semibold text-on-surface mb-4 flex items-center gap-2">
                 <span className="material-symbols-outlined text-primary text-[18px]">
@@ -109,14 +101,16 @@ export default async function ProfilePage() {
                 Recent Activity
               </h2>
               <div className="space-y-2">
-                {user.dailyAttempts.map((attempt) => (
+                {recentActivity.map((attempt) => (
                   <div
                     key={attempt.id}
                     className="flex items-center justify-between py-2 border-b border-outline-variant/30 last:border-0"
                   >
                     <span className="text-sm text-on-surface-variant">{attempt.date}</span>
                     <span className="text-sm font-medium text-on-surface">
-                      {attempt.count} {attempt.count === 1 ? 'attempt' : 'attempts'}
+                      {attempt.count > 0
+                        ? `${attempt.count} ranked ${attempt.count === 1 ? 'game' : 'games'}`
+                        : 'Played'}
                     </span>
                   </div>
                 ))}
