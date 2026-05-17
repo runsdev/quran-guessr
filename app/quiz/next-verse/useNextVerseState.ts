@@ -5,12 +5,16 @@ import { useTransition, useState, useMemo, useEffect } from 'react';
 import { initSession, fetchNextQuestion, submitAnswer } from './actions';
 import type { Question, SubmitResult } from './types';
 
+import { abandonSession } from '@/app/quiz/actions';
+import { loadJuzFilter } from '@/app/quiz/components/JuzFilterSettings';
+
 const SESSION_KEY = 'quizSession:next-verse';
 
 export function useNextVerseState() {
   const [sessionToken, setSessionToken] = useState<string | null>(null);
   const [isInitializing, setIsInitializing] = useState(true);
   const [initError, setInitError] = useState(false);
+  const [juzFilter, setJuzFilter] = useState<number[]>([]);
 
   const [question, setQuestion] = useState<Question | null>(null);
   const [isPending, startTransition] = useTransition();
@@ -21,8 +25,12 @@ export function useNextVerseState() {
   const [score, setScore] = useState(0);
 
   useEffect(() => {
-    const stored = localStorage.getItem(SESSION_KEY) ?? undefined;
-    initSession(stored)
+    const filter = loadJuzFilter();
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setJuzFilter(filter);
+    const urlToken = new URLSearchParams(window.location.search).get('token') ?? undefined;
+    const stored = urlToken ?? localStorage.getItem(SESSION_KEY) ?? undefined;
+    initSession(stored, filter.length > 0 ? filter : undefined)
       .then((data) => {
         localStorage.setItem(SESSION_KEY, data.sessionToken);
         setSessionToken(data.sessionToken);
@@ -93,7 +101,10 @@ export function useNextVerseState() {
     setQuestion(null);
     startTransition(async () => {
       try {
-        const { question: q, questionNumber: qn } = await fetchNextQuestion(sessionToken);
+        const { question: q, questionNumber: qn } = await fetchNextQuestion(
+          sessionToken,
+          juzFilter.length > 0 ? juzFilter : undefined,
+        );
         setQuestion(q);
         setQuestionNumber(qn);
       } catch {
@@ -109,13 +120,24 @@ export function useNextVerseState() {
     setFetchError(false);
     startTransition(async () => {
       try {
-        const { question: q, questionNumber: qn } = await fetchNextQuestion(sessionToken);
+        const { question: q, questionNumber: qn } = await fetchNextQuestion(
+          sessionToken,
+          juzFilter.length > 0 ? juzFilter : undefined,
+        );
         setQuestion(q);
         setQuestionNumber(qn);
       } catch {
         setFetchError(true);
       }
     });
+  };
+
+  const handleEndSession = async () => {
+    if (sessionToken) {
+      localStorage.removeItem(SESSION_KEY);
+      await abandonSession(sessionToken);
+    }
+    window.location.href = '/quiz';
   };
 
   return {
@@ -136,5 +158,6 @@ export function useNextVerseState() {
     handleSubmit,
     handleNext,
     handleRetry,
+    handleEndSession,
   };
 }

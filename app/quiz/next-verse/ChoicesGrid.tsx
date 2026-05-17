@@ -54,7 +54,9 @@ export default function ChoicesGrid({
                 }
                 return (
                   <span key={word.id || wi}>
-                    {word.page_number == null || !loadedPages.has(word.page_number) ? (
+                    {word.page_number == null ||
+                    !loadedPages.has(word.page_number) ||
+                    !word.code_v2 ? (
                       <span style={{ fontFamily: "UthmanicHafs, 'Traditional Arabic', serif" }}>
                         {word.text_qpc_hafs}
                       </span>

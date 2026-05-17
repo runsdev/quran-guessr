@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 
 import { useRouter } from 'next/navigation';
 
@@ -7,6 +7,7 @@ export function useGameModesState(dailyRankedCount: number, dailyRankedLimit: nu
   const [modalOpen, setModalOpen] = useState(false);
   const [modalKey, setModalKey] = useState(0);
   const [pendingHref, setPendingHref] = useState('');
+  const pendingNavRef = useRef('');
 
   const openModal = (href: string) => {
     setPendingHref(href);
@@ -15,9 +16,17 @@ export function useGameModesState(dailyRankedCount: number, dailyRankedLimit: nu
   };
 
   const handleConfirm = () => {
+    pendingNavRef.current = pendingHref;
     setModalOpen(false);
-    router.push(pendingHref);
   };
+
+  useEffect(() => {
+    if (!modalOpen && pendingNavRef.current) {
+      const href = pendingNavRef.current;
+      pendingNavRef.current = '';
+      router.push(href);
+    }
+  }, [modalOpen, router]);
 
   const handleClose = () => {
     setModalOpen(false);

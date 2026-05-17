@@ -29,6 +29,7 @@ export default function QuizClient() {
     handleSubmit,
     handleNext,
     handleRetry,
+    handleEndSession,
   } = useNextVerseState();
   const loadedPages = useQcfFontLoader(pageNumbers);
 
@@ -58,6 +59,7 @@ export default function QuizClient() {
               questionNumber={questionNumber}
               masteryPercent={masteryPercent}
               progressWidth={progressWidth}
+              onEndSession={handleEndSession}
             />
 
             <VerseCard

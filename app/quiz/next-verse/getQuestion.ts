@@ -1,114 +1,122 @@
 /* eslint-disable @typescript-eslint/naming-convention */
+import type { Word } from '@quranjs/api';
+
 import { encryptVerseKey, signAnswer } from './answerToken';
-import { SURAH_NAMES, SURAH_VERSE_COUNTS } from './surahData';
+import { SURAH_NAMES, nextVerseKey, fetchRandomVerseInAyahRange } from './surahData';
 import type { Question, VerseWord } from './types';
 
-/** Raw word shape returned by the Quran API — includes fields we must not forward to clients. */
+import { qdcFetchByJuz, qdcFetchRandom, qdcFetchByKey } from '@/lib/qdc-client';
+import type { QdcWord } from '@/lib/qdc-client';
+import { getContentClient } from '@/lib/qf-server-client';
+import { pickRandomJuz } from '@/lib/quran-pages';
+
+/** Raw word shape — includes page_number for font loading (must not reach the client). */
 interface RawWord extends VerseWord {
-  audio_url: string | null;
-  /** Same glyph as code_v2 but in a different font encoding — not needed client-side. */
-  text?: string;
-  translation?: unknown;
-  transliteration?: unknown;
   page_number: number;
 }
 
-interface QuranVerseResponse {
-  verse: {
-    verse_key: string;
-    words: RawWord[];
-  };
+/** Options for next-verse: include words and request the QCF v2 glyph codes. */
+const WORD_OPTS = {
+  words: true,
+  wordFields: { codeV2: true },
+} as const;
+
+function mapWord(w: Word): RawWord {
+  // prettier-ignore
+  return { id: w.id ?? 0, position: w.position, code_v2: w.codeV2 ?? '', text_qpc_hafs: w.text ?? '', page_number: w.pageNumber ?? 1, char_type_name: w.charTypeName };
 }
 
 /** Strip all API fields that are not in VerseWord or that could reveal a choice's identity. */
 function sanitizeWords(words: RawWord[]): VerseWord[] {
-  return words.map(({ id, position, code_v2, text_qpc_hafs, page_number, char_type_name }) => ({
-    id,
-    position,
-    code_v2,
-    text_qpc_hafs,
-    page_number,
-    char_type_name,
-  }));
+  return words;
 }
 
-async function fetchRandomVerse(): Promise<{ verseKey: string; words: RawWord[] }> {
-  // Each call gets its own AbortController signal to opt out of Next.js
-  // per-render-pass fetch memoization (same URL would otherwise be deduplicated).
-  const { signal } = new AbortController();
-  const res = await fetch(
-    'https://api.quran.com/api/v4/verses/random?words=true&word_fields=code_v2,text_qpc_hafs,page_number,char_type_name&fields=verse_key',
-    { cache: 'no-store', signal },
-  );
-  if (!res.ok) {
-    throw new Error('Quran API error (random verse)');
-  }
-  const { verse } = (await res.json()) as QuranVerseResponse;
-  const words = [...verse.words].sort((a, b) => a.position - b.position);
-  return { verseKey: verse.verse_key, words };
+function qdcToRaw(w: QdcWord): RawWord {
+  const { id, position, code_v2, text, page_number, char_type_name } = w;
+  // prettier-ignore
+  return { id, position, code_v2: code_v2 ?? '', text_qpc_hafs: text ?? '', page_number: page_number ?? 1, char_type_name };
 }
 
-async function fetchVerseByKey(verseKey: string): Promise<RawWord[]> {
-  const res = await fetch(
-    `https://api.quran.com/api/v4/verses/by_key/${verseKey}?words=true&word_fields=code_v2,text_qpc_hafs,page_number,char_type_name`,
-    { cache: 'no-store' },
-  );
-  if (!res.ok) {
-    throw new Error(`Quran API error (verse ${verseKey})`);
-  }
-  const { verse } = (await res.json()) as QuranVerseResponse;
-  return [...verse.words].sort((a, b) => a.position - b.position);
-}
-
-/** Returns the verse key that comes immediately after the given key, or null for the last verse. */
-function nextVerseKey(verseKey: string): string | null {
-  const [surahStr, ayahStr] = verseKey.split(':');
-  const surah = parseInt(surahStr, 10);
-  const ayah = parseInt(ayahStr, 10);
-  const maxAyah = SURAH_VERSE_COUNTS[surah];
-  if (ayah < maxAyah) {
-    return `${surah}:${ayah + 1}`;
-  }
-  if (surah < 114) {
-    return `${surah + 1}:1`;
-  }
-  return null; // last verse of the Quran
-}
-
-/** Fetches a random verse from a surah chosen uniformly within [surahMin, surahMax]. */
-async function fetchRandomVerseInSurahRange(
-  surahMin: number,
-  surahMax: number,
+async function fetchRandomVerse(
+  juzFilter?: number[],
 ): Promise<{ verseKey: string; words: RawWord[] }> {
-  const lo = Math.max(1, surahMin);
-  const hi = Math.min(114, surahMax);
-  const surah = lo + Math.floor(Math.random() * (hi - lo + 1));
-  const maxAyah = SURAH_VERSE_COUNTS[surah];
-  const ayah = 1 + Math.floor(Math.random() * maxAyah);
-  const verseKey = `${surah}:${ayah}`;
-  const words = await fetchVerseByKey(verseKey);
-  return { verseKey, words };
+  const client = getContentClient();
+  if (juzFilter && juzFilter.length > 0) {
+    const juzNum = pickRandomJuz(juzFilter);
+    try {
+      const verses = await client.content.v4.verses.byJuz(
+        String(juzNum) as Parameters<typeof client.content.v4.verses.byJuz>[0],
+        WORD_OPTS,
+      );
+      if (!verses?.length) {
+        throw new Error('No verses for juz');
+      }
+      const verse = verses[Math.floor(Math.random() * verses.length)];
+      const words = [...(verse.words ?? [])].sort((a, b) => a.position - b.position).map(mapWord);
+      return { verseKey: verse.verseKey, words };
+    } catch (err) {
+      console.warn(`SDK byJuz(${juzNum}) failed, falling back to direct API:`, err);
+      const qdcVerse = await qdcFetchByJuz(juzNum);
+      return {
+        verseKey: qdcVerse.verse_key,
+        words: qdcVerse.words.sort((a, b) => a.position - b.position).map(qdcToRaw),
+      };
+    }
+  }
+
+  try {
+    const verse = await client.content.v4.verses.random(WORD_OPTS);
+    const words = [...(verse.words ?? [])].sort((a, b) => a.position - b.position).map(mapWord);
+    return { verseKey: verse.verseKey, words };
+  } catch (err) {
+    console.warn('SDK random failed, falling back to direct API:', err);
+    const qdcVerse = await qdcFetchRandom();
+    return {
+      verseKey: qdcVerse.verse_key,
+      words: qdcVerse.words.sort((a, b) => a.position - b.position).map(qdcToRaw),
+    };
+  }
 }
 
-export async function getRandomQuestion(): Promise<Question> {
-  // Keep retrying until we get a verse that has a next verse (avoids the final ayah 114:6)
+async function fetchVerseByKey(verseKey: string): Promise<RawWord[] | null> {
+  const client = getContentClient();
+  try {
+    const verse = await client.content.v4.verses.byKey(
+      verseKey as Parameters<typeof client.content.v4.verses.byKey>[0],
+      WORD_OPTS,
+    );
+    return [...(verse.words ?? [])].sort((a, b) => a.position - b.position).map(mapWord);
+  } catch (e) {
+    if (e instanceof Error && e.message.includes('404')) {
+      console.warn(`SDK byKey(${verseKey}) 404, falling back to direct API`);
+      const qdcVerse = await qdcFetchByKey(verseKey);
+      if (!qdcVerse) {
+        return null;
+      }
+      return qdcVerse.words.sort((a, b) => a.position - b.position).map(qdcToRaw);
+    }
+    throw e;
+  }
+}
+
+export async function getRandomQuestion(juzFilter?: number[]): Promise<Question> {
+  // Keep retrying until we get a verse that has a fetchable next verse (nextVerseKey returns null for 114:6).
   let current: { verseKey: string; words: RawWord[] };
   let nextKey: string | null;
+  let nextVerseWords: RawWord[] | null;
   do {
-    current = await fetchRandomVerse();
+    current = await fetchRandomVerse(juzFilter);
     nextKey = nextVerseKey(current.verseKey);
-  } while (nextKey === null);
+    nextVerseWords = nextKey ? await fetchVerseByKey(nextKey) : null;
+  } while (!nextKey || !nextVerseWords);
 
-  // Fetch the correct next verse + 3 distractors from ±1 surah of the answer
-  const [nextSurahStr] = nextKey.split(':');
-  const nextSurah = parseInt(nextSurahStr, 10);
-  const distractorPromises = Array.from({ length: 3 }, () =>
-    fetchRandomVerseInSurahRange(nextSurah - 1, nextSurah + 1),
+  // Fetch 3 distractors from the same surah, within ±10 ayahs of the correct answer
+  const [nextSurah, nextAyah] = nextKey.split(':').map(Number) as [number, number];
+  const distractorResults = await Promise.all(
+    Array.from({ length: 3 }, () =>
+      fetchRandomVerseInAyahRange(nextSurah, nextAyah - 10, nextAyah + 10, fetchVerseByKey),
+    ),
   );
-  const [nextVerseWords, ...distractorResults] = await Promise.all([
-    fetchVerseByKey(nextKey),
-    ...distractorPromises,
-  ]);
 
   // Deduplicate: ensure no distractor matches the correct next verse or current verse
   const usedKeys = new Set([current.verseKey, nextKey]);
@@ -121,7 +129,12 @@ export async function getRandomQuestion(): Promise<Question> {
   }
   // If deduplication removed some, fetch replacements from the same range
   while (distractorWordSets.length < 3) {
-    const extra = await fetchRandomVerseInSurahRange(nextSurah - 1, nextSurah + 1);
+    const extra = await fetchRandomVerseInAyahRange(
+      nextSurah,
+      nextAyah - 10,
+      nextAyah + 10,
+      fetchVerseByKey,
+    );
     if (!usedKeys.has(extra.verseKey)) {
       usedKeys.add(extra.verseKey);
       distractorWordSets.push(extra.words);

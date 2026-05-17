@@ -4,6 +4,8 @@ interface Props {
   dailyRankedLimit: number;
   rankedLimitReached: boolean;
   openModal: (href: string) => void;
+  openJuzPanel: () => void;
+  activeJuzCount: number;
 }
 
 export default function PrimaryGameModes({
@@ -12,6 +14,8 @@ export default function PrimaryGameModes({
   dailyRankedLimit,
   rankedLimitReached,
   openModal,
+  openJuzPanel,
+  activeJuzCount,
 }: Props) {
   return (
     <section className="space-y-10 relative">
@@ -21,6 +25,23 @@ export default function PrimaryGameModes({
           <h3 className="text-2xl font-bold text-white mb-1">Select Game Mode</h3>
           <p className="text-on-surface-variant">Choose your path to mastery.</p>
         </div>
+        <button
+          onClick={openJuzPanel}
+          className="flex items-center gap-1.5 px-3 py-1.5 rounded-full border border-outline-variant bg-surface-container text-xs text-on-surface-variant hover:border-primary/50 hover:text-on-surface transition-colors shrink-0"
+          aria-label="Configure juz filter"
+        >
+          <span className="material-symbols-outlined" style={{ fontSize: 16 }}>
+            filter_list
+          </span>
+          <span>
+            Juz Filter
+            {activeJuzCount < 30 && (
+              <span className="ml-1 bg-primary/20 text-primary text-xs font-bold rounded-full px-1.5 py-0.5">
+                {activeJuzCount}
+              </span>
+            )}
+          </span>
+        </button>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-10 relative z-10">
@@ -103,8 +124,8 @@ export default function PrimaryGameModes({
               Locate the Verse
             </h4>
             <p className="text-on-surface-variant mb-10 leading-relaxed">
-              Given an Ayah, identify where it appears in the Quran. No pressure — just a daily
-              challenge to sharpen your skills.
+              5 verses · same for everyone · new challenge each day · identify the page and row of
+              an Ayah.
             </p>
             <div className="mt-auto flex items-center justify-between bg-black/20 rounded-xl p-4 border border-white/5 backdrop-blur-sm">
               <div className="flex items-center gap-3">

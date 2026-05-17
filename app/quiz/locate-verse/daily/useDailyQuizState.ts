@@ -1,10 +1,11 @@
 'use client';
 
-import { useState, useTransition, useMemo } from 'react';
+import { useState, useTransition, useMemo, useEffect } from 'react';
 
-import { submitDailyAnswer } from './actions';
+import { submitDailyAnswer, initDailySession, advanceDailyQuestion } from './actions';
 
 import type { Question, SubmitResult } from '@/app/quiz/locate-verse/types';
+import { TIMER_LIMIT } from '@/app/quiz/locate-verse/types';
 
 export function useDailyQuizState(
   questions: Question[],
@@ -12,6 +13,7 @@ export function useDailyQuizState(
   initialQuestionIndex: number,
   previousScores: number[],
 ) {
+  const [sessionToken, setSessionToken] = useState<string | null>(null);
   const [currentIndex, setCurrentIndex] = useState(initialQuestionIndex);
   const [scores, setScores] = useState<number[]>(previousScores);
   const [isPending, startTransition] = useTransition();
@@ -20,6 +22,23 @@ export function useDailyQuizState(
   const [selectedLine, setSelectedLine] = useState<number | null>(null);
   const [submitResult, setSubmitResult] = useState<SubmitResult | null>(null);
   const [allDone, setAllDone] = useState(false);
+  const [initialTimeLeft, setInitialTimeLeft] = useState(TIMER_LIMIT);
+  const [isInitializing, setIsInitializing] = useState(!!questions[initialQuestionIndex]);
+
+  useEffect(() => {
+    const question = questions[initialQuestionIndex];
+    if (!question) {
+      return;
+    }
+    initDailySession(challengeId, initialQuestionIndex, question)
+      .then((data) => {
+        setSessionToken(data.sessionToken);
+        setInitialTimeLeft(data.initialTimeLeft);
+        setIsInitializing(false);
+      })
+      .catch(() => setIsInitializing(false));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const question = questions[currentIndex] ?? null;
   const totalScore = scores.reduce((a, b) => a + b, 0);
@@ -67,8 +86,15 @@ export function useDailyQuizState(
     const next = currentIndex + 1;
     if (next >= 5) {
       setAllDone(true);
-    } else {
-      setCurrentIndex(next);
+      return;
+    }
+    const nextQuestion = questions[next];
+    setCurrentIndex(next);
+    setInitialTimeLeft(TIMER_LIMIT);
+    if (sessionToken && nextQuestion) {
+      startTransition(async () => {
+        await advanceDailyQuestion(sessionToken, next, nextQuestion);
+      });
     }
   };
 
@@ -85,6 +111,8 @@ export function useDailyQuizState(
     selectedLine,
     submitResult,
     allDone,
+    initialTimeLeft,
+    isInitializing,
     submitted: submitResult !== null,
     pageNumbers,
     setSelectedPage,

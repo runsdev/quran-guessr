@@ -31,7 +31,8 @@ function WordSpan({
   const inner =
     word.char_type_name === 'end' ||
     word.page_number == null ||
-    !loadedPages.has(word.page_number) ? (
+    !loadedPages.has(word.page_number) ||
+    !word.code_v2 ? (
       <span style={{ fontFamily: "UthmanicHafs, 'Traditional Arabic', serif" }}>
         {word.text_qpc_hafs}
       </span>

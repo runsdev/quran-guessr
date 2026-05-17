@@ -1,3 +1,6 @@
+/* eslint-disable @typescript-eslint/naming-convention */
+import type { Word } from '@quranjs/api';
+
 import DailyQuizClient from './DailyQuizClient';
 import DailyResults from './DailyResults';
 
@@ -8,30 +11,60 @@ import type { Question, VerseWord } from '@/app/quiz/locate-verse/types';
 import { auth } from '@/auth';
 import { getOrCreateDailyChallenge, getUtcDateStr } from '@/lib/daily-challenge';
 import { prisma } from '@/lib/prisma';
+import { qdcFetchByKey } from '@/lib/qdc-client';
+import type { QdcWord } from '@/lib/qdc-client';
+import { getContentClient } from '@/lib/qf-server-client';
 import { SURAH_NAMES } from '@/lib/quran-pages';
 
-interface QuranVerseResponse {
-  verse: {
-    // eslint-disable-next-line @typescript-eslint/naming-convention
-    verse_key: string;
-    words: VerseWord[];
+/** Map an SDK Word to the app's VerseWord, keeping page/line for answer calculation. */
+function mapWord(w: Word): VerseWord & { page_number?: number; line_number?: number } {
+  return {
+    id: w.id ?? 0,
+    position: w.position,
+    code_v2: w.codeV2 ?? '',
+    // word.text is the default QPC Hafs rendering returned by the Content API.
+    text_qpc_hafs: w.text ?? '',
+    page_number: w.pageNumber,
+    line_number: w.lineNumber,
+    char_type_name: w.charTypeName,
   };
 }
 
-async function fetchVerseByKey(
-  verseKey: string,
-): Promise<{ verseKey: string; words: VerseWord[] }> {
-  const res = await fetch(
-    `https://api.quran.com/api/v4/verses/by_key/${encodeURIComponent(verseKey)}?words=true` +
-      '&word_fields=code_v2,text_qpc_hafs,page_number,line_number,char_type_name&fields=verse_key',
-    { cache: 'no-store' },
-  );
-  if (!res.ok) {
-    throw new Error(`Quran API error ${res.status}`);
+function qdcWordToVerseWord(
+  w: QdcWord,
+): VerseWord & { page_number?: number; line_number?: number } {
+  return {
+    id: w.id,
+    position: w.position,
+    code_v2: w.code_v2 ?? '',
+    text_qpc_hafs: w.text ?? '',
+    page_number: w.page_number,
+    line_number: w.line_number,
+    char_type_name: w.char_type_name,
+  };
+}
+
+async function fetchVerseByKey(verseKey: string): Promise<{
+  verseKey: string;
+  words: Array<VerseWord & { page_number?: number; line_number?: number }>;
+}> {
+  const client = getContentClient();
+  try {
+    const verse = await client.content.v4.verses.byKey(
+      verseKey as Parameters<typeof client.content.v4.verses.byKey>[0],
+      { words: true, wordFields: { codeV2: true } },
+    );
+    const words = [...(verse.words ?? [])].sort((a, b) => a.position - b.position).map(mapWord);
+    return { verseKey: verse.verseKey, words };
+  } catch (err) {
+    console.warn(`SDK byKey(${verseKey}) failed, falling back to direct API:`, err);
+    const qdcVerse = await qdcFetchByKey(verseKey);
+    if (!qdcVerse) {
+      throw new Error(`Verse ${verseKey} not found`);
+    }
+    const words = qdcVerse.words.sort((a, b) => a.position - b.position).map(qdcWordToVerseWord);
+    return { verseKey: qdcVerse.verse_key, words };
   }
-  const { verse } = (await res.json()) as QuranVerseResponse;
-  const words = [...verse.words].sort((a, b) => a.position - b.position);
-  return { verseKey: verse.verse_key, words };
 }
 
 async function buildQuestion(verseKey: string): Promise<Question> {
@@ -63,7 +96,6 @@ export default async function DailyChallengeLocateVersePage() {
 
   const existingResult = userId
     ? await prisma.dailyChallengeResult.findUnique({
-        // eslint-disable-next-line @typescript-eslint/naming-convention
         where: { challengeId_userId: { challengeId: challenge.id, userId } },
       })
     : null;
