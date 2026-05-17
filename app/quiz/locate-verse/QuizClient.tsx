@@ -38,7 +38,11 @@ export default function QuizClient() {
           </div>
         ) : (
           <>
-            <QuizHeader questionNumber={state.questionNumber} totalScore={state.totalScore} />
+            <QuizHeader
+              questionNumber={state.questionNumber}
+              totalScore={state.totalScore}
+              onEndSession={state.handleEndSession}
+            />
 
             {state.question && (
               <TimerBar

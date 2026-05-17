@@ -14,23 +14,26 @@ export default async function LeaderboardPage() {
   const currentUserId = (session?.user as { id?: string } | undefined)?.id;
 
   // ── Player ELO leaderboard ────────────────────────────────────────────────
-  const topUsers = await prisma.user.findMany({
-    where: { elo: { not: 1000 } },
-    orderBy: { elo: 'desc' },
-    take: 50,
-    select: {
-      id: true,
-      name: true,
-      image: true,
-      elo: true,
-      gamesPlayed: true,
-      mwcCorrect: true,
-      lvGames: true,
-      lvCorrect: true,
-      nvGames: true,
-      nvCorrect: true,
-    },
-  });
+  const [topUsers, totalEloUsers] = await Promise.all([
+    prisma.user.findMany({
+      where: { elo: { not: 1000 } },
+      orderBy: { elo: 'desc' },
+      take: 50,
+      select: {
+        id: true,
+        name: true,
+        image: true,
+        elo: true,
+        gamesPlayed: true,
+        mwcCorrect: true,
+        lvGames: true,
+        lvCorrect: true,
+        nvGames: true,
+        nvCorrect: true,
+      },
+    }),
+    prisma.user.count({ where: { elo: { not: 1000 } } }),
+  ]);
 
   const playerEntries = topUsers.map((u, idx) => ({
     rank: idx + 1,
@@ -110,6 +113,7 @@ export default async function LeaderboardPage() {
     currentUserElo: currentEntry ? currentEntry.elo : null,
     currentUserEloChange: 0,
     totalPlayerEntries: playerEntries.length,
+    totalEloUsers,
     globalAvgPageElo,
     hardestPageNumber: pageEntries[0]?.pageNumber ?? null,
     easiestPageNumber: pageEntries[pageEntries.length - 1]?.pageNumber ?? null,

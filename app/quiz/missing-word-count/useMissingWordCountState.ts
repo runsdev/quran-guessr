@@ -6,6 +6,7 @@ import { initSession, fetchNextQuestion, submitAnswer } from './actions';
 import type { Option } from './AnswerGrid';
 import type { Question, SubmitResult } from './types';
 
+import { abandonSession } from '@/app/quiz/actions';
 import { loadJuzFilter } from '@/app/quiz/components/JuzFilterSettings';
 
 const SESSION_KEY = 'quizSession:missing-word-count';
@@ -15,7 +16,6 @@ export function useMissingWordCountState() {
   const [sessionToken, setSessionToken] = useState<string | null>(null);
   const [isInitializing, setIsInitializing] = useState(true);
   const [initError, setInitError] = useState(false);
-  const [juzFilter, setJuzFilter] = useState<number[]>([]);
 
   const [question, setQuestion] = useState<Question | null>(null);
   const [isPending, startTransition] = useTransition();
@@ -28,8 +28,6 @@ export function useMissingWordCountState() {
 
   useEffect(() => {
     const filter = loadJuzFilter();
-    // eslint-disable-next-line react-hooks/set-state-in-effect
-    setJuzFilter(filter);
     const urlToken = new URLSearchParams(window.location.search).get('token') ?? undefined;
     const stored = urlToken ?? localStorage.getItem(SESSION_KEY) ?? undefined;
     initSession(stored, filter.length > 0 ? filter : undefined)
@@ -51,9 +49,6 @@ export function useMissingWordCountState() {
   }, []);
 
   const submitted = isSubmitting || submitResult !== null;
-  const isCorrect = submitResult?.isCorrect ?? false;
-  const timedOut = selected === null && submitted;
-  const displayPageElo = submitResult?.newPageElo ?? question?.pageElo ?? null;
 
   const pageNumbers = useMemo(() => {
     const nums: number[] = [];
@@ -93,7 +88,6 @@ export function useMissingWordCountState() {
 
   const handleTimerExpire = () => doSubmit(0);
   const handleSubmit = () => doSubmit(selected ?? 0);
-
   const handleNext = () => {
     if (!sessionToken) {
       return;
@@ -106,7 +100,7 @@ export function useMissingWordCountState() {
       try {
         const { question: q, questionNumber: qn } = await fetchNextQuestion(
           sessionToken,
-          juzFilter.length > 0 ? juzFilter : undefined,
+          loadJuzFilter().length > 0 ? loadJuzFilter() : undefined,
         );
         setQuestion(q);
         setQuestionNumber(qn);
@@ -116,7 +110,6 @@ export function useMissingWordCountState() {
       }
     });
   };
-
   const handleRetry = () => {
     if (!sessionToken) {
       return;
@@ -126,7 +119,7 @@ export function useMissingWordCountState() {
       try {
         const { question: q, questionNumber: qn } = await fetchNextQuestion(
           sessionToken,
-          juzFilter.length > 0 ? juzFilter : undefined,
+          loadJuzFilter().length > 0 ? loadJuzFilter() : undefined,
         );
         setQuestion(q);
         setQuestionNumber(qn);
@@ -137,6 +130,13 @@ export function useMissingWordCountState() {
     });
   };
 
+  const handleEndSession = async () => {
+    if (sessionToken) {
+      localStorage.removeItem(SESSION_KEY);
+      await abandonSession(sessionToken);
+    }
+    window.location.href = '/quiz';
+  };
   return {
     isInitializing,
     initError,
@@ -149,13 +149,14 @@ export function useMissingWordCountState() {
     questionNumber,
     initialTimeLeft,
     submitted,
-    isCorrect,
-    timedOut,
-    displayPageElo,
+    isCorrect: submitResult?.isCorrect ?? false,
+    timedOut: selected === null && submitted,
+    displayPageElo: submitResult?.newPageElo ?? question?.pageElo ?? null,
     pageNumbers,
     handleTimerExpire,
     handleSubmit,
     handleNext,
     handleRetry,
+    handleEndSession,
   };
 }

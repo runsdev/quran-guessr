@@ -101,10 +101,11 @@ export async function submitAnswer(
     throw new Error('Invalid answer token');
   }
   const { correctPage, correctLine } = result;
+  const noAnswer = guessedPage === 0 && guessedLine === 0;
   const slotGuess = (guessedPage - 1) * 15 + guessedLine;
   const slotCorrect = (correctPage - 1) * 15 + correctLine;
   const distance = Math.abs(slotGuess - slotCorrect);
-  const roundScore = Math.round(5000 * Math.exp(-distance / 2000));
+  const roundScore = noAnswer ? 0 : Math.round(5000 * Math.exp(-distance / 2000));
 
   const session = await auth();
   const userId = (session?.user as { id?: string } | undefined)?.id ?? null;
@@ -114,7 +115,7 @@ export async function submitAnswer(
         where: { id: userId },
         data: {
           lvGames: { increment: 1 },
-          ...(guessedPage === correctPage ? { lvCorrect: { increment: 1 } } : {}),
+          ...(!noAnswer && guessedPage === correctPage ? { lvCorrect: { increment: 1 } } : {}),
         },
       }),
       recordQfActivityDay(userId, verseKey),

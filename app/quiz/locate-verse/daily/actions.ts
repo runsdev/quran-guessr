@@ -1,10 +1,67 @@
 'use server';
 
 import { decryptVerseKey, verifyAnswer } from '@/app/quiz/locate-verse/answerToken';
-import type { SubmitResult } from '@/app/quiz/locate-verse/types';
+import type { Question, SubmitResult } from '@/app/quiz/locate-verse/types';
+import { TIMER_LIMIT } from '@/app/quiz/locate-verse/types';
 import { auth } from '@/auth';
 import { getOrCreateDailyChallenge, getUtcDateStr } from '@/lib/daily-challenge';
 import { prisma } from '@/lib/prisma';
+import { createQuizSession, advanceQuizSession } from '@/lib/quiz-session';
+
+export async function initDailySession(
+  challengeId: string,
+  questionIndex: number,
+  question: Question,
+): Promise<{ sessionToken: string; initialTimeLeft: number }> {
+  const session = await auth();
+  const userId = (session?.user as { id?: string } | undefined)?.id ?? null;
+
+  if (userId) {
+    const existing = await prisma.quizSession.findFirst({
+      where: {
+        userId,
+        gameMode: 'locate-verse-daily',
+        status: 'active',
+        expiresAt: { gt: new Date() },
+      },
+    });
+
+    if (existing) {
+      const q = existing.currentQuestion as { questionIndex?: number };
+      if (q.questionIndex === questionIndex) {
+        const elapsed = Math.floor((Date.now() - existing.questionStartedAt.getTime()) / 1000);
+        const initialTimeLeft = Math.max(0, existing.timerLimit - elapsed);
+        return { sessionToken: existing.token, initialTimeLeft };
+      }
+      await advanceQuizSession(existing.token, {
+        question: { ...question, questionIndex } as object,
+        questionNumber: questionIndex + 1,
+        timerLimit: TIMER_LIMIT,
+      });
+      return { sessionToken: existing.token, initialTimeLeft: TIMER_LIMIT };
+    }
+  }
+
+  const record = await createQuizSession({
+    userId,
+    gameMode: 'locate-verse-daily',
+    question: { ...question, questionIndex } as object,
+    timerLimit: TIMER_LIMIT,
+  });
+  return { sessionToken: record.token, initialTimeLeft: TIMER_LIMIT };
+}
+
+export async function advanceDailyQuestion(
+  sessionToken: string,
+  questionIndex: number,
+  question: Question,
+): Promise<void> {
+  await advanceQuizSession(sessionToken, {
+    question: { ...question, questionIndex } as object,
+    questionNumber: questionIndex + 1,
+    timerLimit: TIMER_LIMIT,
+  });
+}
 
 export async function submitDailyAnswer(
   challengeId: string,
@@ -25,10 +82,11 @@ export async function submitDailyAnswer(
   }
 
   const { correctPage, correctLine } = result;
+  const noAnswer = guessedPage === 0 && guessedLine === 0;
   const slotGuess = (guessedPage - 1) * 15 + guessedLine;
   const slotCorrect = (correctPage - 1) * 15 + correctLine;
   const distance = Math.abs(slotGuess - slotCorrect);
-  const roundScore = Math.round(5000 * Math.exp(-distance / 2000));
+  const roundScore = noAnswer ? 0 : Math.round(5000 * Math.exp(-distance / 2000));
 
   const session = await auth();
   const userId = (session?.user as { id?: string } | undefined)?.id ?? null;
@@ -84,11 +142,7 @@ export async function submitDailyAnswer(
   };
 }
 
-export async function getDailyChallengeStatus(): Promise<{
-  challengeId: string;
-  completedScores: number[] | null;
-  resumeFromIndex: number;
-}> {
+export async function getDailyChallengeStatus() {
   const today = getUtcDateStr();
   const challenge = await getOrCreateDailyChallenge(today);
 

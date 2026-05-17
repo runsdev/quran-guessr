@@ -81,11 +81,12 @@ export default function DailyQuizClient({
         </div>
       </div>
 
-      {state.question && (
+      {state.question && !state.isInitializing && (
         <TimerBar
           key={state.currentIndex}
           submitted={state.submitted}
           onExpire={state.handleTimerExpire}
+          initialTimeLeft={state.initialTimeLeft}
         />
       )}
 

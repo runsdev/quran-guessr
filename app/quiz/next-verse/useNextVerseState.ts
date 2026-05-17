@@ -5,6 +5,7 @@ import { useTransition, useState, useMemo, useEffect } from 'react';
 import { initSession, fetchNextQuestion, submitAnswer } from './actions';
 import type { Question, SubmitResult } from './types';
 
+import { abandonSession } from '@/app/quiz/actions';
 import { loadJuzFilter } from '@/app/quiz/components/JuzFilterSettings';
 
 const SESSION_KEY = 'quizSession:next-verse';
@@ -131,6 +132,14 @@ export function useNextVerseState() {
     });
   };
 
+  const handleEndSession = async () => {
+    if (sessionToken) {
+      localStorage.removeItem(SESSION_KEY);
+      await abandonSession(sessionToken);
+    }
+    window.location.href = '/quiz';
+  };
+
   return {
     isInitializing,
     initError,
@@ -149,5 +158,6 @@ export function useNextVerseState() {
     handleSubmit,
     handleNext,
     handleRetry,
+    handleEndSession,
   };
 }

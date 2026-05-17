@@ -4,18 +4,25 @@ import Image from 'next/image';
 
 import type { LeaderboardEntry } from './leaderboard-types';
 
-export function getMastery(elo: number) {
-  if (elo >= 1300) {
-    return { label: 'Master', chipCls: 'bg-primary/10 text-primary border border-primary/20' };
-  }
-  if (elo >= 1100) {
+export function getPercentileTier(rank: number, totalUsers: number) {
+  if (totalUsers === 0) {
     return {
-      label: 'Intermediate',
+      label: 'Unranked',
+      chipCls: 'bg-surface-container text-on-surface-variant border border-outline-variant',
+    };
+  }
+  const pct = Math.ceil((rank / totalUsers) * 100);
+  if (pct <= 10) {
+    return { label: `Top ${pct}%`, chipCls: 'bg-primary/10 text-primary border border-primary/20' };
+  }
+  if (pct <= 30) {
+    return {
+      label: `Top ${pct}%`,
       chipCls: 'bg-secondary-container/20 text-secondary border border-secondary-container',
     };
   }
   return {
-    label: 'Beginner',
+    label: `Top ${pct}%`,
     chipCls: 'bg-surface-container text-on-surface-variant border border-outline-variant',
   };
 }
@@ -25,9 +32,10 @@ export function getMastery(elo: number) {
 interface TableProps {
   paged: LeaderboardEntry[];
   currentUserId?: string;
+  totalEloUsers: number;
 }
 
-export function LeaderboardTable({ paged, currentUserId }: TableProps) {
+export function LeaderboardTable({ paged, currentUserId, totalEloUsers }: TableProps) {
   return (
     <div className="overflow-x-auto">
       <table className="w-full text-left border-collapse">
@@ -55,7 +63,7 @@ export function LeaderboardTable({ paged, currentUserId }: TableProps) {
         </thead>
         <tbody className="divide-y divide-primary/5">
           {paged.map((entry) => {
-            const mastery = getMastery(entry.elo);
+            const tier = getPercentileTier(entry.rank, totalEloUsers);
             const isMe = entry.userId === currentUserId;
             const rankCls =
               entry.rank === 1
@@ -126,9 +134,9 @@ export function LeaderboardTable({ paged, currentUserId }: TableProps) {
                 </td>
                 <td className="px-6 py-5">
                   <span
-                    className={`px-3 py-1 text-[10px] font-bold uppercase rounded-full ${mastery.chipCls}`}
+                    className={`px-3 py-1 text-[10px] font-bold uppercase rounded-full ${tier.chipCls}`}
                   >
-                    {mastery.label}
+                    {tier.label}
                   </span>
                 </td>
                 <td className="px-6 py-5 text-sm font-semibold text-on-surface text-center tabular-nums">

@@ -4,6 +4,7 @@ import GameModesClient from './components/GameModesClient';
 import BottomNav from '@/app/components/BottomNav';
 import TopAppBar from '@/app/components/TopAppBar';
 import { auth } from '@/auth';
+import { getOrCreateDailyChallenge } from '@/lib/daily-challenge';
 import { prisma } from '@/lib/prisma';
 import { fetchQfStreak } from '@/lib/qf-api';
 
@@ -44,7 +45,8 @@ export default async function QuizHubPage() {
   let activeSessions: ActiveSession[] = [];
 
   if (userId) {
-    const [user, rankedCount, qfStreak, sessions] = await Promise.all([
+    const today = dateStr(new Date());
+    const [user, rankedCount, qfStreak, sessions, dailyChallenge] = await Promise.all([
       prisma.user.findUnique({ where: { id: userId }, select: { elo: true, name: true } }),
       getDailyRankedCount(userId),
       fetchQfStreak(userId),
@@ -59,6 +61,7 @@ export default async function QuizHubPage() {
         },
         orderBy: { updatedAt: 'desc' },
       }),
+      getOrCreateDailyChallenge(today),
     ]);
     if (user) {
       elo = Math.round(user.elo);
@@ -67,6 +70,25 @@ export default async function QuizHubPage() {
     streak = qfStreak;
     dailyRankedCount = rankedCount;
     activeSessions = sessions;
+
+    // Check for an incomplete daily challenge and add to sessions
+    const dailyResult = await prisma.dailyChallengeResult.findUnique({
+      // eslint-disable-next-line @typescript-eslint/naming-convention
+      where: { challengeId_userId: { challengeId: dailyChallenge.id, userId } },
+      select: { completed: true, scores: true, totalScore: true },
+    });
+    if (dailyResult && !dailyResult.completed) {
+      activeSessions = [
+        {
+          token: `daily-${dailyChallenge.id}`,
+          gameMode: 'locate-verse-daily',
+          questionNumber: dailyResult.scores.length + 1,
+          totalScore: dailyResult.totalScore,
+          updatedAt: new Date(),
+        },
+        ...activeSessions,
+      ];
+    }
   }
 
   return (
@@ -75,7 +97,7 @@ export default async function QuizHubPage() {
 
       <TopAppBar activeTab="Quiz" />
 
-      <main className="max-w-7xl mx-auto px-6 md:px-8 pt-24 pb-32 space-y-24 md:space-y-32">
+      <main className="max-w-7xl mx-auto px-6 md:px-8 pt-24 pb-32 space-y-24 md:space-y-10">
         <DashboardHeader
           userName={userName}
           elo={elo}

@@ -4,6 +4,7 @@ import { initSession, fetchNextQuestion, submitAnswer } from './actions';
 import { TIMER_LIMIT } from './types';
 import type { Question, SubmitResult } from './types';
 
+import { abandonSession } from '@/app/quiz/actions';
 import { loadJuzFilter } from '@/app/quiz/components/JuzFilterSettings';
 
 const SESSION_KEY = 'quizSession:locate-verse';
@@ -74,9 +75,7 @@ export function useQuizState() {
     }
     doSubmit(selectedPage, selectedLine);
   };
-  const handleTimerExpire = () => {
-    doSubmit(selectedPage, selectedLine);
-  };
+  const handleTimerExpire = () => doSubmit(selectedPage, selectedLine);
   const handleNext = () => {
     if (!sessionToken) {
       return;
@@ -123,6 +122,13 @@ export function useQuizState() {
     });
   };
 
+  const handleEndSession = async () => {
+    if (sessionToken) {
+      localStorage.removeItem(SESSION_KEY);
+      await abandonSession(sessionToken);
+    }
+    window.location.href = '/quiz';
+  };
   const submitted = isSubmitting || submitResult !== null;
   const pageNumbers = useMemo(() => question?.fontPages ?? [], [question]);
 
@@ -140,11 +146,13 @@ export function useQuizState() {
     submitted,
     pageNumbers,
     initialTimeLeft,
+    sessionToken,
     setSelectedPage,
     setSelectedLine,
     handleSubmit,
     handleTimerExpire,
     handleNext,
     handleRetry,
+    handleEndSession,
   };
 }

@@ -4,7 +4,7 @@ import type { Prisma } from '@prisma/client';
 
 import { prisma } from './prisma';
 
-export type GameMode = 'locate-verse' | 'next-verse' | 'missing-word-count';
+export type GameMode = 'locate-verse' | 'next-verse' | 'missing-word-count' | 'locate-verse-daily';
 
 const SESSION_TTL_HOURS = 24;
 
@@ -108,5 +108,12 @@ export async function saveQuizSubmitResult(
       submitResult: result as Prisma.InputJsonValue,
       totalScore: { increment: scoreDelta },
     },
+  });
+}
+
+export async function endQuizSession(token: string): Promise<void> {
+  await prisma.quizSession.updateMany({
+    where: { token, status: 'active' },
+    data: { status: 'abandoned', expiresAt: new Date() },
   });
 }

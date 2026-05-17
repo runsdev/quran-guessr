@@ -33,6 +33,7 @@ export interface LeaderboardStats {
   currentUserElo: number | null;
   currentUserEloChange: number;
   totalPlayerEntries: number;
+  totalEloUsers: number;
   // Page ELO stats
   globalAvgPageElo: number;
   hardestPageNumber: number | null;

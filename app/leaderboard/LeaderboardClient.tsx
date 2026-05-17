@@ -88,7 +88,11 @@ export default function LeaderboardClient({
             {filtered.length === 0 ? (
               <div className="py-16 text-center text-on-surface-variant text-sm">{meta.empty}</div>
             ) : tab === 'player' ? (
-              <LeaderboardTable paged={pagedPlayers} currentUserId={currentUserId} />
+              <LeaderboardTable
+                paged={pagedPlayers}
+                currentUserId={currentUserId}
+                totalEloUsers={stats.totalEloUsers}
+              />
             ) : tab === 'page' ? (
               <PageEloTable paged={pagedPages} />
             ) : (
