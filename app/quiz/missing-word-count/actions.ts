@@ -1,7 +1,7 @@
 'use server';
 
 import { verifyAnswer, decryptVerseKey, decryptHiddenWords } from './answerToken';
-import { getAdaptiveQuestion } from './getQuestion';
+import { getAdaptiveQuestion } from './getAdaptiveQuestion';
 import type { Question, SubmitResult, SessionInitResult } from './types';
 import { updateRankedElo } from './updateRankedElo';
 

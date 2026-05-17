@@ -43,3 +43,40 @@ export const SURAH_NAMES: readonly string[] = [
   'Quraysh',       "Al-Ma'un",      'Al-Kawthar',    'Al-Kafirun',   'An-Nasr',       // 106-110
   'Al-Masad',      'Al-Ikhlas',     'Al-Falaq',      'An-Nas',                        // 111-114
 ];
+
+/** Returns the verse key that comes immediately after the given key, or null for the last verse. */
+export function nextVerseKey(verseKey: string): string | null {
+  const [surahStr, ayahStr] = verseKey.split(':');
+  const surah = parseInt(surahStr, 10);
+  const ayah = parseInt(ayahStr, 10);
+  const maxAyah = SURAH_VERSE_COUNTS[surah];
+  if (ayah < maxAyah) {
+    return `${surah}:${ayah + 1}`;
+  }
+  if (surah < 114) {
+    return `${surah + 1}:1`;
+  }
+  return null; // last verse of the Quran
+}
+
+/**
+ * Picks a random verse key from [ayahMin, ayahMax] of the given surah and
+ * fetches its words via the provided fetcher.  Retries until the fetcher
+ * returns a non-null result (i.e. the verse exists in the API).
+ */
+export async function fetchRandomVerseInAyahRange<T>(
+  surah: number,
+  ayahMin: number,
+  ayahMax: number,
+  fetcher: (verseKey: string) => Promise<T | null>,
+): Promise<{ verseKey: string; words: T }> {
+  const lo = Math.max(1, ayahMin);
+  const hi = Math.min(SURAH_VERSE_COUNTS[surah], ayahMax);
+  for (;;) {
+    const verseKey = `${surah}:${lo + Math.floor(Math.random() * (hi - lo + 1))}`;
+    const words = await fetcher(verseKey);
+    if (words) {
+      return { verseKey, words };
+    }
+  }
+}

@@ -1,18 +1,35 @@
 /* eslint-disable @typescript-eslint/naming-convention */
+import type { UserSession } from '@quranjs/api';
+import { createServerClient } from '@quranjs/api/server';
+
 import { prisma } from './prisma';
 
-const QF_USER_API_BASE =
-  process.env.QF_ENVIRONMENT === 'production'
-    ? 'https://apis.quran.foundation/auth'
-    : 'https://apis-prelive.quran.foundation/auth';
+const IS_PRODUCTION = process.env.QF_ENVIRONMENT === 'production';
 
-const QF_TOKEN_URL =
-  process.env.QF_ENVIRONMENT === 'production'
-    ? 'https://oauth2.quran.foundation/oauth2/token'
-    : 'https://prelive-oauth2.quran.foundation/oauth2/token';
+const QF_USER_API_BASE = IS_PRODUCTION
+  ? 'https://apis.quran.foundation/auth'
+  : 'https://apis-prelive.quran.foundation/auth';
 
-/** Returns a fresh (possibly refreshed) access token for the given userId, or null if unavailable. */
-async function getAccessToken(userId: string): Promise<string | null> {
+/** Prelive service URLs — used when QF_ENVIRONMENT is not "production". */
+const PRELIVE_SERVICES = {
+  oauth2BaseUrl: 'https://prelive-oauth2.quran.foundation',
+  contentBaseUrl: 'https://apis-prelive.quran.foundation/content',
+  searchBaseUrl: 'https://apis-prelive.quran.foundation/search',
+  authBaseUrl: 'https://apis-prelive.quran.foundation/auth',
+} as const;
+
+/**
+ * Build a @quranjs/api/server client scoped to a signed-in user session.
+ *
+ * The SDK handles token refresh automatically.  When it refreshes, the
+ * `storage.setSession` callback persists the new tokens back to the database
+ * so the next request can reuse them without another round-trip.
+ *
+ * CLIENT_SECRET stays here — server module, never bundled into the client.
+ */
+async function buildUserClient(
+  userId: string,
+): Promise<ReturnType<typeof createServerClient> | null> {
   const account = await prisma.account.findFirst({
     where: { userId, provider: 'quran-foundation' },
     select: { access_token: true, refresh_token: true, expires_at: true },
@@ -21,56 +38,45 @@ async function getAccessToken(userId: string): Promise<string | null> {
     return null;
   }
 
-  // Valid for at least 60 more seconds
-  if (account.expires_at && account.expires_at > Math.floor(Date.now() / 1000) + 60) {
-    return account.access_token;
-  }
+  const userSession: UserSession = {
+    accessToken: account.access_token,
+    refreshToken: account.refresh_token ?? undefined,
+    expiresAt: account.expires_at ?? undefined,
+  };
 
-  // Token expired — try to refresh
-  if (!account.refresh_token) {
-    return account.access_token;
-  }
-
-  try {
-    const res = await fetch(QF_TOKEN_URL, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-      body: new URLSearchParams({
-        grant_type: 'refresh_token',
-
-        refresh_token: account.refresh_token,
-
-        client_id: process.env.QF_CLIENT_ID!,
-
-        client_secret: process.env.QF_CLIENT_SECRET!,
-      }),
-    });
-    if (!res.ok) {
-      return account.access_token;
-    }
-
-    const tokens = (await res.json()) as {
-      access_token?: string;
-      refresh_token?: string;
-      expires_in?: number;
-    };
-    if (!tokens.access_token) {
-      return account.access_token;
-    }
-
-    await prisma.account.updateMany({
-      where: { userId, provider: 'quran-foundation' },
-      data: {
-        access_token: tokens.access_token,
-        refresh_token: tokens.refresh_token ?? account.refresh_token,
-        expires_at: tokens.expires_in ? Math.floor(Date.now() / 1000) + tokens.expires_in : null,
+  return createServerClient({
+    clientId: process.env.QF_CLIENT_ID!,
+    clientSecret: process.env.QF_CLIENT_SECRET!,
+    userSession,
+    ...(!IS_PRODUCTION && { services: PRELIVE_SERVICES }),
+    storage: {
+      setSession: async (session: UserSession | null) => {
+        if (session?.accessToken) {
+          await prisma.account.updateMany({
+            where: { userId, provider: 'quran-foundation' },
+            data: {
+              access_token: session.accessToken,
+              refresh_token: session.refreshToken ?? account.refresh_token,
+              expires_at: session.expiresAt ?? null,
+            },
+          });
+        }
       },
-    });
+    },
+  });
+}
 
-    return tokens.access_token;
-  } catch {
-    return account.access_token;
+/**
+ * Return a valid access token for userId, letting the SDK refresh it if
+ * needed and persist the new tokens via the storage callback above.
+ */
+async function getAccessToken(userId: string): Promise<string | null> {
+  const client = await buildUserClient(userId);
+  if (!client) {
+    return null;
   }
+  const session = await client.getUserSession();
+  return session?.accessToken ?? null;
 }
 
 /**

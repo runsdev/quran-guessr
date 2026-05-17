@@ -1,63 +1,115 @@
+import type { Verse, Word } from '@quranjs/api';
+
 import { encryptVerseKey, signAnswer, encryptHiddenWords } from './answerToken';
 import type { Question, Segment } from './types';
 
 import type { VerseWord } from '@/app/quiz/types';
 import { prisma } from '@/lib/prisma';
-import { pickRandomJuz, getPageRangeForJuz } from '@/lib/quran-pages';
+import { qdcFetchByJuz, qdcFetchByPage, qdcFetchRandom } from '@/lib/qdc-client';
+import type { QdcVerse } from '@/lib/qdc-client';
+import { getContentClient } from '@/lib/qf-server-client';
+import { pickRandomJuz } from '@/lib/quran-pages';
 
-interface QuranWord {
-  id: number;
-  position: number;
-  // eslint-disable-next-line @typescript-eslint/naming-convention
-  code_v2: string;
-  // eslint-disable-next-line @typescript-eslint/naming-convention
-  text_qpc_hafs: string;
+/** Map an SDK Word to the app's VerseWord shape. */
+function mapWord(w: Word): VerseWord & {
   // eslint-disable-next-line @typescript-eslint/naming-convention
   page_number: number;
+} {
+  // prettier-ignore
   // eslint-disable-next-line @typescript-eslint/naming-convention
-  char_type_name: string;
+  return { id: w.id ?? 0, position: w.position, code_v2: w.codeV2 ?? '', text_qpc_hafs: w.text ?? '', page_number: w.pageNumber ?? 1, char_type_name: w.charTypeName };
 }
+
+/** Options passed to every verse endpoint: include words and request the QCF v2 glyph codes. */
+const WORD_OPTS = {
+  words: true,
+  wordFields: { codeV2: true },
+} as const;
 
 interface QuranVerse {
   // eslint-disable-next-line @typescript-eslint/naming-convention
   verse_key: string;
-  words: QuranWord[];
+  // eslint-disable-next-line @typescript-eslint/naming-convention
+  words: Array<VerseWord & { page_number: number }>;
 }
 
-interface QuranApiRandomResponse {
-  verse: QuranVerse;
+function toQuranVerse(v: Verse): QuranVerse {
+  return {
+    // eslint-disable-next-line @typescript-eslint/naming-convention
+    verse_key: v.verseKey,
+    words: (v.words ?? []).map(mapWord),
+  };
 }
 
-interface QuranApiPageResponse {
-  verses: QuranVerse[];
+function qdcToQuranVerse(v: QdcVerse): QuranVerse {
+  return {
+    // eslint-disable-next-line @typescript-eslint/naming-convention
+    verse_key: v.verse_key,
+    words: v.words.map((w) => ({
+      id: w.id,
+      position: w.position,
+      // eslint-disable-next-line @typescript-eslint/naming-convention
+      code_v2: w.code_v2 ?? '',
+      // eslint-disable-next-line @typescript-eslint/naming-convention
+      text_qpc_hafs: w.text ?? '',
+      // eslint-disable-next-line @typescript-eslint/naming-convention
+      page_number: w.page_number ?? 1,
+      // eslint-disable-next-line @typescript-eslint/naming-convention
+      char_type_name: w.char_type_name,
+    })),
+  };
 }
 
 async function fetchVerse(targetPageNumber?: number, juzFilter?: number[]): Promise<QuranVerse> {
+  const client = getContentClient();
+
   if (targetPageNumber !== undefined) {
-    const res = await fetch(
-      `https://api.quran.com/api/v4/verses/by_page/${targetPageNumber}?words=true&word_fields=code_v2,text_qpc_hafs&fields=verse_key`,
-      { cache: 'no-store' },
-    );
-    if (!res.ok) {
-      throw new Error('Quran API error');
+    try {
+      // byPage with words:true returns empty on some environments; use a two-step
+      // approach: get the verse index for the page (no words), pick randomly, then
+      // fetch the full verse with words via byKey.
+      const pageIndex = await client.content.v4.verses.byPage(
+        String(targetPageNumber) as Parameters<typeof client.content.v4.verses.byPage>[0],
+      );
+      if (!pageIndex?.length) {
+        throw new Error('No verses found for page');
+      }
+      const picked = pageIndex[Math.floor(Math.random() * pageIndex.length)];
+      const verse = await client.content.v4.verses.byKey(
+        picked.verseKey as Parameters<typeof client.content.v4.verses.byKey>[0],
+        WORD_OPTS,
+      );
+      return toQuranVerse(verse);
+    } catch (err) {
+      console.warn(`SDK byPage(${targetPageNumber}) failed, falling back to direct API:`, err);
+      return qdcToQuranVerse(await qdcFetchByPage(targetPageNumber));
     }
-    const { verses } = (await res.json()) as QuranApiPageResponse;
-    if (!verses?.length) {
-      throw new Error('No verses found for page');
-    }
-    return verses[Math.floor(Math.random() * verses.length)];
   }
 
-  const juzParam =
-    juzFilter && juzFilter.length > 0 ? `&juz_number=${pickRandomJuz(juzFilter)}` : '';
-  const res = await fetch(
-    `https://api.quran.com/api/v4/verses/random?words=true&word_fields=code_v2,text_qpc_hafs&fields=verse_key${juzParam}`,
-    { cache: 'no-store' },
-  );
-  if (!res.ok) {
-    throw new Error('Quran API error');
+  if (juzFilter && juzFilter.length > 0) {
+    const juzNum = pickRandomJuz(juzFilter);
+    try {
+      const verses = await client.content.v4.verses.byJuz(
+        String(juzNum) as Parameters<typeof client.content.v4.verses.byJuz>[0],
+        WORD_OPTS,
+      );
+      if (!verses?.length) {
+        throw new Error('No verses found for juz');
+      }
+      return toQuranVerse(verses[Math.floor(Math.random() * verses.length)]);
+    } catch (err) {
+      console.warn(`SDK byJuz(${juzNum}) failed, falling back to direct API:`, err);
+      return qdcToQuranVerse(await qdcFetchByJuz(juzNum));
+    }
   }
-  return ((await res.json()) as QuranApiRandomResponse).verse;
+
+  try {
+    const verse = await client.content.v4.verses.random(WORD_OPTS);
+    return toQuranVerse(verse);
+  } catch (err) {
+    console.warn('SDK random failed, falling back to direct API:', err);
+    return qdcToQuranVerse(await qdcFetchRandom());
+  }
 }
 
 /**
@@ -134,41 +186,4 @@ export async function getRandomQuestion(
   }
 
   throw new Error('Could not find a suitable verse after multiple attempts');
-}
-
-export async function getAdaptiveQuestion(
-  userId: string | null,
-  juzFilter?: number[],
-): Promise<Question> {
-  if (!userId) {
-    return getRandomQuestion(undefined, juzFilter);
-  }
-
-  const user = await prisma.user.findUnique({ where: { id: userId }, select: { elo: true } });
-  const userElo = user?.elo ?? 1000;
-
-  // Build page range constraints from juz filter
-  const juzPageRanges =
-    juzFilter && juzFilter.length > 0 ? juzFilter.map((j) => getPageRangeForJuz(j)) : null;
-
-  const matchingPages = await prisma.pageElo.findMany({
-    where: {
-      elo: { gte: userElo - 200, lte: userElo + 200 },
-      ...(juzPageRanges
-        ? {
-            OR: juzPageRanges.map(({ start, end }) => ({
-              pageNumber: { gte: start, lte: end },
-            })),
-          }
-        : {}),
-    },
-    select: { pageNumber: true },
-  });
-
-  const targetPage =
-    matchingPages.length > 0
-      ? matchingPages[Math.floor(Math.random() * matchingPages.length)].pageNumber
-      : undefined;
-
-  return getRandomQuestion(targetPage, juzFilter);
 }

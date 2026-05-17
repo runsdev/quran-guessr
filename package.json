@@ -15,6 +15,7 @@
     "test": "vitest run",
     "test:watch": "vitest watch",
     "test:coverage": "vitest run --coverage",
+    "test:api": "vitest run lib/__tests__/qf-sdk-endpoints.test.ts app/quiz/missing-word-count/__tests__/getQuestion.test.ts",
     "seed": "tsx prisma/seed.ts",
     "seed:reset": "tsx prisma/seed.ts --reset",
     "prepare": "husky"
