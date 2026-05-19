@@ -178,7 +178,7 @@ export async function getRandomQuestion(
     return {
       encryptedVerseKey: encryptVerseKey(verse.verse_key),
       segments,
-      answerToken: signAnswer(verse.verse_key, missingCount, pageNumber),
+      answerToken: signAnswer(verse.verse_key, missingCount, pageNumber, wordCount),
       encryptedHiddenWords: encryptHiddenWords(hiddenWords),
       totalWords: wordCount,
       pageElo: pageEloRecord ? Math.round(pageEloRecord.elo) : 1200,
