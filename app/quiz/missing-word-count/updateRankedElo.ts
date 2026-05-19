@@ -15,12 +15,21 @@ export async function updateRankedElo(
   isCorrect: boolean,
   today: string,
   currentPageElo: number,
+  totalWords: number,
+  missingCount: number,
 ): Promise<EloUpdateResult> {
   const user = await prisma.user.findUnique({
     where: { id: userId },
     select: { elo: true, gamesPlayed: true },
   });
-  const result = computeElo(user?.elo ?? 1000, currentPageElo, isCorrect, user?.gamesPlayed ?? 0);
+  const result = computeElo(
+    user?.elo ?? 1000,
+    currentPageElo,
+    isCorrect,
+    user?.gamesPlayed ?? 0,
+    totalWords,
+    missingCount,
+  );
 
   await prisma.$transaction([
     prisma.user.update({

@@ -97,7 +97,7 @@ export async function submitAnswer(
   if (verified === null) {
     throw new Error('Invalid answer token');
   }
-  const { missingCount: correctAnswer, pageNumber } = verified;
+  const { missingCount: correctAnswer, pageNumber, totalWords } = verified;
   const isCorrect = guess === correctAnswer;
 
   const existingPageElo = await prisma.pageElo.findUnique({ where: { pageNumber } });
@@ -135,7 +135,15 @@ export async function submitAnswer(
     return unranked;
   }
 
-  const eloResult = await updateRankedElo(userId, pageNumber, isCorrect, today, currentPageElo);
+  const eloResult = await updateRankedElo(
+    userId,
+    pageNumber,
+    isCorrect,
+    today,
+    currentPageElo,
+    totalWords,
+    correctAnswer,
+  );
   void recordQfActivityDay(userId, verseKey);
 
   const submitResult: SubmitResult = {
