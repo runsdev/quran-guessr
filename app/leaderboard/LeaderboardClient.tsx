@@ -61,7 +61,7 @@ export default function LeaderboardClient({
   };
 
   return (
-    <div className="flex h-screen pt-16 overflow-hidden bg-surface text-on-surface">
+    <div className="flex h-screen pt-20 overflow-hidden bg-surface text-on-surface">
       <main className="flex-1 overflow-y-auto pb-20 md:pb-0">
         <div className="max-w-5xl mx-auto space-y-8 p-4 md:p-8">
           <div>

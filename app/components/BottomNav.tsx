@@ -1,29 +1,37 @@
 import React from 'react';
 
 const navItems = [
-  { icon: 'quiz', label: 'Quiz', active: false, href: '/quiz' },
-  { icon: 'leaderboard', label: 'Rankings', active: false, href: '/leaderboard' },
-  { icon: 'person', label: 'Profile', active: false, href: '/profile' },
+  { icon: 'quiz', label: 'Quiz', href: '/quiz' },
+  { icon: 'leaderboard', label: 'Rankings', href: '/leaderboard' },
+  { icon: 'person', label: 'Profile', href: '/profile' },
 ];
 
 /**
- * Mobile-only fixed bottom navigation bar.
+ * Mobile-only fixed bottom navigation bar — Apple-style frosted bar.
  */
 const BottomNav = (): React.JSX.Element => (
-  <nav className="md:hidden bg-surface-container-lowest/90 backdrop-blur-lg fixed bottom-0 w-full rounded-t-2xl z-50 border-t border-primary/10 shadow-[0_-4px_12px_rgba(0,0,0,0.3)] flex justify-around items-center h-20 px-6">
-    {navItems.map(({ icon, label, active, href }) => (
+  <nav
+    className="md:hidden fixed bottom-0 w-full z-50 flex justify-around items-center rounded-t-2xl"
+    style={{
+      height: 68,
+      background: 'rgba(255,255,255,0.85)',
+      backdropFilter: 'blur(20px)',
+      WebkitBackdropFilter: 'blur(20px)',
+      borderTop: '1px solid rgba(0,0,0,0.08)',
+      fontFamily: 'var(--font-inter), system-ui, -apple-system, sans-serif',
+    }}
+  >
+    {navItems.map(({ icon, label, href }) => (
       <a
         key={label}
-        href={href ?? '#'}
-        className={[
-          'flex flex-col items-center justify-center rounded-xl px-4 py-1 active:scale-90 transition-all duration-300 ease-out',
-          active
-            ? 'text-primary bg-primary/10'
-            : 'text-on-surface-variant hover:bg-surface-container',
-        ].join(' ')}
+        href={href}
+        className="flex flex-col items-center justify-center gap-0.5 px-4 py-1 active:opacity-60 transition-opacity"
+        style={{ color: '#6a6a6a', textDecoration: 'none' }}
       >
-        <span className="material-symbols-outlined">{icon}</span>
-        <span className="text-[11px] font-medium">{label}</span>
+        <span className="material-symbols-outlined" style={{ fontSize: 24 }}>
+          {icon}
+        </span>
+        <span style={{ fontSize: 11, fontWeight: 400, letterSpacing: '-0.08px' }}>{label}</span>
       </a>
     ))}
   </nav>

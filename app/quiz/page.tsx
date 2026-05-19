@@ -93,11 +93,9 @@ export default async function QuizHubPage() {
 
   return (
     <div className="min-h-screen bg-background text-on-surface">
-      <div className="fixed inset-0 z-[-1] bg-[radial-gradient(ellipse_at_top_right,var(--tw-gradient-stops))] from-[#0f172a] via-background to-background opacity-80 pointer-events-none" />
-
       <TopAppBar activeTab="Quiz" />
 
-      <main className="max-w-7xl mx-auto px-6 md:px-8 pt-24 pb-32 space-y-24 md:space-y-10">
+      <main className="max-w-7xl mx-auto px-6 md:px-8 pt-20 pb-32 space-y-24 md:space-y-10">
         <DashboardHeader
           userName={userName}
           elo={elo}

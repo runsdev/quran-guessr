@@ -58,7 +58,7 @@ export default async function ProfilePage() {
   return (
     <>
       <TopAppBar activeTab="Profile" />
-      <main className="min-h-screen bg-surface text-on-surface pt-16 pb-24 md:pb-8">
+      <main className="min-h-screen bg-surface text-on-surface pt-20 pb-24 md:pb-8">
         <div className="max-w-2xl mx-auto p-4 md:p-8 space-y-6">
           {/* Profile header */}
           <div className="bg-surface-container-low border border-primary/10 rounded-3xl p-6 flex items-center gap-5">

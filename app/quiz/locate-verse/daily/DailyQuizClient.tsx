@@ -42,7 +42,7 @@ export default function DailyQuizClient({
   }
 
   return (
-    <main className="flex-1 flex flex-col px-5 max-w-3xl mx-auto w-full gap-6 justify-center min-h-screen pt-16 pb-24 md:pb-8">
+    <main className="flex-1 flex flex-col px-5 max-w-3xl mx-auto w-full gap-6 justify-center min-h-screen pt-20 pb-24 md:pb-8">
       {/* Header */}
       <div className="w-full flex justify-between items-center">
         <div className="flex flex-col gap-1">

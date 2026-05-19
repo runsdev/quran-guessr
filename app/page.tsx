@@ -1,3 +1,4 @@
+'use client';
 import BentoGrid from './components/BentoGrid';
 import BottomNav from './components/BottomNav';
 import HeroSection from './components/HeroSection';
@@ -7,7 +8,7 @@ export default function Home() {
   return (
     <>
       <TopAppBar />
-      <main className="min-h-screen pt-16 pb-24 md:pb-0 bg-background">
+      <main style={{ paddingTop: 80, paddingBottom: 68 }} className="md:pb-0">
         <HeroSection />
         <BentoGrid />
       </main>
