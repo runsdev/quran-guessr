@@ -1,6 +1,6 @@
 'use client';
 
-import { useTransition, useState, useMemo, useEffect } from 'react';
+import { useTransition, useState, useMemo, useEffect, useRef } from 'react';
 
 import { initSession, fetchNextQuestion, submitAnswer } from './actions';
 import type { Option } from './AnswerGrid';
@@ -25,8 +25,13 @@ export function useMissingWordCountState() {
   const [questionNumber, setQuestionNumber] = useState(1);
   const [initialTimeLeft, setInitialTimeLeft] = useState(TIMER_LIMIT);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const initCalledRef = useRef(false);
 
   useEffect(() => {
+    if (initCalledRef.current) {
+      return;
+    }
+    initCalledRef.current = true;
     const filter = loadJuzFilter();
     const urlToken = new URLSearchParams(window.location.search).get('token') ?? undefined;
     const stored = urlToken ?? localStorage.getItem(SESSION_KEY) ?? undefined;
@@ -88,20 +93,14 @@ export function useMissingWordCountState() {
 
   const handleTimerExpire = () => doSubmit(0);
   const handleSubmit = () => doSubmit(selected ?? 0);
-  const handleNext = () => {
+  const loadNextQuestion = () => {
     if (!sessionToken) {
       return;
     }
-    setSelected(null);
-    setSubmitResult(null);
-    setIsSubmitting(false);
-    setQuestion(null);
+    const filter = loadJuzFilter().length > 0 ? loadJuzFilter() : undefined;
     startTransition(async () => {
       try {
-        const { question: q, questionNumber: qn } = await fetchNextQuestion(
-          sessionToken,
-          loadJuzFilter().length > 0 ? loadJuzFilter() : undefined,
-        );
+        const { question: q, questionNumber: qn } = await fetchNextQuestion(sessionToken, filter);
         setQuestion(q);
         setQuestionNumber(qn);
         setInitialTimeLeft(TIMER_LIMIT);
@@ -110,24 +109,17 @@ export function useMissingWordCountState() {
       }
     });
   };
+
+  const handleNext = () => {
+    setSelected(null);
+    setSubmitResult(null);
+    setIsSubmitting(false);
+    setQuestion(null);
+    loadNextQuestion();
+  };
   const handleRetry = () => {
-    if (!sessionToken) {
-      return;
-    }
     setFetchError(false);
-    startTransition(async () => {
-      try {
-        const { question: q, questionNumber: qn } = await fetchNextQuestion(
-          sessionToken,
-          loadJuzFilter().length > 0 ? loadJuzFilter() : undefined,
-        );
-        setQuestion(q);
-        setQuestionNumber(qn);
-        setInitialTimeLeft(TIMER_LIMIT);
-      } catch {
-        setFetchError(true);
-      }
-    });
+    loadNextQuestion();
   };
 
   const handleEndSession = async () => {

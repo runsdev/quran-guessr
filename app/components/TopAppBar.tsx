@@ -1,12 +1,10 @@
 import React from 'react';
 
-import Image from 'next/image';
 import Link from 'next/link';
 
 const navItems = [
   { label: 'Quiz', href: '/quiz' },
   { label: 'Rankings', href: '/leaderboard' },
-  { label: 'Profile', href: '/profile' },
 ];
 
 interface TopAppBarProps {
@@ -14,54 +12,64 @@ interface TopAppBarProps {
 }
 
 /**
- * Fixed top app bar with logo, nav links, and user actions.
+ * Airbnb-style global nav — 80px white bar, 1px hairline bottom border.
+ * Wordmark (Rausch) left · product tabs center · account link right.
  */
 const TopAppBar = ({ activeTab }: TopAppBarProps): React.JSX.Element => (
-  <header className="bg-surface-container-lowest/80 backdrop-blur-md fixed top-0 w-full z-50 border-b border-primary-container/20 flex justify-between items-center px-5 h-16 font-[Inter,var(--font-geist-sans)]">
-    {/* Logo */}
-    <Link href="/" className="flex items-center gap-2">
-      <span className="text-xl font-bold text-primary">QuranGuessr</span>
+  <header
+    className="fixed top-0 w-full z-50 flex items-center justify-between px-6 md:px-10"
+    style={{
+      height: 80,
+      backgroundColor: '#ffffff',
+      borderBottom: '1px solid #dddddd',
+      fontFamily: 'var(--font-inter), Circular, system-ui, sans-serif',
+    }}
+  >
+    {/* Wordmark */}
+    <Link
+      href="/"
+      className="flex items-center"
+      style={{ color: '#ff385c', textDecoration: 'none', fontWeight: 700, fontSize: 22 }}
+    >
+      QuranGuessr
     </Link>
 
-    {/* Desktop nav */}
-    <nav className="hidden md:flex items-center space-x-8">
+    {/* Desktop center product tabs */}
+    <nav className="hidden md:flex items-center gap-10 absolute left-1/2 -translate-x-1/2">
       {navItems.map(({ label, href }) => (
-        <a
+        <Link
           key={label}
           href={href}
-          className={
-            activeTab === label
-              ? 'text-primary font-semibold transition-colors duration-200'
-              : 'text-on-surface-variant hover:text-primary transition-colors duration-200'
-          }
+          className="flex flex-col items-center pb-1"
+          style={{
+            color: '#222222',
+            textDecoration: 'none',
+            fontSize: 16,
+            fontWeight: 600,
+            borderBottom: activeTab === label ? '2px solid #222222' : '2px solid transparent',
+            transition: 'border-color 0.15s',
+          }}
         >
           {label}
-        </a>
+        </Link>
       ))}
     </nav>
 
-    {/* Actions */}
-    <div className="flex items-center gap-4">
-      {/* <button
-        className="active:scale-95 transition-transform p-2 text-primary"
-        aria-label="Notifications"
-      >
-        <span className="material-symbols-outlined">notifications</span>
-      </button> */}
-      <Link
-        href="/profile"
-        className="w-8 h-8 rounded-full overflow-hidden border border-primary/30"
-      >
-        <Image
-          src="https://lh3.googleusercontent.com/aida-public/AB6AXuBuHthqw_vn74nsV_4BkNEg-657WmshRnUEoocu-5GcXH0qowMUnxXJcQ9TLSNbuxquO4cobPGI0cEC3e5qj6UesGOwiPiYo8Gry7Djn-toAx8ml69KGYkqtrk0tk7I4vVPsEZSphWxDtHmUJmXSqG29EqxmqdHYnMvDFjDoiKkycWK6b7hikeDuQ8PWEBBN3iPFXyUAk8e2qcNHxgx2d595OwYz6x1W0o2GtjJabv8Ubh1Mz01DsBJ1Qwi1WD2rKvn95IdyetAWpaQ"
-          alt="User avatar"
-          width={32}
-          height={32}
-          className="w-full h-full object-cover"
-          unoptimized
-        />
-      </Link>
-    </div>
+    {/* Right — account utilities */}
+    <Link
+      href="/profile"
+      style={{
+        color: '#222222',
+        textDecoration: 'none',
+        fontSize: 14,
+        fontWeight: 600,
+        border: '1px solid #dddddd',
+        borderRadius: 9999,
+        padding: '8px 16px',
+      }}
+    >
+      Account
+    </Link>
   </header>
 );
 

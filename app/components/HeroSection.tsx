@@ -1,54 +1,102 @@
 import React from 'react';
 
-import Image from 'next/image';
 import Link from 'next/link';
 
 /**
- * Hero section for the home page — headline, subtitle, and CTA buttons.
+ * Airbnb-style hero section — white canvas, modest 28px/700 headline,
+ * pill-shaped search-bar adaptation, Rausch CTA.
  */
 const HeroSection = (): React.JSX.Element => (
-  <section className="relative overflow-hidden px-(--spacing-margin) py-(--spacing-xl) md:py-20 flex flex-col items-center">
-    {/* Gradient backdrop */}
-    <div className="absolute inset-0 z-0 pointer-events-none">
-      <div className="absolute inset-0 bg-linear-to-b from-primary/5 to-transparent" />
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full h-full opacity-20">
-        <Image
-          src="/quran-hero.jpg"
-          alt=""
-          className="w-full h-full object-cover mix-blend-overlay"
-          width={1920}
-          height={1080}
-        />
+  <section
+    className="w-full flex flex-col items-center text-center"
+    style={{ backgroundColor: '#ffffff', padding: '64px 24px' }}
+  >
+    {/* Hero headline — 28px/700 per Airbnb spec */}
+    <h1
+      style={{
+        fontSize: 28,
+        fontWeight: 700,
+        lineHeight: 1.43,
+        color: '#222222',
+        maxWidth: 640,
+        marginBottom: 8,
+      }}
+    >
+      Test your knowledge of the Holy Quran
+    </h1>
+
+    {/* Sub-headline */}
+    <p
+      style={{
+        fontSize: 16,
+        fontWeight: 400,
+        lineHeight: 1.5,
+        color: '#6a6a6a',
+        maxWidth: 480,
+        marginBottom: 36,
+      }}
+    >
+      Interactive quizzes on verse location, missing words, and sequence — for every level.
+    </p>
+
+    {/* Pill-shaped discovery bar (Airbnb search-bar aesthetic) */}
+    <div
+      className="flex flex-col sm:flex-row items-center gap-0 w-full max-w-xl"
+      style={{
+        background: '#ffffff',
+        border: '1px solid #dddddd',
+        borderRadius: 9999,
+        boxShadow:
+          'rgba(0,0,0,0.02) 0 0 0 1px, rgba(0,0,0,0.04) 0 2px 6px, rgba(0,0,0,0.10) 0 4px 8px',
+        overflow: 'hidden',
+      }}
+    >
+      <div
+        className="flex-1 flex flex-col items-start px-6 py-3"
+        style={{ borderRight: '1px solid #dddddd' }}
+      >
+        <span style={{ fontSize: 14, fontWeight: 500, color: '#222222' }}>Quiz Mode</span>
+        <span style={{ fontSize: 14, color: '#6a6a6a' }}>Choose your game</span>
       </div>
+      <div className="flex-1 flex flex-col items-start px-6 py-3">
+        <span style={{ fontSize: 14, fontWeight: 500, color: '#222222' }}>Difficulty</span>
+        <span style={{ fontSize: 14, color: '#6a6a6a' }}>All levels</span>
+      </div>
+      {/* Rausch search orb */}
+      <Link
+        href="/quiz"
+        className="flex items-center justify-center shrink-0 m-2"
+        style={{
+          width: 48,
+          height: 48,
+          borderRadius: 9999,
+          backgroundColor: '#ff385c',
+          color: '#ffffff',
+          textDecoration: 'none',
+          fontSize: 22,
+        }}
+        aria-label="Start quiz"
+      >
+        <span className="material-symbols-outlined" style={{ fontSize: 22 }}>
+          search
+        </span>
+      </Link>
     </div>
 
-    {/* Content */}
-    <div className="relative z-10 max-w-4xl w-full text-center space-y-(--spacing-lg)">
-      <h1 className="text-4xl lg:text-6xl font-bold tracking-tight text-on-surface leading-tight">
-        Master the <span className="text-primary">Holy Quran</span> Through Interactive Learning
-      </h1>
-
-      <p className="text-lg leading-7 text-on-surface-variant max-w-2xl mx-auto">
-        Challenge yourself with engaging quizzes that test your knowledge of the Quran. Track your
-        progress, compete with friends, and deepen your understanding of the Quran in a fun and
-        interactive way.
-      </p>
-
-      <div className="flex flex-col sm:flex-row gap-(--spacing-gutter) justify-center items-center pt-(--spacing-md)">
-        <Link
-          href="/quiz"
-          className="w-full sm:w-auto px-(--spacing-xl) py-(--spacing-md) bg-primary-container text-on-primary-container rounded-xl font-semibold active:scale-95 transition-all shadow-lg"
-        >
-          Discover Quiz
-        </Link>
-        <Link
-          href="/leaderboard"
-          className="w-full sm:w-auto px-(--spacing-xl) py-(--spacing-md) border border-primary text-primary rounded-xl font-semibold active:scale-95 transition-all hover:bg-primary/5"
-        >
-          View Leaderboard
-        </Link>
-      </div>
-    </div>
+    {/* Secondary CTA */}
+    <Link
+      href="/leaderboard"
+      style={{
+        display: 'inline-block',
+        marginTop: 20,
+        color: '#222222',
+        textDecoration: 'underline',
+        fontSize: 14,
+        fontWeight: 400,
+      }}
+    >
+      View Leaderboard
+    </Link>
   </section>
 );
 

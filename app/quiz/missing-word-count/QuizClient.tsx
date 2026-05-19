@@ -38,7 +38,7 @@ export default function QuizClient() {
   return (
     <>
       <TopAppBar activeTab="Quiz" />
-      <main className="flex-1 flex flex-col px-5 max-w-3xl mx-auto w-full gap-6 justify-center min-h-screen pt-16 pb-24 md:pb-8">
+      <main className="flex-1 flex flex-col px-5 max-w-3xl mx-auto w-full gap-6 justify-center min-h-screen pt-20 pb-24 md:pb-8">
         {isInitializing ? (
           <div className="flex items-center justify-center gap-3 text-on-surface-variant">
             <span className="material-symbols-outlined animate-spin">progress_activity</span>
@@ -107,7 +107,7 @@ export default function QuizClient() {
 
             <div className="w-full text-center">
               <h2 className="text-2xl font-semibold text-on-background">
-                How many words are missing from this Ayah?
+                How many words are missing from this verse?
               </h2>
             </div>
 

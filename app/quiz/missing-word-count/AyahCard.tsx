@@ -23,9 +23,9 @@ function WordSpan({
 }) {
   const highlightClass =
     highlight === 'correct'
-      ? 'text-green-400 bg-green-400/10 rounded px-0.5'
+      ? 'text-green-700 bg-green-400/10 rounded px-0.5'
       : highlight === 'incorrect'
-        ? 'text-red-400 bg-red-400/10 rounded px-0.5'
+        ? 'text-red-700 bg-red-400/10 rounded px-0.5'
         : '';
 
   const inner =

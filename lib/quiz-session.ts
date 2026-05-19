@@ -63,6 +63,7 @@ export async function createQuizSession(opts: {
       expiresAt: sessionExpiresAt(),
     },
   });
+  console.log('Created quiz session', record);
   return toActiveSession(record);
 }
 

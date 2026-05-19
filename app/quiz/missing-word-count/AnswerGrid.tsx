@@ -23,11 +23,11 @@ export default function AnswerGrid({
         const isAnswer = submitted && num === correctAnswer;
         const isWrongPick = submitted && isSelected && !isCorrect;
         let btnStyle =
-          'bg-[#1E293B] border-outline-variant text-on-surface hover:border-primary hover:bg-surface-container-high hover:text-primary';
+          'bg-[#f7f7f7] border-outline-variant text-on-surface hover:border-primary hover:bg-[#ffd1da] hover:text-primary';
         if (isAnswer) {
-          btnStyle = 'bg-green-900/60 border-green-400 text-green-300';
+          btnStyle = 'bg-green-50 border-green-500 text-green-700';
         } else if (isWrongPick) {
-          btnStyle = 'bg-red-900/60 border-red-400 text-red-300';
+          btnStyle = 'bg-red-50 border-red-400 text-red-600';
         } else if (isSelected) {
           btnStyle = 'bg-primary-container border-primary text-on-background';
         }

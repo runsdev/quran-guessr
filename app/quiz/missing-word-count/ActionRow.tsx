@@ -32,7 +32,7 @@ export default function ActionRow({
     <div className="w-full flex items-center justify-between min-h-12">
       {submitted && missingCount !== null ? (
         <div className="flex flex-col gap-1">
-          <p className={`text-sm font-medium ${isCorrect ? 'text-green-400' : 'text-red-400'}`}>
+          <p className={`text-sm font-medium ${isCorrect ? 'text-green-700' : 'text-red-700'}`}>
             {isCorrect
               ? 'Correct!'
               : timedOut
@@ -42,7 +42,7 @@ export default function ActionRow({
           {userEloDelta !== null && newUserElo !== null ? (
             <p className="text-xs text-on-surface-variant">
               ELO:{' '}
-              <span className={userEloDelta >= 0 ? 'text-green-400' : 'text-red-400'}>
+              <span className={userEloDelta >= 0 ? 'text-green-700' : 'text-red-700'}>
                 {userEloDelta >= 0 ? '+' : ''}
                 {userEloDelta}
               </span>{' '}

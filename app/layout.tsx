@@ -1,5 +1,4 @@
 import { GeistMono } from 'geist/font/mono';
-import { GeistSans } from 'geist/font/sans';
 import type { Metadata } from 'next';
 import { Inter } from 'next/font/google';
 
@@ -8,7 +7,12 @@ import SessionProvider from './components/providers/SessionProvider';
 import { auth } from '@/auth';
 import './globals.css';
 
-const inter = Inter({ subsets: ['latin'], variable: '--font-inter' });
+const inter = Inter({
+  subsets: ['latin'],
+  variable: '--font-inter',
+  weight: ['300', '400', '600', '700'],
+  display: 'swap',
+});
 
 export const metadata: Metadata = {
   title: 'Quran Guessr',
@@ -23,10 +27,7 @@ export default async function RootLayout({
   const session = await auth();
 
   return (
-    <html
-      lang="en"
-      className={`${GeistSans.variable} ${GeistMono.variable} ${inter.variable} h-full antialiased dark`}
-    >
+    <html lang="en" className={`${GeistMono.variable} ${inter.variable} h-full antialiased`}>
       <head>
         <link rel="preconnect" href="https://verses.quran.foundation" crossOrigin="anonymous" />
         <link

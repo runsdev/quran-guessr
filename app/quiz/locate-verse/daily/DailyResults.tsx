@@ -24,7 +24,7 @@ export default function DailyResults({ date, totalScore, scores, questions }: Pr
           : { label: 'Keep Practicing', color: 'text-rose-400' };
 
   return (
-    <main className="flex-1 flex flex-col px-5 max-w-3xl mx-auto w-full gap-6 justify-center min-h-screen pt-16 pb-24 md:pb-8">
+    <main className="flex-1 flex flex-col px-5 max-w-3xl mx-auto w-full gap-6 justify-center min-h-screen pt-20 pb-24 md:pb-8">
       {/* Header */}
       <div className="text-center space-y-2">
         <p className="text-xs font-semibold uppercase tracking-widest text-on-surface-variant">
