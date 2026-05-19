@@ -95,7 +95,7 @@ export default async function QuizHubPage() {
     <div className="min-h-screen bg-background text-on-surface">
       <TopAppBar activeTab="Quiz" />
 
-      <main className="max-w-7xl mx-auto px-6 md:px-8 pt-20 pb-32 space-y-24 md:space-y-10">
+      <main className="max-w-7xl mx-auto px-6 md:px-8 pt-30 pb-32 space-y-24 md:space-y-10">
         <DashboardHeader
           userName={userName}
           elo={elo}
