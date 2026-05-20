@@ -129,7 +129,7 @@ const LoginPanel = (): React.JSX.Element => {
           src="/quran-hero.jpg"
           alt="Open Quran with elegant calligraphy"
           fill
-          unoptimized
+          sizes="(max-width: 768px) 0px, 50vw"
         />
         <div
           className="absolute inset-0"

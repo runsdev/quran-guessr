@@ -1,4 +1,3 @@
-'use client';
 import AboutSection from './components/AboutSection';
 import BentoGrid from './components/BentoGrid';
 import BottomNav from './components/BottomNav';
