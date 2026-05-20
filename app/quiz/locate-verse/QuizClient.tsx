@@ -20,7 +20,7 @@ export default function QuizClient() {
   return (
     <>
       <TopAppBar activeTab="Quiz" />
-      <main className="flex-1 flex flex-col px-5 max-w-3xl mx-auto w-full gap-6 justify-center min-h-screen pt-16 pb-24 md:pb-8">
+      <main className="flex-1 flex flex-col px-5 max-w-3xl mx-auto w-full gap-6 justify-center min-h-screen pt-20 pb-24 md:pb-8">
         {state.isInitializing ? (
           <div className="flex items-center justify-center gap-3 text-on-surface-variant">
             <span className="material-symbols-outlined animate-spin">progress_activity</span>

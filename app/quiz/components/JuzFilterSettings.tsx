@@ -67,11 +67,11 @@ function JuzFilterPanel({ onClose }: { onClose: () => void }) {
       aria-label="Juz filter settings"
     >
       <div
-        className="absolute inset-0 bg-black/60 backdrop-blur-sm"
+        className="absolute inset-0 bg-black/60 backdrop-blur-sm min-h-screen"
         onClick={onClose}
         aria-hidden="true"
       />
-      <div className="relative z-10 w-full max-w-[80%] bg-surface-container rounded-t-3xl md:rounded-3xl border border-outline-variant shadow-2xl p-6 max-h-[90dvh] flex flex-col gap-5 overflow-hidden">
+      <div className="relative z-10 md:max-w-[30%] w-full max-w-[90%] bg-surface-container rounded-3xl md:rounded-3xl border border-outline-variant shadow-2xl p-6 flex flex-col gap-5 overflow-hidden">
         <div className="flex items-center justify-between shrink-0">
           <div>
             <h2 className="text-lg font-bold text-on-surface">Juz Filter</h2>

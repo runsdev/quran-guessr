@@ -92,27 +92,36 @@ export default async function QuizHubPage() {
   }
 
   return (
-    <div className="min-h-screen bg-background text-on-surface">
-      <div className="fixed inset-0 z-[-1] bg-[radial-gradient(ellipse_at_top_right,var(--tw-gradient-stops))] from-[#0f172a] via-background to-background opacity-80 pointer-events-none" />
-
+    <div className="min-h-screen text-on-surface">
       <TopAppBar activeTab="Quiz" />
 
-      <main className="max-w-7xl mx-auto px-6 md:px-8 pt-24 pb-32 space-y-24 md:space-y-10">
-        <DashboardHeader
-          userName={userName}
-          elo={elo}
-          streak={streak}
-          dailyRankedCount={dailyRankedCount}
-          dailyRankedLimit={DAILY_RANKED_LIMIT}
-        />
+      {/* ── Band 1: white — welcome header ── */}
+      <section style={{ backgroundColor: '#ffffff', paddingTop: 80 + 48, paddingBottom: 48 }}>
+        <div className="max-w-7xl mx-auto px-6 md:px-8">
+          <DashboardHeader
+            userName={userName}
+            elo={elo}
+            streak={streak}
+            dailyRankedCount={dailyRankedCount}
+            dailyRankedLimit={DAILY_RANKED_LIMIT}
+          />
+        </div>
+      </section>
 
-        <GameModesClient
-          elo={elo}
-          dailyRankedCount={dailyRankedCount}
-          dailyRankedLimit={DAILY_RANKED_LIMIT}
-          activeSessions={activeSessions}
-        />
-      </main>
+      {/* ── Band 2: soft — game modes ── */}
+      <section
+        style={{ backgroundColor: '#f7f7f7', paddingTop: 64, paddingBottom: 96 }}
+        className="pb-32 md:pb-24"
+      >
+        <div className="max-w-7xl mx-auto px-6 md:px-8 space-y-10">
+          <GameModesClient
+            elo={elo}
+            dailyRankedCount={dailyRankedCount}
+            dailyRankedLimit={DAILY_RANKED_LIMIT}
+            activeSessions={activeSessions}
+          />
+        </div>
+      </section>
 
       <BottomNav />
     </div>

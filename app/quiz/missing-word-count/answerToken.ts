@@ -86,36 +86,45 @@ export function decryptHiddenWords<T>(token: string): T[] {
   return JSON.parse(json) as T[];
 }
 
-export function signAnswer(verseKey: string, missingCount: number, pageNumber: number): string {
+export function signAnswer(
+  verseKey: string,
+  missingCount: number,
+  pageNumber: number,
+  totalWords: number,
+): string {
   const hmac = createHmac('sha256', getSecret())
-    .update(`${verseKey}:${missingCount}:${pageNumber}`)
+    .update(`${verseKey}:${missingCount}:${pageNumber}:${totalWords}`)
     .digest('hex');
-  return `${pageNumber}.${hmac}`;
+  return `${pageNumber}.${totalWords}.${hmac}`;
 }
 
-/** Returns `{ missingCount, pageNumber }` if the token is valid, otherwise null. */
+/** Returns `{ missingCount, pageNumber, totalWords }` if the token is valid, otherwise null. */
 export function verifyAnswer(
   verseKey: string,
   token: string,
-): { missingCount: number; pageNumber: number } | null {
-  const dotIndex = token.indexOf('.');
-  if (dotIndex === -1) {
+): { missingCount: number; pageNumber: number; totalWords: number } | null {
+  const parts = token.split('.');
+  if (parts.length !== 3) {
     return null;
   }
-  const pageNumber = parseInt(token.slice(0, dotIndex), 10);
-  const hmac = token.slice(dotIndex + 1);
+  const [pageStr, totalWordsStr, hmac] = parts;
+  const pageNumber = parseInt(pageStr, 10);
+  const totalWords = parseInt(totalWordsStr, 10);
   if (!Number.isInteger(pageNumber) || pageNumber < 1 || pageNumber > 604) {
+    return null;
+  }
+  if (!Number.isInteger(totalWords) || totalWords < 1) {
     return null;
   }
 
   for (let count = 0; count <= 4; count++) {
     const expected = createHmac('sha256', getSecret())
-      .update(`${verseKey}:${count}:${pageNumber}`)
+      .update(`${verseKey}:${count}:${pageNumber}:${totalWords}`)
       .digest('hex');
     const expectedBuf = Buffer.from(expected, 'hex');
     const tokenBuf = Buffer.from(hmac, 'hex');
     if (expectedBuf.length === tokenBuf.length && timingSafeEqual(expectedBuf, tokenBuf)) {
-      return { missingCount: count, pageNumber };
+      return { missingCount: count, pageNumber, totalWords };
     }
   }
   return null;
