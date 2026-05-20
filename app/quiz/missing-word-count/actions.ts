@@ -12,6 +12,7 @@ import { recordQfActivityDay } from '@/lib/qf-api';
 import {
   createQuizSession,
   getActiveQuizSession,
+  getActiveSessionByUserAndMode,
   advanceQuizSession,
   saveQuizSubmitResult,
 } from '@/lib/quiz-session';
@@ -19,6 +20,23 @@ import {
 const DAILY_RANKED_LIMIT = 20;
 const TIMER_LIMIT = 90;
 const GAME_MODE = 'missing-word-count' as const;
+
+function toSessionInitResult(
+  existing: Awaited<ReturnType<typeof getActiveQuizSession>> & object,
+): SessionInitResult {
+  const elapsed = Math.floor((Date.now() - existing.questionStartedAt.getTime()) / 1000);
+  const submitResult = existing.submitResult as SubmitResult | null;
+  const initialTimeLeft =
+    submitResult !== null ? existing.timerLimit : Math.max(0, existing.timerLimit - elapsed);
+  return {
+    sessionToken: existing.token,
+    question: existing.currentQuestion as unknown as Question,
+    questionNumber: existing.questionNumber,
+    totalScore: existing.totalScore,
+    initialTimeLeft,
+    submitResult,
+  };
+}
 
 export async function initSession(
   sessionToken?: string,
@@ -30,19 +48,14 @@ export async function initSession(
   if (sessionToken) {
     const existing = await getActiveQuizSession(sessionToken);
     if (existing) {
-      const elapsed = Math.floor((Date.now() - existing.questionStartedAt.getTime()) / 1000);
-      const submitResult = existing.submitResult as SubmitResult | null;
-      const initialTimeLeft =
-        submitResult !== null ? existing.timerLimit : Math.max(0, existing.timerLimit - elapsed);
+      return toSessionInitResult(existing);
+    }
+  }
 
-      return {
-        sessionToken,
-        question: existing.currentQuestion as unknown as Question,
-        questionNumber: existing.questionNumber,
-        totalScore: existing.totalScore,
-        initialTimeLeft,
-        submitResult,
-      };
+  if (userId) {
+    const existing = await getActiveSessionByUserAndMode(userId, GAME_MODE);
+    if (existing) {
+      return toSessionInitResult(existing);
     }
   }
 
