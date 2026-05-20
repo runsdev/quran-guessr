@@ -5,7 +5,7 @@ import { encryptVerseKey, signAnswer } from './answerToken';
 import { SURAH_NAMES, nextVerseKey, fetchRandomVerseInAyahRange } from './surahData';
 import type { Question, VerseWord } from './types';
 
-import { qdcFetchByJuz, qdcFetchRandom, qdcFetchByKey } from '@/lib/qdc-client';
+import { qdcFetchByJuz, qdcFetchByPage, qdcFetchRandom, qdcFetchByKey } from '@/lib/qdc-client';
 import type { QdcWord } from '@/lib/qdc-client';
 import { getContentClient } from '@/lib/qf-server-client';
 import { pickRandomJuz } from '@/lib/quran-pages';
@@ -39,8 +39,34 @@ function qdcToRaw(w: QdcWord): RawWord {
 
 async function fetchRandomVerse(
   juzFilter?: number[],
+  pageNumber?: number,
 ): Promise<{ verseKey: string; words: RawWord[] }> {
   const client = getContentClient();
+
+  if (pageNumber !== undefined) {
+    try {
+      const pageIndex = await client.content.v4.verses.byPage(
+        String(pageNumber) as Parameters<typeof client.content.v4.verses.byPage>[0],
+      );
+      if (!pageIndex?.length) {
+        throw new Error('No verses for page');
+      }
+      const picked = pageIndex[Math.floor(Math.random() * pageIndex.length)];
+      const verse = await client.content.v4.verses.byKey(
+        picked.verseKey as Parameters<typeof client.content.v4.verses.byKey>[0],
+        WORD_OPTS,
+      );
+      const words = [...(verse.words ?? [])].sort((a, b) => a.position - b.position).map(mapWord);
+      return { verseKey: verse.verseKey, words };
+    } catch (err) {
+      console.warn(`SDK byPage(${pageNumber}) failed, falling back to direct API:`, err);
+      const qdcVerse = await qdcFetchByPage(pageNumber);
+      return {
+        verseKey: qdcVerse.verse_key,
+        words: qdcVerse.words.sort((a, b) => a.position - b.position).map(qdcToRaw),
+      };
+    }
+  }
   if (juzFilter && juzFilter.length > 0) {
     const juzNum = pickRandomJuz(juzFilter);
     try {
@@ -99,13 +125,16 @@ async function fetchVerseByKey(verseKey: string): Promise<RawWord[] | null> {
   }
 }
 
-export async function getRandomQuestion(juzFilter?: number[]): Promise<Question> {
+export async function getRandomQuestion(
+  juzFilter?: number[],
+  pageNumber?: number,
+): Promise<Question> {
   // Keep retrying until we get a verse that has a fetchable next verse (nextVerseKey returns null for 114:6).
   let current: { verseKey: string; words: RawWord[] };
   let nextKey: string | null;
   let nextVerseWords: RawWord[] | null;
   do {
-    current = await fetchRandomVerse(juzFilter);
+    current = await fetchRandomVerse(juzFilter, pageNumber);
     nextKey = nextVerseKey(current.verseKey);
     nextVerseWords = nextKey ? await fetchVerseByKey(nextKey) : null;
   } while (!nextKey || !nextVerseWords);

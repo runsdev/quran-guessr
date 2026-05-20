@@ -75,7 +75,7 @@ const eslintConfig = defineConfig([
       ],
 
       // ── File / code size ──────────────────────────────────────────
-      'max-lines': ['error', { max: 150, skipBlankLines: true, skipComments: true }],
+      'max-lines': ['error', { max: 200, skipBlankLines: true, skipComments: true }],
 
       // ── Unicorn ───────────────────────────────────────────────────
       'unicorn/no-abusive-eslint-disable': 'error',

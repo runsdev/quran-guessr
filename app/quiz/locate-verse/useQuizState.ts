@@ -1,6 +1,7 @@
 import { useState, useTransition, useMemo, useEffect } from 'react';
 
 import { initSession, fetchNextQuestion, submitAnswer } from './actions';
+import { fetchPracticeQuestion, submitPracticeAnswer } from './practice-actions';
 import { TIMER_LIMIT } from './types';
 import type { Question, SubmitResult } from './types';
 
@@ -23,8 +24,32 @@ export function useQuizState() {
   const [totalScore, setTotalScore] = useState(0);
   const [initialTimeLeft, setInitialTimeLeft] = useState(TIMER_LIMIT);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isPractice] = useState(
+    () =>
+      typeof window !== 'undefined' &&
+      new URLSearchParams(window.location.search).get('practice') === 'true',
+  );
+  const [practicePageNumber] = useState<number | null>(() => {
+    if (typeof window === 'undefined') {
+      return null;
+    }
+    const p = new URLSearchParams(window.location.search).get('page');
+    return p ? parseInt(p, 10) : null;
+  });
 
   useEffect(() => {
+    if (isPractice && practicePageNumber) {
+      fetchPracticeQuestion(practicePageNumber)
+        .then((q) => {
+          setQuestion(q);
+          setIsInitializing(false);
+        })
+        .catch(() => {
+          setInitError(true);
+          setIsInitializing(false);
+        });
+      return;
+    }
     const filter = loadJuzFilter();
     const urlToken = new URLSearchParams(window.location.search).get('token') ?? undefined;
     const stored = urlToken ?? localStorage.getItem(SESSION_KEY) ?? undefined;
@@ -45,22 +70,29 @@ export function useQuizState() {
         setInitError(true);
         setIsInitializing(false);
       });
-  }, []);
+  }, [isPractice, practicePageNumber]);
 
   const doSubmit = (page: number | null, line: number | null) => {
-    if (!sessionToken || !question || isSubmitting || submitResult !== null) {
+    if ((!sessionToken && !isPractice) || !question || isSubmitting || submitResult !== null) {
       return;
     }
     setIsSubmitting(true);
     startTransition(async () => {
       try {
-        const result = await submitAnswer(
-          sessionToken,
-          question.encryptedVerseKey,
-          question.answerToken,
-          page ?? 0,
-          line ?? 0,
-        );
+        const result = isPractice
+          ? await submitPracticeAnswer(
+              question.encryptedVerseKey,
+              question.answerToken,
+              page ?? 0,
+              line ?? 0,
+            )
+          : await submitAnswer(
+              sessionToken!,
+              question.encryptedVerseKey,
+              question.answerToken,
+              page ?? 0,
+              line ?? 0,
+            );
         setSubmitResult(result);
         setTotalScore((s) => s + result.roundScore);
       } catch {
@@ -76,8 +108,32 @@ export function useQuizState() {
     doSubmit(selectedPage, selectedLine);
   };
   const handleTimerExpire = () => doSubmit(selectedPage, selectedLine);
+
+  const fetchNext = () => {
+    startTransition(async () => {
+      try {
+        if (isPractice && practicePageNumber) {
+          const q = await fetchPracticeQuestion(practicePageNumber);
+          setQuestion(q);
+          setQuestionNumber((n) => n + 1);
+        } else {
+          const juzFilter = loadJuzFilter();
+          const { question: q, questionNumber: qn } = await fetchNextQuestion(
+            sessionToken!,
+            juzFilter.length > 0 ? juzFilter : undefined,
+          );
+          setQuestion(q);
+          setQuestionNumber(qn);
+        }
+        setInitialTimeLeft(TIMER_LIMIT);
+      } catch {
+        setFetchError(true);
+      }
+    });
+  };
+
   const handleNext = () => {
-    if (!sessionToken) {
+    if (!sessionToken && !isPractice) {
       return;
     }
     setSelectedPage(null);
@@ -85,45 +141,19 @@ export function useQuizState() {
     setSubmitResult(null);
     setIsSubmitting(false);
     setQuestion(null);
-    startTransition(async () => {
-      try {
-        const juzFilter = loadJuzFilter();
-        const { question: q, questionNumber: qn } = await fetchNextQuestion(
-          sessionToken,
-          juzFilter.length > 0 ? juzFilter : undefined,
-        );
-        setQuestion(q);
-        setQuestionNumber(qn);
-        setInitialTimeLeft(TIMER_LIMIT);
-      } catch {
-        setFetchError(true);
-      }
-    });
+    fetchNext();
   };
 
   const handleRetry = () => {
-    if (!sessionToken) {
+    if (!sessionToken && !isPractice) {
       return;
     }
     setFetchError(false);
-    startTransition(async () => {
-      try {
-        const juzFilter = loadJuzFilter();
-        const { question: q, questionNumber: qn } = await fetchNextQuestion(
-          sessionToken,
-          juzFilter.length > 0 ? juzFilter : undefined,
-        );
-        setQuestion(q);
-        setQuestionNumber(qn);
-        setInitialTimeLeft(TIMER_LIMIT);
-      } catch {
-        setFetchError(true);
-      }
-    });
+    fetchNext();
   };
 
   const handleEndSession = async () => {
-    if (sessionToken) {
+    if (!isPractice && sessionToken) {
       localStorage.removeItem(SESSION_KEY);
       await abandonSession(sessionToken);
     }

@@ -3,6 +3,7 @@
 import { useTransition, useState, useMemo, useEffect } from 'react';
 
 import { initSession, fetchNextQuestion, submitAnswer } from './actions';
+import { fetchPracticeQuestion, submitPracticeAnswer } from './practice-actions';
 import type { Question, SubmitResult } from './types';
 
 import { abandonSession } from '@/app/quiz/actions';
@@ -15,6 +16,18 @@ export function useNextVerseState() {
   const [isInitializing, setIsInitializing] = useState(true);
   const [initError, setInitError] = useState(false);
   const [juzFilter, setJuzFilter] = useState<number[]>([]);
+  const [isPractice] = useState(
+    () =>
+      typeof window !== 'undefined' &&
+      new URLSearchParams(window.location.search).get('practice') === 'true',
+  );
+  const [practicePageNumber] = useState<number | null>(() => {
+    if (typeof window === 'undefined') {
+      return null;
+    }
+    const p = new URLSearchParams(window.location.search).get('page');
+    return p ? parseInt(p, 10) : null;
+  });
 
   const [question, setQuestion] = useState<Question | null>(null);
   const [isPending, startTransition] = useTransition();
@@ -25,6 +38,18 @@ export function useNextVerseState() {
   const [score, setScore] = useState(0);
 
   useEffect(() => {
+    if (isPractice && practicePageNumber) {
+      fetchPracticeQuestion(practicePageNumber)
+        .then((q) => {
+          setQuestion(q);
+          setIsInitializing(false);
+        })
+        .catch(() => {
+          setInitError(true);
+          setIsInitializing(false);
+        });
+      return;
+    }
     const filter = loadJuzFilter();
     // eslint-disable-next-line react-hooks/set-state-in-effect
     setJuzFilter(filter);
@@ -46,7 +71,7 @@ export function useNextVerseState() {
         setInitError(true);
         setIsInitializing(false);
       });
-  }, []);
+  }, [isPractice, practicePageNumber]);
 
   const submitted = submitResult !== null;
   const isCorrect = submitResult?.isCorrect ?? false;
@@ -71,17 +96,19 @@ export function useNextVerseState() {
   }, [question]);
 
   const handleSubmit = () => {
-    if (!sessionToken || selected === null || !question || submitResult !== null) {
+    if ((!sessionToken && !isPractice) || selected === null || !question || submitResult !== null) {
       return;
     }
     startTransition(async () => {
       try {
-        const result = await submitAnswer(
-          sessionToken,
-          question.encryptedVerseKey,
-          question.answerToken,
-          selected,
-        );
+        const result = isPractice
+          ? await submitPracticeAnswer(question.encryptedVerseKey, question.answerToken, selected)
+          : await submitAnswer(
+              sessionToken!,
+              question.encryptedVerseKey,
+              question.answerToken,
+              selected,
+            );
         setSubmitResult(result);
         if (result.isCorrect) {
           setScore((s) => s + 1);
@@ -92,48 +119,47 @@ export function useNextVerseState() {
     });
   };
 
+  const fetchNext = () => {
+    startTransition(async () => {
+      try {
+        if (isPractice && practicePageNumber) {
+          const q = await fetchPracticeQuestion(practicePageNumber);
+          setQuestion(q);
+          setQuestionNumber((n) => n + 1);
+        } else {
+          const { question: q, questionNumber: qn } = await fetchNextQuestion(
+            sessionToken!,
+            juzFilter.length > 0 ? juzFilter : undefined,
+          );
+          setQuestion(q);
+          setQuestionNumber(qn);
+        }
+      } catch {
+        setFetchError(true);
+      }
+    });
+  };
+
   const handleNext = () => {
-    if (!sessionToken) {
+    if (!sessionToken && !isPractice) {
       return;
     }
     setSelected(null);
     setSubmitResult(null);
     setQuestion(null);
-    startTransition(async () => {
-      try {
-        const { question: q, questionNumber: qn } = await fetchNextQuestion(
-          sessionToken,
-          juzFilter.length > 0 ? juzFilter : undefined,
-        );
-        setQuestion(q);
-        setQuestionNumber(qn);
-      } catch {
-        setFetchError(true);
-      }
-    });
+    fetchNext();
   };
 
   const handleRetry = () => {
-    if (!sessionToken) {
+    if (!sessionToken && !isPractice) {
       return;
     }
     setFetchError(false);
-    startTransition(async () => {
-      try {
-        const { question: q, questionNumber: qn } = await fetchNextQuestion(
-          sessionToken,
-          juzFilter.length > 0 ? juzFilter : undefined,
-        );
-        setQuestion(q);
-        setQuestionNumber(qn);
-      } catch {
-        setFetchError(true);
-      }
-    });
+    fetchNext();
   };
 
   const handleEndSession = async () => {
-    if (sessionToken) {
+    if (!isPractice && sessionToken) {
       localStorage.removeItem(SESSION_KEY);
       await abandonSession(sessionToken);
     }
