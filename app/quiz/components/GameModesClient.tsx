@@ -5,7 +5,6 @@ import { useState } from 'react';
 import type { ActiveSession } from '../page';
 
 import ChallengeCategories from './ChallengeCategories';
-import ContinueSessions from './ContinueSessions';
 import IntegrityModal from './IntegrityModal';
 import JuzFilterSettings, { loadJuzFilter } from './JuzFilterSettings';
 import PrimaryGameModes from './PrimaryGameModes';
@@ -50,8 +49,6 @@ export default function GameModesClient({
       />
 
       <JuzFilterSettings open={juzPanelOpen} onClose={handleJuzPanelClose} />
-
-      <ContinueSessions sessions={activeSessions} />
 
       <PrimaryGameModes
         elo={elo}

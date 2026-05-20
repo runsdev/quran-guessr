@@ -27,7 +27,7 @@ export function useGameModesState(
     if (gameMode) {
       const existing = activeSessions.find((s) => s.gameMode === gameMode);
       if (existing) {
-        router.push(`${href}?token=${existing.token}`);
+        router.push(href);
         return;
       }
     }
