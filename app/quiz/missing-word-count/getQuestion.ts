@@ -10,6 +10,8 @@ import type { QdcVerse } from '@/lib/qdc-client';
 import { getContentClient } from '@/lib/qf-server-client';
 import { pickRandomJuz } from '@/lib/quran-pages';
 
+const IS_PRODUCTION = process.env.NODE_ENV === 'production';
+
 /** Map an SDK Word to the app's VerseWord shape. */
 function mapWord(w: Word): VerseWord & {
   // eslint-disable-next-line @typescript-eslint/naming-convention
@@ -61,13 +63,15 @@ function qdcToQuranVerse(v: QdcVerse): QuranVerse {
 }
 
 async function fetchVerse(targetPageNumber?: number, juzFilter?: number[]): Promise<QuranVerse> {
-  const client = getContentClient();
-
   if (targetPageNumber !== undefined) {
+    if (!IS_PRODUCTION) {
+      return qdcToQuranVerse(await qdcFetchByPage(targetPageNumber));
+    }
     try {
       // byPage with words:true returns empty on some environments; use a two-step
       // approach: get the verse index for the page (no words), pick randomly, then
       // fetch the full verse with words via byKey.
+      const client = getContentClient();
       const pageIndex = await client.content.v4.verses.byPage(
         String(targetPageNumber) as Parameters<typeof client.content.v4.verses.byPage>[0],
       );
@@ -88,7 +92,11 @@ async function fetchVerse(targetPageNumber?: number, juzFilter?: number[]): Prom
 
   if (juzFilter && juzFilter.length > 0) {
     const juzNum = pickRandomJuz(juzFilter);
+    if (!IS_PRODUCTION) {
+      return qdcToQuranVerse(await qdcFetchByJuz(juzNum));
+    }
     try {
+      const client = getContentClient();
       const verses = await client.content.v4.verses.byJuz(
         String(juzNum) as Parameters<typeof client.content.v4.verses.byJuz>[0],
         WORD_OPTS,
@@ -103,7 +111,11 @@ async function fetchVerse(targetPageNumber?: number, juzFilter?: number[]): Prom
     }
   }
 
+  if (!IS_PRODUCTION) {
+    return qdcToQuranVerse(await qdcFetchRandom());
+  }
   try {
+    const client = getContentClient();
     const verse = await client.content.v4.verses.random(WORD_OPTS);
     return toQuranVerse(verse);
   } catch (err) {

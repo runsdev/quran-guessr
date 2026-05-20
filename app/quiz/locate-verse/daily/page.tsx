@@ -16,6 +16,8 @@ import type { QdcWord } from '@/lib/qdc-client';
 import { getContentClient } from '@/lib/qf-server-client';
 import { SURAH_NAMES } from '@/lib/quran-pages';
 
+const IS_PRODUCTION = process.env.NODE_ENV === 'production';
+
 /** Map an SDK Word to the app's VerseWord, keeping page/line for answer calculation. */
 function mapWord(w: Word): VerseWord & { page_number?: number; line_number?: number } {
   return {
@@ -48,8 +50,16 @@ async function fetchVerseByKey(verseKey: string): Promise<{
   verseKey: string;
   words: Array<VerseWord & { page_number?: number; line_number?: number }>;
 }> {
-  const client = getContentClient();
+  if (!IS_PRODUCTION) {
+    const qdcVerse = await qdcFetchByKey(verseKey);
+    if (!qdcVerse) {
+      throw new Error(`Verse ${verseKey} not found`);
+    }
+    const words = qdcVerse.words.sort((a, b) => a.position - b.position).map(qdcWordToVerseWord);
+    return { verseKey: qdcVerse.verse_key, words };
+  }
   try {
+    const client = getContentClient();
     const verse = await client.content.v4.verses.byKey(
       verseKey as Parameters<typeof client.content.v4.verses.byKey>[0],
       { words: true, wordFields: { codeV2: true } },
