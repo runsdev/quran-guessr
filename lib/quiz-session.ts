@@ -77,6 +77,20 @@ export async function getActiveQuizSession(token: string): Promise<ActiveSession
   return toActiveSession(record);
 }
 
+export async function getActiveSessionByUserAndMode(
+  userId: string,
+  gameMode: GameMode,
+): Promise<ActiveSession | null> {
+  const record = await prisma.quizSession.findFirst({
+    where: { userId, gameMode, status: 'active', expiresAt: { gt: new Date() } },
+    orderBy: { updatedAt: 'desc' },
+  });
+  if (!record) {
+    return null;
+  }
+  return toActiveSession(record);
+}
+
 export async function advanceQuizSession(
   token: string,
   opts: {

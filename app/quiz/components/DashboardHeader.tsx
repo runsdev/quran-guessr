@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 interface Props {
   userName: string;
   elo: number;
@@ -103,43 +104,6 @@ export default function DashboardHeader({
             <p className="text-sm font-medium" style={{ color: '#222222' }}>
               {streak >= STREAK_GOAL ? 'Goal reached!' : `${STREAK_GOAL - streak} to goal`}
             </p>
-          </div>
-        </div>
-
-        <div className="w-px h-10 hidden md:block" style={{ background: '#dddddd' }} />
-
-        {/* Daily ranked */}
-        <div className="flex items-center gap-3 px-2">
-          <div
-            className="w-10 h-10 rounded-full flex items-center justify-center"
-            style={{
-              background: dailyRankedCount >= dailyRankedLimit ? '#fde8e0' : '#d1e7dd',
-              border: `1px solid ${dailyRankedCount >= dailyRankedLimit ? '#f5c6c0' : '#a3cfbb'}`,
-            }}
-          >
-            <span
-              className="material-symbols-outlined"
-              style={{
-                color: dailyRankedCount >= dailyRankedLimit ? '#c13515' : '#0a4a28',
-                fontSize: 20,
-              }}
-            >
-              {dailyRankedCount >= dailyRankedLimit ? 'block' : 'check_circle'}
-            </span>
-          </div>
-          <div>
-            <p
-              className="text-xs uppercase tracking-wider font-semibold"
-              style={{ color: '#6a6a6a' }}
-            >
-              Ranked Today
-            </p>
-            <span className="text-xl font-bold" style={{ color: '#222222' }}>
-              {dailyRankedCount}
-              <span className="text-sm font-normal" style={{ color: '#6a6a6a' }}>
-                /{dailyRankedLimit}
-              </span>
-            </span>
           </div>
         </div>
       </div>

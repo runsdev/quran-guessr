@@ -2,22 +2,6 @@
 
 import type { PageEloEntry } from './leaderboard-types';
 
-function getPageDifficulty(elo: number) {
-  if (elo >= 1300) {
-    return { label: 'Hard', chipCls: 'bg-error/10 text-error border border-error/20' };
-  }
-  if (elo >= 1100) {
-    return {
-      label: 'Moderate',
-      chipCls: 'bg-secondary-container/20 text-secondary border border-secondary-container',
-    };
-  }
-  return {
-    label: 'Easy',
-    chipCls: 'bg-tertiary-container/20 text-tertiary border border-tertiary-container/50',
-  };
-}
-
 interface PageTableProps {
   paged: PageEloEntry[];
 }
@@ -43,9 +27,6 @@ export function PageEloTable({ paged }: PageTableProps) {
             <th className="px-6 py-4 text-[11px] font-bold text-on-surface-variant uppercase tracking-widest">
               Page ELO
             </th>
-            <th className="px-6 py-4 text-[11px] font-bold text-on-surface-variant uppercase tracking-widest">
-              Difficulty
-            </th>
             <th className="px-6 py-4 text-[11px] font-bold text-on-surface-variant uppercase tracking-widest text-center">
               Attempts
             </th>
@@ -55,11 +36,13 @@ export function PageEloTable({ paged }: PageTableProps) {
             <th className="px-6 py-4 text-[11px] font-bold text-on-surface-variant uppercase tracking-widest">
               Last Updated
             </th>
+            <th className="px-6 py-4 text-[11px] font-bold text-on-surface-variant uppercase tracking-widest">
+              Practice
+            </th>
           </tr>
         </thead>
         <tbody className="divide-y divide-primary/5">
           {paged.map((entry) => {
-            const difficulty = getPageDifficulty(entry.elo);
             const rankCls =
               entry.rank === 1
                 ? 'text-yellow-400'
@@ -99,13 +82,6 @@ export function PageEloTable({ paged }: PageTableProps) {
                     {entry.elo.toLocaleString()}
                   </span>
                 </td>
-                <td className="px-6 py-5">
-                  <span
-                    className={`px-3 py-1 text-[10px] font-bold uppercase rounded-full ${difficulty.chipCls}`}
-                  >
-                    {difficulty.label}
-                  </span>
-                </td>
                 <td className="px-6 py-5 text-sm text-on-surface-variant text-center tabular-nums">
                   {entry.totalAttempts > 0 ? entry.totalAttempts.toLocaleString() : '—'}
                 </td>
@@ -116,6 +92,28 @@ export function PageEloTable({ paged }: PageTableProps) {
                 </td>
                 <td className="px-6 py-5 text-sm text-on-surface-variant">
                   {new Date(entry.updatedAt).toLocaleDateString()}
+                </td>
+                <td className="px-4 py-5">
+                  <div className="flex gap-1 items-center">
+                    {(
+                      [
+                        { mode: 'locate-verse', icon: 'my_location', title: 'Locate Verse' },
+                        { mode: 'missing-word-count', icon: 'find_replace', title: 'Word Count' },
+                        { mode: 'next-verse', icon: 'format_quote', title: 'Verse Quest' },
+                      ] as const
+                    ).map(({ mode, icon, title }) => (
+                      <a
+                        key={mode}
+                        href={`/quiz/${mode}?page=${entry.pageNumber}&practice=true`}
+                        title={`Practice ${title}`}
+                        className="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-primary/10 transition-colors"
+                      >
+                        <span className="material-symbols-outlined text-on-surface-variant text-[16px]">
+                          {icon}
+                        </span>
+                      </a>
+                    ))}
+                  </div>
                 </td>
               </tr>
             );

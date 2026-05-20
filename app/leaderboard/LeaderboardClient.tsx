@@ -42,7 +42,28 @@ export default function LeaderboardClient({
   const filteredPlayers = playerEntries.filter((e) =>
     e.name.toLowerCase().includes(search.toLowerCase()),
   );
-  const filteredPages = pageEntries.filter((e) => String(e.pageNumber).includes(search));
+  const normalizedPageSearch = search.replace(/^0+/, '') || search;
+  const filteredPages = pageEntries
+    .filter((e) =>
+      normalizedPageSearch === ''
+        ? true
+        : String(e.pageNumber) === normalizedPageSearch ||
+          String(e.pageNumber).startsWith(normalizedPageSearch),
+    )
+    .sort((a, b) => {
+      if (normalizedPageSearch === '') {
+        return 0;
+      }
+      const aExact = String(a.pageNumber) === normalizedPageSearch;
+      const bExact = String(b.pageNumber) === normalizedPageSearch;
+      if (aExact && !bExact) {
+        return -1;
+      }
+      if (!aExact && bExact) {
+        return 1;
+      }
+      return 0;
+    });
   const filteredDaily = dailyEntries.filter((e) =>
     e.name.toLowerCase().includes(search.toLowerCase()),
   );

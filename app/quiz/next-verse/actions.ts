@@ -10,6 +10,7 @@ import { recordQfActivityDay } from '@/lib/qf-api';
 import {
   createQuizSession,
   getActiveQuizSession,
+  getActiveSessionByUserAndMode,
   advanceQuizSession,
   saveQuizSubmitResult,
 } from '@/lib/quiz-session';
@@ -36,6 +37,19 @@ export async function initSession(
     if (existing) {
       return {
         sessionToken,
+        question: existing.currentQuestion as unknown as Question,
+        questionNumber: existing.questionNumber,
+        totalScore: existing.totalScore,
+        submitResult: existing.submitResult as SubmitResult | null,
+      };
+    }
+  }
+
+  if (userId) {
+    const existing = await getActiveSessionByUserAndMode(userId, GAME_MODE);
+    if (existing) {
+      return {
+        sessionToken: existing.token,
         question: existing.currentQuestion as unknown as Question,
         questionNumber: existing.questionNumber,
         totalScore: existing.totalScore,

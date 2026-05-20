@@ -4,6 +4,7 @@ import { useTransition, useState, useMemo, useEffect, useRef } from 'react';
 
 import { initSession, fetchNextQuestion, submitAnswer } from './actions';
 import type { Option } from './AnswerGrid';
+import { fetchPracticeQuestion, submitPracticeAnswer } from './practice-actions';
 import type { Question, SubmitResult } from './types';
 
 import { abandonSession } from '@/app/quiz/actions';
@@ -16,6 +17,18 @@ export function useMissingWordCountState() {
   const [sessionToken, setSessionToken] = useState<string | null>(null);
   const [isInitializing, setIsInitializing] = useState(true);
   const [initError, setInitError] = useState(false);
+  const [isPractice] = useState(
+    () =>
+      typeof window !== 'undefined' &&
+      new URLSearchParams(window.location.search).get('practice') === 'true',
+  );
+  const [practicePageNumber] = useState<number | null>(() => {
+    if (typeof window === 'undefined') {
+      return null;
+    }
+    const p = new URLSearchParams(window.location.search).get('page');
+    return p ? parseInt(p, 10) : null;
+  });
 
   const [question, setQuestion] = useState<Question | null>(null);
   const [isPending, startTransition] = useTransition();
@@ -32,6 +45,18 @@ export function useMissingWordCountState() {
       return;
     }
     initCalledRef.current = true;
+    if (isPractice && practicePageNumber) {
+      fetchPracticeQuestion(practicePageNumber)
+        .then((q) => {
+          setQuestion(q);
+          setIsInitializing(false);
+        })
+        .catch(() => {
+          setInitError(true);
+          setIsInitializing(false);
+        });
+      return;
+    }
     const filter = loadJuzFilter();
     const urlToken = new URLSearchParams(window.location.search).get('token') ?? undefined;
     const stored = urlToken ?? localStorage.getItem(SESSION_KEY) ?? undefined;
@@ -70,19 +95,26 @@ export function useMissingWordCountState() {
   }, [question]);
 
   const doSubmit = (guess: number) => {
-    if (!sessionToken || !question || isSubmitting || submitResult !== null) {
+    if ((!sessionToken && !isPractice) || !question || isSubmitting || submitResult !== null) {
       return;
     }
     setIsSubmitting(true);
     startTransition(async () => {
       try {
-        const result = await submitAnswer(
-          sessionToken,
-          question.encryptedVerseKey,
-          question.answerToken,
-          guess,
-          question.encryptedHiddenWords,
-        );
+        const result = isPractice
+          ? await submitPracticeAnswer(
+              question.encryptedVerseKey,
+              question.answerToken,
+              guess,
+              question.encryptedHiddenWords,
+            )
+          : await submitAnswer(
+              sessionToken!,
+              question.encryptedVerseKey,
+              question.answerToken,
+              guess,
+              question.encryptedHiddenWords,
+            );
         setSubmitResult(result);
       } catch {
         setFetchError(true);
@@ -94,16 +126,26 @@ export function useMissingWordCountState() {
   const handleTimerExpire = () => doSubmit(0);
   const handleSubmit = () => doSubmit(selected ?? 0);
   const loadNextQuestion = () => {
-    if (!sessionToken) {
+    if (!sessionToken && !isPractice) {
       return;
     }
-    const filter = loadJuzFilter().length > 0 ? loadJuzFilter() : undefined;
     startTransition(async () => {
       try {
-        const { question: q, questionNumber: qn } = await fetchNextQuestion(sessionToken, filter);
-        setQuestion(q);
-        setQuestionNumber(qn);
-        setInitialTimeLeft(TIMER_LIMIT);
+        if (isPractice && practicePageNumber) {
+          const q = await fetchPracticeQuestion(practicePageNumber);
+          setQuestion(q);
+          setQuestionNumber((n) => n + 1);
+          setInitialTimeLeft(TIMER_LIMIT);
+        } else {
+          const filter = loadJuzFilter().length > 0 ? loadJuzFilter() : undefined;
+          const { question: q, questionNumber: qn } = await fetchNextQuestion(
+            sessionToken!,
+            filter,
+          );
+          setQuestion(q);
+          setQuestionNumber(qn);
+          setInitialTimeLeft(TIMER_LIMIT);
+        }
       } catch {
         setFetchError(true);
       }
@@ -123,7 +165,7 @@ export function useMissingWordCountState() {
   };
 
   const handleEndSession = async () => {
-    if (sessionToken) {
+    if (!isPractice && sessionToken) {
       localStorage.removeItem(SESSION_KEY);
       await abandonSession(sessionToken);
     }
