@@ -8,6 +8,8 @@ import type { QdcWord } from '@/lib/qdc-client';
 import { getContentClient } from '@/lib/qf-server-client';
 import { SURAH_NAMES, pickRandomJuz } from '@/lib/quran-pages';
 
+const IS_PRODUCTION = process.env.NODE_ENV === 'production';
+
 interface RawWord extends VerseWord {
   // eslint-disable-next-line @typescript-eslint/naming-convention
   page_number: number;
@@ -60,10 +62,16 @@ async function fetchRandomVerse(
   juzFilter?: number[],
   pageNumber?: number,
 ): Promise<{ verseKey: string; words: RawWord[] }> {
-  const client = getContentClient();
-
   if (pageNumber !== undefined) {
+    if (!IS_PRODUCTION) {
+      const qdcVerse = await qdcFetchByPage(pageNumber);
+      return {
+        verseKey: qdcVerse.verse_key,
+        words: qdcVerse.words.sort((a, b) => a.position - b.position).map(qdcWordToRaw),
+      };
+    }
     try {
+      const client = getContentClient();
       const pageIndex = await client.content.v4.verses.byPage(
         String(pageNumber) as Parameters<typeof client.content.v4.verses.byPage>[0],
       );
@@ -89,7 +97,15 @@ async function fetchRandomVerse(
 
   if (juzFilter && juzFilter.length > 0) {
     const juzNum = pickRandomJuz(juzFilter);
+    if (!IS_PRODUCTION) {
+      const qdcVerse = await qdcFetchByJuz(juzNum);
+      return {
+        verseKey: qdcVerse.verse_key,
+        words: qdcVerse.words.sort((a, b) => a.position - b.position).map(qdcWordToRaw),
+      };
+    }
     try {
+      const client = getContentClient();
       const verses = await client.content.v4.verses.byJuz(
         String(juzNum) as Parameters<typeof client.content.v4.verses.byJuz>[0],
         WORD_OPTS,
@@ -110,7 +126,15 @@ async function fetchRandomVerse(
     }
   }
 
+  if (!IS_PRODUCTION) {
+    const qdcVerse = await qdcFetchRandom();
+    return {
+      verseKey: qdcVerse.verse_key,
+      words: qdcVerse.words.sort((a, b) => a.position - b.position).map(qdcWordToRaw),
+    };
+  }
   try {
+    const client = getContentClient();
     const verse = await client.content.v4.verses.random(WORD_OPTS);
     const words = [...(verse.words ?? [])].sort((a, b) => a.position - b.position).map(mapWord);
     return { verseKey: verse.verseKey, words };
@@ -136,10 +160,11 @@ export async function getRandomQuestion(
 
   const fontPages = [...new Set(words.map((w) => w.page_number))];
 
-  // Strip page_number and line_number before sending to the client — they reveal the answer.
+  // Keep page_number so VerseCard can select the correct QCF v2 per-page font.
+  // Strip line_number only — it directly reveals the answer line.
   const verseWords: VerseWord[] = words.map(
     // eslint-disable-next-line @typescript-eslint/naming-convention, @typescript-eslint/no-unused-vars
-    ({ page_number: _p, line_number: _l, ...word }) => word,
+    ({ line_number: _l, ...word }) => word,
   );
 
   const [surahStr] = verseKey.split(':');

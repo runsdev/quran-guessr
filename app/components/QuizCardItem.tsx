@@ -20,9 +20,10 @@ interface QuizMode {
 interface Props {
   quiz: QuizMode;
   innerRef: (el: HTMLDivElement | null) => void;
+  priority?: boolean;
 }
 
-export default function QuizCardItem({ quiz, innerRef }: Props) {
+export default function QuizCardItem({ quiz, innerRef, priority = false }: Props) {
   const [lightboxOpen, setLightboxOpen] = useState(false);
 
   return (
@@ -107,7 +108,12 @@ export default function QuizCardItem({ quiz, innerRef }: Props) {
       </div>
 
       {/* ── Right: image (click to zoom) ── */}
-      <QuizImageThumb src={quiz.image} alt={quiz.title} onOpen={() => setLightboxOpen(true)} />
+      <QuizImageThumb
+        src={quiz.image}
+        alt={quiz.title}
+        onOpen={() => setLightboxOpen(true)}
+        priority={priority}
+      />
 
       {/* ── Lightbox modal ── */}
       {lightboxOpen && (

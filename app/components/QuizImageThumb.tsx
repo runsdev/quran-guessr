@@ -4,9 +4,10 @@ interface Props {
   src: string;
   alt: string;
   onOpen: () => void;
+  priority?: boolean;
 }
 
-export default function QuizImageThumb({ src, alt, onOpen }: Props) {
+export default function QuizImageThumb({ src, alt, onOpen, priority = false }: Props) {
   return (
     <button
       className="hidden md:flex"
@@ -32,6 +33,7 @@ export default function QuizImageThumb({ src, alt, onOpen }: Props) {
         alt={alt}
         width={300}
         height={220}
+        priority={priority}
         style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
       />
       <div

@@ -23,8 +23,6 @@ export default function QuizClient() {
     questionNumber,
     submitted,
     isCorrect,
-    masteryPercent,
-    progressWidth,
     pageNumbers,
     handleSubmit,
     handleNext,
@@ -54,13 +52,7 @@ export default function QuizClient() {
           </div>
         ) : (
           <>
-            <QuizProgressHeader
-              verseReference={question?.verseReference ?? null}
-              questionNumber={questionNumber}
-              masteryPercent={masteryPercent}
-              progressWidth={progressWidth}
-              onEndSession={handleEndSession}
-            />
+            <QuizProgressHeader questionNumber={questionNumber} onEndSession={handleEndSession} />
 
             <VerseCard
               verseWords={question?.verseWords ?? null}

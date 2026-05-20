@@ -128,6 +128,7 @@ export default function QuizAccordionSection() {
           >
             <QuizCardItem
               quiz={quiz}
+              priority={i === 0}
               innerRef={(el) => {
                 innerRefs.current[i] = el;
               }}

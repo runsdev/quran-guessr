@@ -10,6 +10,8 @@ import type { QdcWord } from '@/lib/qdc-client';
 import { getContentClient } from '@/lib/qf-server-client';
 import { pickRandomJuz } from '@/lib/quran-pages';
 
+const IS_PRODUCTION = process.env.NODE_ENV === 'production';
+
 /** Raw word shape — includes page_number for font loading (must not reach the client). */
 interface RawWord extends VerseWord {
   page_number: number;
@@ -41,10 +43,16 @@ async function fetchRandomVerse(
   juzFilter?: number[],
   pageNumber?: number,
 ): Promise<{ verseKey: string; words: RawWord[] }> {
-  const client = getContentClient();
-
   if (pageNumber !== undefined) {
+    if (!IS_PRODUCTION) {
+      const qdcVerse = await qdcFetchByPage(pageNumber);
+      return {
+        verseKey: qdcVerse.verse_key,
+        words: qdcVerse.words.sort((a, b) => a.position - b.position).map(qdcToRaw),
+      };
+    }
     try {
+      const client = getContentClient();
       const pageIndex = await client.content.v4.verses.byPage(
         String(pageNumber) as Parameters<typeof client.content.v4.verses.byPage>[0],
       );
@@ -69,7 +77,15 @@ async function fetchRandomVerse(
   }
   if (juzFilter && juzFilter.length > 0) {
     const juzNum = pickRandomJuz(juzFilter);
+    if (!IS_PRODUCTION) {
+      const qdcVerse = await qdcFetchByJuz(juzNum);
+      return {
+        verseKey: qdcVerse.verse_key,
+        words: qdcVerse.words.sort((a, b) => a.position - b.position).map(qdcToRaw),
+      };
+    }
     try {
+      const client = getContentClient();
       const verses = await client.content.v4.verses.byJuz(
         String(juzNum) as Parameters<typeof client.content.v4.verses.byJuz>[0],
         WORD_OPTS,
@@ -90,7 +106,15 @@ async function fetchRandomVerse(
     }
   }
 
+  if (!IS_PRODUCTION) {
+    const qdcVerse = await qdcFetchRandom();
+    return {
+      verseKey: qdcVerse.verse_key,
+      words: qdcVerse.words.sort((a, b) => a.position - b.position).map(qdcToRaw),
+    };
+  }
   try {
+    const client = getContentClient();
     const verse = await client.content.v4.verses.random(WORD_OPTS);
     const words = [...(verse.words ?? [])].sort((a, b) => a.position - b.position).map(mapWord);
     return { verseKey: verse.verseKey, words };
@@ -105,8 +129,15 @@ async function fetchRandomVerse(
 }
 
 async function fetchVerseByKey(verseKey: string): Promise<RawWord[] | null> {
-  const client = getContentClient();
+  if (!IS_PRODUCTION) {
+    const qdcVerse = await qdcFetchByKey(verseKey);
+    if (!qdcVerse) {
+      return null;
+    }
+    return qdcVerse.words.sort((a, b) => a.position - b.position).map(qdcToRaw);
+  }
   try {
+    const client = getContentClient();
     const verse = await client.content.v4.verses.byKey(
       verseKey as Parameters<typeof client.content.v4.verses.byKey>[0],
       WORD_OPTS,
