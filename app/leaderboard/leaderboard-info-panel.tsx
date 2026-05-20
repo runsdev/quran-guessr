@@ -1,10 +1,5 @@
 'use client';
 
-import Image from 'next/image';
-
-const QURAN_IMG =
-  'https://lh3.googleusercontent.com/aida-public/AB6AXuCzVNydmKB58bxdb3OgfahabJW6_eKMkRj-2ha0GCVRSg1Rg3ropPXtIRH0Ml1Hg7Dzu-QUmEG8Od9OEGVcwTKkjL0IEC_yy1KydgOKxpekv-0JKFqumAlW0wltQgSF540z1vHvKHEtWPZniH6AQQrbipbTEOnokmEkwgklimClc2iGsE5eDnjKM6GM-KqqKtNtrZKiFRIRMxiJWIUOs4j33vbcPAO1bUtw2Vt-hYFaVP2MkN4dkI08C7hyzi1l2mLO5ZClvq1a3USk';
-
 import type { LeaderboardTab } from './leaderboard-types';
 
 interface InfoPanelProps {
@@ -27,12 +22,13 @@ export function InfoPanel({ tab }: InfoPanelProps) {
           {tab === 'player' ? (
             <p className="text-sm text-on-surface-variant leading-relaxed">
               Your Player ELO reflects your performance against the{' '}
-              <span className="text-primary">page difficulty</span>. Win against hard pages to climb
-              faster. Uses adaptive K-factor (K=40 new, K=32 regular, K=16 established).
+              <span className="text-primary">page difficulty</span>. ELO is calculated using a
+              modified Glicko-2 system, which accounts for the number of questions answered to
+              stabilize ratings for newer players.
             </p>
           ) : tab === 'daily' ? (
             <p className="text-sm text-on-surface-variant leading-relaxed">
-              Each day, <span className="text-primary">5 random verses</span> are selected for
+              Each day, <span className="text-primary">5 random verses </span> are selected for
               everyone worldwide. Scores are based on how close your page &amp; row guess is —
               perfect guesses earn up to 5,000 pts per question (25,000 total).
             </p>
@@ -44,88 +40,6 @@ export function InfoPanel({ tab }: InfoPanelProps) {
             </p>
           )}
         </section>
-
-        <div className="h-px bg-primary/10" />
-
-        <section className="space-y-4">
-          <h3 className="text-xs font-bold text-on-surface-variant uppercase tracking-widest">
-            Mastery Thresholds
-          </h3>
-          {tab === 'player' ? (
-            <div className="space-y-3">
-              <div className="flex items-center gap-3">
-                <div className="w-2 h-2 rounded-full bg-primary shrink-0" />
-                <div>
-                  <p className="text-xs font-bold text-on-surface">Master (1,300+)</p>
-                  <p className="text-[11px] text-on-surface-variant">
-                    Consistently beats difficult pages.
-                  </p>
-                </div>
-              </div>
-              <div className="flex items-center gap-3">
-                <div className="w-2 h-2 rounded-full bg-secondary shrink-0" />
-                <div>
-                  <p className="text-xs font-bold text-on-surface">Intermediate (1,100 – 1,299)</p>
-                  <p className="text-[11px] text-on-surface-variant">
-                    Solid recall with occasional misses.
-                  </p>
-                </div>
-              </div>
-              <div className="flex items-center gap-3">
-                <div className="w-2 h-2 rounded-full bg-outline shrink-0" />
-                <div>
-                  <p className="text-xs font-bold text-on-surface">Beginner (&lt; 1,100)</p>
-                  <p className="text-[11px] text-on-surface-variant">
-                    Still building memorization strength.
-                  </p>
-                </div>
-              </div>
-            </div>
-          ) : (
-            <div className="space-y-3">
-              <div className="flex items-center gap-3">
-                <div className="w-2 h-2 rounded-full bg-error shrink-0" />
-                <div>
-                  <p className="text-xs font-bold text-on-surface">Hard (1,300+)</p>
-                  <p className="text-[11px] text-on-surface-variant">
-                    Players frequently answer incorrectly.
-                  </p>
-                </div>
-              </div>
-              <div className="flex items-center gap-3">
-                <div className="w-2 h-2 rounded-full bg-secondary shrink-0" />
-                <div>
-                  <p className="text-xs font-bold text-on-surface">Moderate (1,100 – 1,299)</p>
-                  <p className="text-[11px] text-on-surface-variant">Mixed player performance.</p>
-                </div>
-              </div>
-              <div className="flex items-center gap-3">
-                <div className="w-2 h-2 rounded-full bg-tertiary shrink-0" />
-                <div>
-                  <p className="text-xs font-bold text-on-surface">Easy (&lt; 1,100)</p>
-                  <p className="text-[11px] text-on-surface-variant">
-                    Players answer correctly most of the time.
-                  </p>
-                </div>
-              </div>
-            </div>
-          )}
-        </section>
-
-        <div className="p-5 bg-primary/5 border border-primary/20 rounded-2xl">
-          <div className="relative w-full h-32 rounded-xl overflow-hidden mb-4">
-            <Image
-              src={QURAN_IMG}
-              alt="Quran pages"
-              fill
-              className="object-cover opacity-60"
-              unoptimized
-            />
-          </div>
-          <p className="text-xs text-primary/80 italic text-center">
-            &ldquo;The best of you are those who learn the Quran and teach it.&rdquo;
-          </p>
-        </div>
       </div>
     </aside>
   );

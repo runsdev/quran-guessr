@@ -2,7 +2,20 @@ import { useState, useEffect, useRef } from 'react';
 
 import { useRouter } from 'next/navigation';
 
-export function useGameModesState(dailyRankedCount: number, dailyRankedLimit: number) {
+import type { ActiveSession } from '../page';
+
+const HREF_TO_GAME_MODE: Record<string, string> = {
+  '/quiz/locate-verse': 'locate-verse',
+  '/quiz/next-verse': 'next-verse',
+  '/quiz/missing-word-count': 'missing-word-count',
+  '/quiz/locate-verse/daily': 'locate-verse-daily',
+};
+
+export function useGameModesState(
+  dailyRankedCount: number,
+  dailyRankedLimit: number,
+  activeSessions: ActiveSession[],
+) {
   const router = useRouter();
   const [modalOpen, setModalOpen] = useState(false);
   const [modalKey, setModalKey] = useState(0);
@@ -10,6 +23,14 @@ export function useGameModesState(dailyRankedCount: number, dailyRankedLimit: nu
   const pendingNavRef = useRef('');
 
   const openModal = (href: string) => {
+    const gameMode = HREF_TO_GAME_MODE[href];
+    if (gameMode) {
+      const existing = activeSessions.find((s) => s.gameMode === gameMode);
+      if (existing) {
+        router.push(`${href}?token=${existing.token}`);
+        return;
+      }
+    }
     setPendingHref(href);
     setModalKey((k) => k + 1);
     setModalOpen(true);
