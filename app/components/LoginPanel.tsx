@@ -1,6 +1,7 @@
 'use client';
 
 import Image from 'next/image';
+import { redirect } from 'next/navigation';
 import { signIn, signOut, useSession } from 'next-auth/react';
 
 /** Login / profile panel — Apple utility card style. */
@@ -69,10 +70,12 @@ const LoginPanel = (): React.JSX.Element => {
           /* ── Signed-out state ── */
           <>
             <h2 style={{ fontSize: 28, fontWeight: 700, color: '#222222', lineHeight: 1.43 }}>
-              Continue Your Journey
+              Register or Sign In
             </h2>
             <p style={{ fontSize: 16, color: '#6a6a6a', lineHeight: 1.5 }}>
-              Sign in to sync your progress across devices and climb the global leaderboards.
+              Sign in with your Quran.com account to save your progress and compete on the
+              leaderboard! It&rsquo;s quick, easy, and free. Just click the button below to get
+              started.
             </p>
             <button
               style={{
@@ -93,6 +96,26 @@ const LoginPanel = (): React.JSX.Element => {
             >
               Continue with Quran.com
             </button>
+            <p style={{ fontSize: 16, color: '#6a6a6a', lineHeight: 1.5 }}>
+              Or{' '}
+              <button
+                style={{
+                  borderRadius: 8,
+                  padding: '2px 4px',
+                  fontSize: 16,
+                  fontWeight: 500,
+                  border: '1px solid #dddddd',
+                  cursor: 'pointer',
+                  transition: 'opacity 0.15s',
+                  opacity: status === 'loading' ? 0.6 : 1,
+                }}
+                onClick={() => redirect('/quiz')}
+                disabled={status === 'loading'}
+              >
+                try the quiz
+              </button>{' '}
+              without signing in.
+            </p>
           </>
         )}
       </div>
@@ -103,7 +126,7 @@ const LoginPanel = (): React.JSX.Element => {
       >
         <Image
           className="absolute inset-0 w-full h-full object-cover"
-          src="https://lh3.googleusercontent.com/aida-public/AB6AXuA2xsd6Gzg9iRdBDk3SItlpJFEdSMMCmTkEjeNQYEMsVQ40ZxSXypQ2o2I-CsB06Vwrg7-HGoCeSGoLNRt1IJPZsNF4GpyBV1L4SBLSm1rcK8iOYYG99E9OpjPxTnJQXwgpyvQflVL8WxquAnWYOpO_GeaFr4tr3Cl34aj-BdE4HwDDe-6zmi45gigh9jDi5BvtSa2dI-nyAWju5ckkLEfHhDD8ZzQX7TeiXd0WFKcpXywhT8NCgO0TEHtsR1Yt40elv-SrCwNwLEXi"
+          src="/quran-hero.jpg"
           alt="Open Quran with elegant calligraphy"
           fill
           unoptimized

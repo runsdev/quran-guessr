@@ -122,9 +122,9 @@ export default function LocationGrid({
       <div
         className={`flex flex-col gap-4 rounded-2xl p-4 ring-2 bg-surface-container transition-all duration-200 ${
           isPageCorrect && isRowCorrect
-            ? 'ring-green-500'
+            ? 'ring-green-700'
             : isPageWrong || isRowWrong
-              ? 'ring-rose-500'
+              ? 'ring-rose-700'
               : 'ring-outline-variant'
         }`}
       >
@@ -149,7 +149,7 @@ export default function LocationGrid({
             correctLine !== null && (
               <span className="opacity-50 ml-1">
                 →{' '}
-                <span className="text-green-400 font-semibold">
+                <span className="text-green-900 font-semibold">
                   Page {correctPage}, Row {correctLine}
                 </span>
               </span>

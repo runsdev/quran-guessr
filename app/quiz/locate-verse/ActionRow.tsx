@@ -50,9 +50,28 @@ export default function ActionRow({
         </div>
       );
     } else {
+      const pageDist = Math.abs((selectedPage ?? 0) - correctPage);
+      const lineDist = Math.abs((selectedLine ?? 0) - correctLine);
+      let missLabel: string;
+      let missColor: string;
+      if (pageDist <= 3 && lineDist <= 2) {
+        missLabel = '~ So close!';
+        missColor = 'text-amber-400';
+      } else if (pageDist <= 10) {
+        missLabel = '~ Close.';
+        missColor = 'text-amber-400';
+      } else if (pageDist <= 30) {
+        missLabel = '↗ Not far.';
+        missColor = 'text-orange-400';
+      } else {
+        missLabel = '✗ Miss.';
+        missColor = 'text-rose-400';
+      }
       feedbackEl = (
         <div className="flex flex-col gap-0.5">
-          <p className="text-sm font-medium text-rose-400">✗ Miss. {pts}</p>
+          <p className={`text-sm font-medium ${missColor}`}>
+            {missLabel} {pts}
+          </p>
           <p className="text-xs text-on-surface-variant">
             Page {correctPage}, Row {correctLine}
           </p>

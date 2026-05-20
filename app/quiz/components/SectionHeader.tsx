@@ -9,7 +9,7 @@ export default function SectionHeader({ openJuzPanel, activeJuzCount }: HeaderPr
         <h3 className="text-2xl font-bold mb-1" style={{ color: '#222222' }}>
           Select Game Mode
         </h3>
-        <p style={{ color: '#6a6a6a' }}>Choose your path to mastery.</p>
+        <p style={{ color: '#6a6a6a' }}>Choose the game mode that suits your learning style.</p>
       </div>
       <button
         onClick={openJuzPanel}
