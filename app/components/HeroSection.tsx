@@ -4,7 +4,6 @@ import Link from 'next/link';
 
 /**
  * Airbnb-style hero section — white canvas, modest 28px/700 headline,
- * pill-shaped search-bar adaptation, Rausch CTA.
  */
 const HeroSection = (): React.JSX.Element => (
   <section
@@ -39,64 +38,42 @@ const HeroSection = (): React.JSX.Element => (
       Interactive quizzes on verse location, missing words, and sequence — for every level.
     </p>
 
-    {/* Pill-shaped discovery bar (Airbnb search-bar aesthetic) */}
-    <div
-      className="flex flex-col sm:flex-row items-center gap-0 w-full max-w-xl"
-      style={{
-        background: '#ffffff',
-        border: '1px solid #dddddd',
-        borderRadius: 9999,
-        boxShadow:
-          'rgba(0,0,0,0.02) 0 0 0 1px, rgba(0,0,0,0.04) 0 2px 6px, rgba(0,0,0,0.10) 0 4px 8px',
-        overflow: 'hidden',
-      }}
-    >
-      <div
-        className="flex-1 flex flex-col items-start px-6 py-3"
-        style={{ borderRight: '1px solid #dddddd' }}
-      >
-        <span style={{ fontSize: 14, fontWeight: 500, color: '#222222' }}>Quiz Mode</span>
-        <span style={{ fontSize: 14, color: '#6a6a6a' }}>Choose your game</span>
-      </div>
-      <div className="flex-1 flex flex-col items-start px-6 py-3">
-        <span style={{ fontSize: 14, fontWeight: 500, color: '#222222' }}>Difficulty</span>
-        <span style={{ fontSize: 14, color: '#6a6a6a' }}>All levels</span>
-      </div>
-      {/* Rausch search orb */}
+    {/* CTAs */}
+    <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap', justifyContent: 'center' }}>
       <Link
         href="/quiz"
-        className="flex items-center justify-center shrink-0 m-2"
         style={{
-          width: 48,
-          height: 48,
-          borderRadius: 9999,
+          display: 'inline-block',
           backgroundColor: '#ff385c',
           color: '#ffffff',
+          borderRadius: 8,
+          padding: '14px 24px',
+          fontSize: 16,
+          fontWeight: 500,
           textDecoration: 'none',
-          fontSize: 22,
+          textAlign: 'center',
+          lineHeight: 1.25,
         }}
-        aria-label="Start quiz"
       >
-        <span className="material-symbols-outlined" style={{ fontSize: 22 }}>
-          search
-        </span>
+        Explore Quiz
+      </Link>
+      <Link
+        href="/leaderboard"
+        style={{
+          display: 'inline-block',
+          padding: '12px 24px',
+          backgroundColor: '#ffffff',
+          color: '#222222',
+          borderRadius: 8,
+          fontSize: 14,
+          fontWeight: 600,
+          textDecoration: 'none',
+          border: '1px solid #222222',
+        }}
+      >
+        View Leaderboard
       </Link>
     </div>
-
-    {/* Secondary CTA */}
-    <Link
-      href="/leaderboard"
-      style={{
-        display: 'inline-block',
-        marginTop: 20,
-        color: '#222222',
-        textDecoration: 'underline',
-        fontSize: 14,
-        fontWeight: 400,
-      }}
-    >
-      View Leaderboard
-    </Link>
   </section>
 );
 

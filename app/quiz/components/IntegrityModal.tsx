@@ -19,25 +19,21 @@ export default function IntegrityModal({ open, onClose, onConfirm }: Props) {
 
   return createPortal(
     <div
-      className="fixed inset-0 z-200 flex items-center justify-center bg-black/75 backdrop-blur-sm"
+      className="fixed inset-0 z-200 flex items-center justify-center bg-black/50"
       onClick={onClose}
     >
       <div
-        className="relative max-w-[65%] w-full mx-4 rounded-3xl overflow-hidden shadow-[0_25px_80px_rgba(0,0,0,0.8)]"
+        className="relative md:max-w-[65%] w-full mx-4 rounded-md overflow-hidden bg-background border border-outline"
         style={{
-          background: 'linear-gradient(145deg, #0f1c33 0%, #172240 100%)',
-          border: '1px solid rgba(255,255,255,0.12)',
-          borderTop: '1px solid rgba(255,255,255,0.22)',
+          boxShadow:
+            'rgba(0,0,0,0.02) 0 0 0 1px, rgba(0,0,0,0.04) 0 2px 6px 0, rgba(0,0,0,0.1) 0 4px 8px 0',
         }}
         onClick={(e) => e.stopPropagation()}
       >
-        {/* Top accent line */}
-        <div className="h-0.5 w-full bg-linear-to-r from-primary via-primary/60 to-transparent" />
-
         <div className="p-8 md:p-10">
           {/* Icon */}
           <div className="flex justify-center mb-6">
-            <div className="w-16 h-16 rounded-2xl bg-primary/10 border border-primary/20 flex items-center justify-center shadow-[0_0_30px_rgba(106,215,222,0.12)]">
+            <div className="w-16 h-16 rounded-md bg-primary/10 border border-primary/20 flex items-center justify-center">
               <span
                 className="material-symbols-outlined text-primary text-4xl"
                 style={{ fontVariationSettings: "'FILL' 1" }}
@@ -47,12 +43,14 @@ export default function IntegrityModal({ open, onClose, onConfirm }: Props) {
             </div>
           </div>
 
-          <h2 className="text-2xl font-bold text-white text-center mb-2">Play with Integrity</h2>
-          <p className="text-primary/60 text-center text-sm font-medium mb-6 tracking-widest">
+          <h2 className="text-[22px] font-semibold text-on-surface text-center mb-2 tracking-[-0.01em]">
+            Play with Integrity
+          </h2>
+          <p className="text-on-surface-variant text-center text-sm font-medium mb-6 tracking-widest">
             بِسْمِ اللَّهِ الرَّحْمَنِ الرَّحِيمِ
           </p>
 
-          <p className="text-on-surface-variant text-center leading-relaxed mb-8">
+          <p className="text-on-surface-variant text-center text-[15px] leading-relaxed mb-8">
             This is a test of what lives in your heart. Answer from memory only — do not open the
             Quran, consult a translation, or use any external aid. Let your score reflect your true
             connection with the Book of Allah.
@@ -70,13 +68,13 @@ export default function IntegrityModal({ open, onClose, onConfirm }: Props) {
               <div
                 className={`w-5 h-5 rounded border-2 flex items-center justify-center transition-all duration-200 ${
                   pledged
-                    ? 'bg-primary border-primary shadow-[0_0_8px_rgba(106,215,222,0.4)]'
-                    : 'border-outline-variant group-hover:border-primary/50'
+                    ? 'bg-primary border-primary'
+                    : 'border-outline group-hover:border-on-surface-variant'
                 }`}
               >
                 {pledged && (
                   <span
-                    className="material-symbols-outlined text-on-primary-container"
+                    className="material-symbols-outlined text-on-primary"
                     style={{ fontSize: 14, fontVariationSettings: "'wght' 700" }}
                   >
                     check
@@ -84,7 +82,7 @@ export default function IntegrityModal({ open, onClose, onConfirm }: Props) {
                 )}
               </div>
             </div>
-            <span className="text-sm text-on-surface-variant group-hover:text-white transition-colors leading-relaxed">
+            <span className="text-sm text-on-surface-variant group-hover:text-on-surface transition-colors leading-relaxed">
               I commit to answering from memory only, without peeking at the Quran or any other
               resource.
             </span>
@@ -94,14 +92,14 @@ export default function IntegrityModal({ open, onClose, onConfirm }: Props) {
           <div className="flex gap-3">
             <button
               onClick={onClose}
-              className="flex-1 py-3 rounded-xl border border-outline-variant text-on-surface-variant hover:border-outline hover:text-white transition-all duration-200 font-medium text-sm"
+              className="flex-1 h-12 rounded-lg border border-outline text-on-surface hover:border-on-surface-variant transition-colors duration-200 font-medium text-sm bg-background"
             >
               Cancel
             </button>
             <button
               onClick={onConfirm}
               disabled={!pledged}
-              className="flex-1 py-3 rounded-xl font-bold text-sm transition-all duration-300 bg-primary text-on-primary-container disabled:opacity-40 disabled:cursor-not-allowed hover:shadow-[0_0_24px_rgba(106,215,222,0.35)] hover:scale-[1.02] active:scale-100"
+              className="flex-1 h-12 rounded-lg font-medium text-sm transition-colors duration-200 bg-primary text-on-primary disabled:bg-primary-container disabled:text-on-surface-variant disabled:cursor-not-allowed hover:bg-on-primary-container"
             >
               Begin Game
             </button>

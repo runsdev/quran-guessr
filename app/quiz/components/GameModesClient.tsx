@@ -25,7 +25,7 @@ export default function GameModesClient({
   activeSessions,
 }: Props) {
   const { modalOpen, modalKey, rankedLimitReached, openModal, handleConfirm, handleClose } =
-    useGameModesState(dailyRankedCount, dailyRankedLimit);
+    useGameModesState(dailyRankedCount, dailyRankedLimit, activeSessions);
 
   const [juzPanelOpen, setJuzPanelOpen] = useState(false);
   const [activeJuzCount, setActiveJuzCount] = useState<number>(() => {
