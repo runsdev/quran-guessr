@@ -14,6 +14,7 @@ export default function RankedGameCard({
       onClick={() => openModal('/quiz/missing-word-count')}
       disabled={rankedLimitReached}
       className="game-card card-shadow group flex flex-col text-left w-full p-8 rounded-2xl transition-all hover:-translate-y-0.5 disabled:opacity-60 disabled:cursor-not-allowed disabled:hover:translate-y-0"
+      style={{ background: '#ffffff', border: '1px solid #dddddd' }}
     >
       <div className="flex justify-between items-start mb-6 w-full">
         <div
@@ -50,7 +51,7 @@ export default function RankedGameCard({
       </p>
       <div
         className="mt-auto flex items-center justify-between rounded-xl p-4 w-full"
-        style={{ background: '#f7f7f7', border: '1px solid #dddddd' }}
+        style={{ background: '#f2f2f2', border: '1px solid #dddddd' }}
       >
         <div className="flex items-center gap-3">
           <span className="material-symbols-outlined" style={{ color: '#ff385c', opacity: 0.7 }}>
