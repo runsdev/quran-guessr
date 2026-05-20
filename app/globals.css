@@ -169,6 +169,14 @@
     rgba(0, 0, 0, 0.1) 0 4px 8px 0;
 }
 
+/* ── Quiz card image zoom overlay ── */
+button:hover > .image-zoom-overlay {
+  background: rgba(0, 0, 0, 0.28) !important;
+}
+button:hover .image-zoom-icon {
+  opacity: 1 !important;
+}
+
 /* ── Glass panel — now a clean white card (no blur for Airbnb) ── */
 .glass-panel {
   background: #ffffff;

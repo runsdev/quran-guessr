@@ -8,6 +8,18 @@ export default function ChallengeCategories({ rankedLimitReached, openModal }: P
   return (
     <section className="space-y-8">
       <div>
+        <p
+          style={{
+            fontSize: 13,
+            fontWeight: 700,
+            color: '#ff385c',
+            letterSpacing: '0.1em',
+            textTransform: 'uppercase',
+            marginBottom: 6,
+          }}
+        >
+          More Modes
+        </p>
         <h3 className="text-2xl font-bold mb-1" style={{ color: '#222222' }}>
           Challenge Categories
         </h3>
@@ -19,6 +31,7 @@ export default function ChallengeCategories({ rankedLimitReached, openModal }: P
         <button
           onClick={() => openModal('/quiz/next-verse')}
           className="game-card card-shadow p-6 rounded-2xl text-left w-full transition-all hover:-translate-y-0.5"
+          style={{ background: '#ffffff', border: '1px solid #dddddd' }}
         >
           <div
             className="w-12 h-12 rounded-xl flex items-center justify-center mb-4"
@@ -40,6 +53,7 @@ export default function ChallengeCategories({ rankedLimitReached, openModal }: P
         <button
           onClick={() => openModal('/quiz/locate-verse')}
           className="game-card card-shadow p-6 rounded-2xl text-left w-full transition-all hover:-translate-y-0.5"
+          style={{ background: '#ffffff', border: '1px solid #dddddd' }}
         >
           <div
             className="w-12 h-12 rounded-xl flex items-center justify-center mb-4"

@@ -13,9 +13,9 @@ export function getBoxClass(
   const isW = submitted && cd !== null && val !== null && val !== cd;
   const isActive = activeBox === box && !submitted;
   return isC
-    ? 'ring-2 ring-green-500 bg-green-500/10 text-green-400'
+    ? 'ring-2 ring-green-500 bg-green-500/10 text-green-700'
     : isW
-      ? 'ring-2 ring-rose-500 bg-rose-500/10 text-rose-400'
+      ? 'ring-2 ring-rose-500 bg-rose-500/10 text-rose-700'
       : isActive
         ? 'ring-2 ring-primary bg-primary-container/20 text-on-background'
         : val !== null
