@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 
 import { DailyChallengeTable } from './leaderboard-daily-table';
 import { InfoPanel } from './leaderboard-info-panel';
@@ -37,12 +37,33 @@ export default function LeaderboardClient({
 }: Props) {
   const [tab, setTab] = useState<LeaderboardTab>('player');
   const [search, setSearch] = useState('');
+  const [debouncedSearch, setDebouncedSearch] = useState('');
   const [page, setPage] = useState(0);
 
-  const filteredPlayers = playerEntries.filter((e) =>
-    e.name.toLowerCase().includes(search.toLowerCase()),
+  const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const handleSearchChange = (v: string) => {
+    setSearch(v);
+    if (debounceRef.current) {
+      clearTimeout(debounceRef.current);
+    }
+    debounceRef.current = setTimeout(() => {
+      setDebouncedSearch(v);
+      setPage(0);
+    }, 250);
+  };
+  useEffect(
+    () => () => {
+      if (debounceRef.current) {
+        clearTimeout(debounceRef.current);
+      }
+    },
+    [],
   );
-  const normalizedPageSearch = search.replace(/^0+/, '') || search;
+
+  const filteredPlayers = playerEntries.filter((e) =>
+    e.name.toLowerCase().includes(debouncedSearch.toLowerCase()),
+  );
+  const normalizedPageSearch = debouncedSearch.replace(/^0+/, '') || debouncedSearch;
   const filteredPages = pageEntries
     .filter((e) =>
       normalizedPageSearch === ''
@@ -65,7 +86,7 @@ export default function LeaderboardClient({
       return 0;
     });
   const filteredDaily = dailyEntries.filter((e) =>
-    e.name.toLowerCase().includes(search.toLowerCase()),
+    e.name.toLowerCase().includes(debouncedSearch.toLowerCase()),
   );
   const filtered =
     tab === 'player' ? filteredPlayers : tab === 'page' ? filteredPages : filteredDaily;
@@ -78,6 +99,7 @@ export default function LeaderboardClient({
   const handleTabChange = (newTab: LeaderboardTab) => {
     setTab(newTab);
     setSearch('');
+    setDebouncedSearch('');
     setPage(0);
   };
 
@@ -96,10 +118,7 @@ export default function LeaderboardClient({
             tab={tab}
             onTabChange={handleTabChange}
             search={search}
-            onSearchChange={(v) => {
-              setSearch(v);
-              setPage(0);
-            }}
+            onSearchChange={handleSearchChange}
             placeholder={meta.placeholder}
           />
 

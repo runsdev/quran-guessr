@@ -36,6 +36,7 @@ export default function RankedGameCard({
             <span
               className="px-3 py-1.5 rounded-full text-xs font-bold uppercase tracking-widest"
               style={{ background: '#fde8e0', color: '#c13515' }}
+              title={`Daily limit of ${dailyRankedLimit} ranked games reached. Resets at midnight UTC.`}
             >
               Limit Reached
             </span>
@@ -58,9 +59,12 @@ export default function RankedGameCard({
             workspace_premium
           </span>
           <span className="text-sm font-medium" style={{ color: '#222222' }}>
-            ELO: <span style={{ color: '#ff385c', fontWeight: 700 }}>{elo.toLocaleString()}</span>
+            <span title="Your ELO rating — starts at 1000. Correct answers increase it, wrong answers decrease it.">
+              ELO: <span style={{ color: '#ff385c', fontWeight: 700 }}>{elo.toLocaleString()}</span>
+            </span>
             {' · '}
             <span
+              title={`${dailyRankedCount} of ${dailyRankedLimit} ranked games played today. Resets at midnight UTC.`}
               style={{
                 color: rankedLimitReached ? '#c13515' : '#6a6a6a',
                 fontWeight: rankedLimitReached ? 700 : 400,

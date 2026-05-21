@@ -42,9 +42,13 @@ export default function ChoicesGrid({
             key={i}
             onClick={() => !submitted && onSelect(i)}
             disabled={submitted}
+            aria-pressed={!submitted ? isSelected : undefined}
+            aria-label={`Choice ${i + 1}`}
             className={`w-full bg-surface-container border-2 ${borderClass} ${bgClass} rounded-xl p-5 text-right transition-all duration-200 flex flex-col justify-center min-h-25 disabled:cursor-default`}
           >
             <p
+              lang="ar"
+              dir="rtl"
               className="quran-text text-on-background w-full"
               style={{ fontSize: '1.6rem', lineHeight: '2.8rem' }}
             >

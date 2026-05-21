@@ -1,5 +1,8 @@
 'use client';
 
+import { AnimatePresence, motion } from 'framer-motion';
+import { toast } from 'sonner';
+
 import ActionRow from './ActionRow';
 import { LocateVerseQuizSkeleton } from './loading';
 import LocationGrid from './LocationGrid';
@@ -27,7 +30,7 @@ export default function QuizClient() {
       <TopAppBar activeTab="Quiz" />
       <main className="flex-1 flex flex-col px-5 max-w-3xl mx-auto w-full gap-6 justify-center min-h-screen pt-20 pb-24 md:pb-8">
         {state.initError ? (
-          <div className="flex flex-col items-center gap-3 py-8">
+          <div role="alert" className="flex flex-col items-center gap-3 py-8">
             <span className="text-sm text-error">Failed to start quiz session.</span>
             <button
               onClick={() => window.location.reload()}
@@ -41,7 +44,10 @@ export default function QuizClient() {
             <QuizHeader
               questionNumber={state.questionNumber}
               totalScore={state.totalScore}
-              onEndSession={state.handleEndSession}
+              onEndSession={async () => {
+                toast.info('Session ended');
+                await state.handleEndSession();
+              }}
             />
 
             {state.question && (
@@ -53,41 +59,52 @@ export default function QuizClient() {
               />
             )}
 
-            <VerseCard
-              verseWords={state.question?.verseWords ?? null}
-              loading={state.isPending && state.question === null}
-              error={state.fetchError}
-              loadedPages={loadedPages}
-              onRetry={state.handleRetry}
-            />
+            <AnimatePresence mode="wait">
+              <motion.div
+                key={state.questionNumber}
+                initial={{ opacity: 0, y: 8 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -8 }}
+                transition={{ duration: 0.18 }}
+                className="flex flex-col gap-6"
+              >
+                <VerseCard
+                  verseWords={state.question?.verseWords ?? null}
+                  loading={state.isPending && state.question === null}
+                  error={state.fetchError}
+                  loadedPages={loadedPages}
+                  onRetry={state.handleRetry}
+                />
 
-            <QuizPrompt />
+                <QuizPrompt />
 
-            {state.question && (
-              <LocationGrid
-                selectedPage={state.selectedPage}
-                selectedLine={state.selectedLine}
-                submitted={state.submitted}
-                correctPage={state.submitResult?.correctPage ?? null}
-                correctLine={state.submitResult?.correctLine ?? null}
-                onSelectPage={state.setSelectedPage}
-                onSelectLine={state.setSelectedLine}
-              />
-            )}
+                {state.question && (
+                  <LocationGrid
+                    selectedPage={state.selectedPage}
+                    selectedLine={state.selectedLine}
+                    submitted={state.submitted}
+                    correctPage={state.submitResult?.correctPage ?? null}
+                    correctLine={state.submitResult?.correctLine ?? null}
+                    onSelectPage={state.setSelectedPage}
+                    onSelectLine={state.setSelectedLine}
+                  />
+                )}
 
-            {!state.question && !state.isPending && state.fetchError && (
-              <QuizError onRetry={state.handleRetry} />
-            )}
+                {!state.question && !state.isPending && state.fetchError && (
+                  <QuizError onRetry={state.handleRetry} />
+                )}
 
-            <ActionRow
-              submitResult={state.submitResult}
-              submitted={state.submitted}
-              selectedPage={state.selectedPage}
-              selectedLine={state.selectedLine}
-              loading={state.isPending}
-              onSubmit={state.handleSubmit}
-              onNext={state.handleNext}
-            />
+                <ActionRow
+                  submitResult={state.submitResult}
+                  submitted={state.submitted}
+                  selectedPage={state.selectedPage}
+                  selectedLine={state.selectedLine}
+                  loading={state.isPending}
+                  onSubmit={state.handleSubmit}
+                  onNext={state.handleNext}
+                />
+              </motion.div>
+            </AnimatePresence>
           </>
         )}
       </main>

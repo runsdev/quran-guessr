@@ -1,11 +1,13 @@
 import { GeistMono } from 'geist/font/mono';
 import type { Metadata } from 'next';
 import { Inter, Scheherazade_New } from 'next/font/google';
+import { Toaster } from 'sonner';
 
 import MaterialSymbolsLoader from './components/MaterialSymbolsLoader';
 import SessionProvider from './components/providers/SessionProvider';
 
 import { auth } from '@/auth';
+
 import './globals.css';
 
 const inter = Inter({
@@ -47,6 +49,7 @@ export default async function RootLayout({
       <body className="min-h-full flex flex-col">
         <SessionProvider session={session}>{children}</SessionProvider>
         <MaterialSymbolsLoader />
+        <Toaster position="bottom-center" richColors closeButton />
       </body>
     </html>
   );

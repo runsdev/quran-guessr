@@ -11,8 +11,14 @@ import { loadJuzFilter } from './JuzFilterSettings';
 import PrimaryGameModes from './PrimaryGameModes';
 import { useGameModesState } from './useGameModesState';
 
-const IntegrityModal = dynamic(() => import('./IntegrityModal'), { ssr: false });
-const JuzFilterSettings = dynamic(() => import('./JuzFilterSettings'), { ssr: false });
+const IntegrityModal = dynamic(() => import('./IntegrityModal'), {
+  ssr: false,
+  loading: () => null,
+});
+const JuzFilterSettings = dynamic(() => import('./JuzFilterSettings'), {
+  ssr: false,
+  loading: () => null,
+});
 
 interface Props {
   elo: number;

@@ -178,6 +178,7 @@ export function useNextVerseState() {
     questionNumber,
     submitted,
     isCorrect,
+    score,
     masteryPercent,
     progressWidth,
     pageNumbers,

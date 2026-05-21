@@ -1,7 +1,7 @@
 'use client';
 
 import Image from 'next/image';
-import { redirect } from 'next/navigation';
+import Link from 'next/link';
 import { signIn, signOut, useSession } from 'next-auth/react';
 
 /** Login / profile panel — Apple utility card style. */
@@ -77,7 +77,8 @@ const LoginPanel = (): React.JSX.Element => {
             </button>
             <p style={{ fontSize: 16, color: '#6a6a6a', lineHeight: 1.5 }}>
               Or{' '}
-              <button
+              <Link
+                href="/quiz"
                 className="hover:bg-surface-container active:scale-95 transition-all disabled:opacity-60 disabled:pointer-events-none"
                 style={{
                   borderRadius: 8,
@@ -87,11 +88,9 @@ const LoginPanel = (): React.JSX.Element => {
                   border: '1px solid #dddddd',
                   cursor: 'pointer',
                 }}
-                onClick={() => redirect('/quiz')}
-                disabled={status === 'loading'}
               >
                 try the quiz
-              </button>{' '}
+              </Link>{' '}
               without signing in.
             </p>
           </>

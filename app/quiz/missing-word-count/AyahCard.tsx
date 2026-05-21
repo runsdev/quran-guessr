@@ -93,7 +93,7 @@ export default function AyahCard({
       )}
 
       {!loading && !error && question && !submitted && (
-        <p className="quran-text text-on-surface relative z-10 text-center">
+        <p lang="ar" dir="rtl" className="quran-text text-on-surface relative z-10 text-center">
           {question.segments
             .filter((seg): seg is { type: 'words'; words: VerseWord[] } => seg.type === 'words')
             .map((seg, segIdx) =>
@@ -106,7 +106,7 @@ export default function AyahCard({
 
       {!loading && !error && submitted && fullVerseWords && (
         <div className="flex flex-col items-center gap-3 w-full relative z-10">
-          <p className="quran-text text-on-surface text-center">
+          <p lang="ar" dir="rtl" className="quran-text text-on-surface text-center">
             {fullVerseWords.map((entry, idx) => (
               <WordSpan
                 key={idx}

@@ -20,32 +20,34 @@ export default function ActionRow({
 }: ActionRowProps) {
   return (
     <div className="w-full flex items-center justify-between min-h-12">
-      {submitted ? (
-        <p className={`text-sm font-medium ${isCorrect ? 'text-green-400' : 'text-rose-400'}`}>
-          {isCorrect ? 'Correct!' : 'Not quite — see the highlighted answer.'}
-        </p>
-      ) : (
-        <span />
-      )}
-      {submitted ? (
-        <button onClick={onNext} className={BTN}>
-          Next Question
-          <span className="material-symbols-outlined" style={{ fontSize: 18 }}>
-            arrow_forward
-          </span>
-        </button>
-      ) : (
-        <button
-          onClick={onSubmit}
-          disabled={selected === null || loading}
-          className={`${BTN} disabled:opacity-40 disabled:cursor-not-allowed`}
-        >
-          Submit
-          <span className="material-symbols-outlined" style={{ fontSize: 18 }}>
-            arrow_forward
-          </span>
-        </button>
-      )}
+      <div role="status" aria-live="polite" aria-atomic="true" className="flex-1">
+        {submitted && (
+          <p className={`text-sm font-medium ${isCorrect ? 'text-green-400' : 'text-rose-400'}`}>
+            {isCorrect ? 'Correct!' : 'Not quite — see the highlighted answer.'}
+          </p>
+        )}
+      </div>
+      <div className="shrink-0">
+        {submitted ? (
+          <button onClick={onNext} className={BTN}>
+            Next Question
+            <span className="material-symbols-outlined" style={{ fontSize: 18 }}>
+              arrow_forward
+            </span>
+          </button>
+        ) : (
+          <button
+            onClick={onSubmit}
+            disabled={selected === null || loading}
+            className={`${BTN} disabled:opacity-40 disabled:cursor-not-allowed`}
+          >
+            Submit
+            <span className="material-symbols-outlined" style={{ fontSize: 18 }}>
+              arrow_forward
+            </span>
+          </button>
+        )}
+      </div>
     </div>
   );
 }

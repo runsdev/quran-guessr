@@ -82,26 +82,30 @@ export default function ActionRow({
 
   return (
     <div className="w-full flex items-center justify-between min-h-12">
-      {submitted ? feedbackEl : <span />}
-      {submitted ? (
-        <button onClick={onNext} className={BTN}>
-          Next Question
-          <span className="material-symbols-outlined" style={{ fontSize: 18 }}>
-            arrow_forward
-          </span>
-        </button>
-      ) : (
-        <button
-          onClick={onSubmit}
-          disabled={selectedPage === null || selectedLine === null || loading}
-          className={`${BTN} disabled:opacity-40 disabled:cursor-not-allowed`}
-        >
-          Submit Answer
-          <span className="material-symbols-outlined" style={{ fontSize: 18 }}>
-            check
-          </span>
-        </button>
-      )}
+      <div role="status" aria-live="polite" aria-atomic="true" className="flex-1">
+        {submitted ? feedbackEl : null}
+      </div>
+      <div className="shrink-0">
+        {submitted ? (
+          <button onClick={onNext} className={BTN}>
+            Next Question
+            <span className="material-symbols-outlined" style={{ fontSize: 18 }}>
+              arrow_forward
+            </span>
+          </button>
+        ) : (
+          <button
+            onClick={onSubmit}
+            disabled={selectedPage === null || selectedLine === null || loading}
+            className={`${BTN} disabled:opacity-40 disabled:cursor-not-allowed`}
+          >
+            Submit Answer
+            <span className="material-symbols-outlined" style={{ fontSize: 18 }}>
+              check
+            </span>
+          </button>
+        )}
+      </div>
     </div>
   );
 }

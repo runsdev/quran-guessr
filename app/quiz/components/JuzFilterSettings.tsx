@@ -3,6 +3,8 @@
 
 import { useState, useCallback } from 'react';
 
+import { toast } from 'sonner';
+
 export const JUZ_FILTER_KEY = 'quizJuzFilter';
 
 export function loadJuzFilter(): number[] {
@@ -55,6 +57,7 @@ function JuzFilterPanel({ onClose }: { onClose: () => void }) {
     setSelected(new Set(Array.from({ length: to - from + 1 }, (_, i) => i + from)));
   const handleSave = () => {
     saveJuzFilter([...selected].sort((a, b) => a - b));
+    toast.success('Juz filter saved');
     onClose();
   };
 

@@ -16,8 +16,21 @@ export default function AnswerGrid({
   isCorrect,
   onSelect,
 }: AnswerGridProps) {
+  const handleKeyDown = (e: React.KeyboardEvent, num: Option) => {
+    if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault();
+      if (!submitted) {
+        onSelect(num);
+      }
+    }
+  };
+
   return (
-    <div className="grid grid-cols-4 gap-2 w-full">
+    <div
+      className="grid grid-cols-4 gap-2 w-full"
+      role="group"
+      aria-label="Choose the number of missing words"
+    >
       {OPTIONS.map((num) => {
         const isSelected = selected === num;
         const isAnswer = submitted && num === correctAnswer;
@@ -35,7 +48,10 @@ export default function AnswerGrid({
           <button
             key={num}
             onClick={() => !submitted && onSelect(num)}
+            onKeyDown={(e) => handleKeyDown(e, num)}
             disabled={submitted}
+            aria-pressed={!submitted ? isSelected : undefined}
+            aria-label={`${num} missing word${num !== 1 ? 's' : ''}${isAnswer ? ' (correct answer)' : isWrongPick ? ' (your wrong answer)' : ''}`}
             className={`aspect-square border rounded-xl flex items-center justify-center transition-all duration-200 active:scale-95 disabled:cursor-default ${btnStyle}`}
           >
             <span className="text-3xl font-bold">{num}</span>

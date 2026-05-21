@@ -28,6 +28,7 @@ const TopAppBar = ({ activeTab }: TopAppBarProps): React.JSX.Element => (
     {/* Wordmark */}
     <Link
       href="/"
+      aria-label="QuranGuessr — go to homepage"
       className="flex items-center"
       style={{ color: '#ff385c', textDecoration: 'none', fontWeight: 700, fontSize: 22 }}
     >
@@ -40,6 +41,7 @@ const TopAppBar = ({ activeTab }: TopAppBarProps): React.JSX.Element => (
         <Link
           key={label}
           href={href}
+          aria-current={activeTab === label ? 'page' : undefined}
           className="flex flex-col items-center pb-1"
           style={{
             color: '#222222',
