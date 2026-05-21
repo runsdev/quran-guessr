@@ -1,3 +1,5 @@
+import { unstable_cache } from 'next/cache';
+
 import { prisma } from './prisma';
 
 // Verse counts per surah (index 0 = surah 1, index 113 = surah 114)
@@ -65,11 +67,15 @@ export function getUtcDateStr(date?: Date): string {
   return d.toISOString().split('T')[0];
 }
 
-export async function getOrCreateDailyChallenge(date: string) {
-  const existing = await prisma.dailyChallenge.findUnique({ where: { date } });
-  if (existing) {
-    return existing;
-  }
-  const verseKeys = getDailyVerseKeys(date);
-  return prisma.dailyChallenge.create({ data: { date, verseKeys } });
-}
+export const getOrCreateDailyChallenge = unstable_cache(
+  async (date: string) => {
+    const existing = await prisma.dailyChallenge.findUnique({ where: { date } });
+    if (existing) {
+      return existing;
+    }
+    const verseKeys = getDailyVerseKeys(date);
+    return prisma.dailyChallenge.create({ data: { date, verseKeys } });
+  },
+  ['daily-challenge'],
+  { revalidate: 3600, tags: ['daily-challenge'] },
+);

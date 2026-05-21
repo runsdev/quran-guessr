@@ -1,5 +1,7 @@
 'use server';
 
+import { revalidateTag } from 'next/cache';
+
 import { computeElo } from '@/lib/elo';
 import { prisma } from '@/lib/prisma';
 
@@ -60,6 +62,9 @@ export async function updateRankedElo(
       data: { count: { increment: 1 } },
     }),
   ]);
+
+  revalidateTag('leaderboard-players', {});
+  revalidateTag('leaderboard-pages', {});
 
   return result;
 }

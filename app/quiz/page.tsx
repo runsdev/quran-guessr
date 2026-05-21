@@ -6,7 +6,7 @@ import TopAppBar from '@/app/components/TopAppBar';
 import { auth } from '@/auth';
 import { getOrCreateDailyChallenge } from '@/lib/daily-challenge';
 import { prisma } from '@/lib/prisma';
-import { fetchQfStreak } from '@/lib/qf-api';
+import { getCachedQfStreak } from '@/lib/qf-api';
 
 export const dynamic = 'force-dynamic';
 
@@ -46,10 +46,14 @@ export default async function QuizHubPage() {
 
   if (userId) {
     const today = dateStr(new Date());
-    const [user, rankedCount, qfStreak, sessions, dailyChallenge] = await Promise.all([
+
+    // getOrCreateDailyChallenge is cached — call it first to unlock parallel dailyResult lookup
+    const dailyChallenge = await getOrCreateDailyChallenge(today);
+
+    const [user, rankedCount, qfStreak, sessions, dailyResult] = await Promise.all([
       prisma.user.findUnique({ where: { id: userId }, select: { elo: true, name: true } }),
       getDailyRankedCount(userId),
-      fetchQfStreak(userId),
+      getCachedQfStreak(userId),
       prisma.quizSession.findMany({
         where: { userId, status: 'active', expiresAt: { gt: new Date() } },
         select: {
@@ -61,8 +65,13 @@ export default async function QuizHubPage() {
         },
         orderBy: { updatedAt: 'desc' },
       }),
-      getOrCreateDailyChallenge(today),
+      prisma.dailyChallengeResult.findUnique({
+        // eslint-disable-next-line @typescript-eslint/naming-convention
+        where: { challengeId_userId: { challengeId: dailyChallenge.id, userId } },
+        select: { completed: true, scores: true, totalScore: true },
+      }),
     ]);
+
     if (user) {
       elo = Math.round(user.elo);
       userName = user.name?.split(' ')[0] ?? 'Scholar';
@@ -71,12 +80,6 @@ export default async function QuizHubPage() {
     dailyRankedCount = rankedCount;
     activeSessions = sessions;
 
-    // Check for an incomplete daily challenge and add to sessions
-    const dailyResult = await prisma.dailyChallengeResult.findUnique({
-      // eslint-disable-next-line @typescript-eslint/naming-convention
-      where: { challengeId_userId: { challengeId: dailyChallenge.id, userId } },
-      select: { completed: true, scores: true, totalScore: true },
-    });
     if (dailyResult && !dailyResult.completed) {
       activeSessions = [
         {

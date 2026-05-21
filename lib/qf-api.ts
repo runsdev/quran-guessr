@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/naming-convention */
 import type { UserSession } from '@quranjs/api';
 import { createServerClient } from '@quranjs/api/server';
+import { unstable_cache } from 'next/cache';
 
 import { prisma } from './prisma';
 
@@ -107,6 +108,12 @@ export async function fetchQfStreak(userId: string): Promise<number> {
     return 0;
   }
 }
+
+const _cachedQfStreak = unstable_cache((userId: string) => fetchQfStreak(userId), ['qf-streak'], {
+  revalidate: 60,
+});
+
+export const getCachedQfStreak = (userId: string) => _cachedQfStreak(userId);
 
 /**
  * Record a quiz activity day against the user's QF account.

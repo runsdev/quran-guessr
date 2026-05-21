@@ -73,5 +73,11 @@
       "prettier --write"
     ],
     "*.{js,mjs,mts,json,md}": "prettier --write"
-  }
+  },
+  "browserslist": [
+    "chrome >= 93",
+    "edge >= 93",
+    "safari >= 15.4",
+    "firefox >= 90"
+  ]
 }
