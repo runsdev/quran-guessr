@@ -1,8 +1,8 @@
 import { GeistMono } from 'geist/font/mono';
 import type { Metadata } from 'next';
 import { Inter, Scheherazade_New } from 'next/font/google';
-import Script from 'next/script';
 
+import MaterialSymbolsLoader from './components/MaterialSymbolsLoader';
 import SessionProvider from './components/providers/SessionProvider';
 
 import { auth } from '@/auth';
@@ -46,10 +46,7 @@ export default async function RootLayout({
       </head>
       <body className="min-h-full flex flex-col">
         <SessionProvider session={session}>{children}</SessionProvider>
-        <Script
-          src="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0&display=swap"
-          strategy="lazyOnload"
-        />
+        <MaterialSymbolsLoader />
       </body>
     </html>
   );
