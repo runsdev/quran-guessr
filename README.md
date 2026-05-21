@@ -21,7 +21,7 @@ rating drops, creating a live difficulty map of all 604 pages across the global 
 
 | Audience                    | How QuranGuessr helps                                                   |
 | --------------------------- | ----------------------------------------------------------------------- |
-| **Hifz students**           | Reinforces memorisation by testing verse recall under time pressure     |
+| **Huffaz**                  | Reinforces memorisation by testing verse recall under time pressure     |
 | **Casual learners**         | Low-stakes game modes let anyone explore the Quran at their own pace    |
 | **Competitive learners**    | ELO rankings and daily ranked limits keep serious students motivated    |
 | **Teachers & study groups** | Leaderboards and per-page difficulty stats reveal weak spots to work on |
@@ -67,14 +67,10 @@ words.
 
 ## ELO Rating System
 
-QuranGuessr uses a **dynamic K-factor ELO system** modelled on competitive chess
-
-- **Starting ELO**: 1 000
-- **Mastery tier**: 1 300+
-- **Minimum floor**: 100 (ELO never drops below this)
-- **Zero-sum**: every point you gain comes off the page's rating, and vice versa
-
-Object to change.
+QuranGuessr uses a **dynamic K-factor ELO system** modelled on competitive chess. Each player holds
+a global ELO rating, and each of the 604 Quran pages holds its own difficulty rating. A correct
+answer on a hard page yields a larger ELO gain than a correct answer on an easy page, and vice
+versa. Ratings converge over time to reflect true mastery.
 
 ---
 
@@ -99,16 +95,15 @@ sessions.
 
 ## Tech Stack
 
-| Layer            | Technology                               |
-| ---------------- | ---------------------------------------- |
-| Framework        | Next.js 16 (App Router)                  |
-| Styling          | Tailwind CSS v4                          |
-| Database ORM     | Prisma                                   |
-| Database         | PostgreSQL                               |
-| Auth             | NextAuth.js v5 + Quran Foundation OAuth2 |
-| Answer integrity | AES-256-GCM encryption + HMAC signing    |
-| Language         | TypeScript                               |
-| Testing          | Vitest + Testing Library                 |
+| Layer        | Technology                               |
+| ------------ | ---------------------------------------- |
+| Framework    | Next.js 16 (App Router)                  |
+| Styling      | Tailwind CSS v4                          |
+| Database ORM | Prisma                                   |
+| Database     | MongoDB                                  |
+| Auth         | NextAuth.js v5 + Quran Foundation OAuth2 |
+| Language     | TypeScript                               |
+| Testing      | Vitest + Testing Library                 |
 
 ---
 
@@ -117,7 +112,7 @@ sessions.
 ### Prerequisites
 
 - Node.js 20+
-- A PostgreSQL database
+- A MongoDB database
 - Quran Foundation OAuth2 credentials (see [Quran Foundation](https://quran.foundation))
 
 ### Setup
@@ -176,4 +171,4 @@ prisma/
 
 ## License
 
-Private repository — all rights reserved.
+MIT — see [LICENSE](LICENSE) for details.
