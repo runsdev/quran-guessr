@@ -3,6 +3,7 @@
 import ActionRow from './ActionRow';
 import AnswerGrid from './AnswerGrid';
 import AyahCard from './AyahCard';
+import { MissingWordCountSkeleton } from './loading';
 import TimerBar from './TimerBar';
 import { useMissingWordCountState } from './useMissingWordCountState';
 
@@ -35,16 +36,15 @@ export default function QuizClient() {
   } = useMissingWordCountState();
   const loadedPages = useQcfFontLoader(pageNumbers);
 
+  if (isInitializing) {
+    return <MissingWordCountSkeleton />;
+  }
+
   return (
     <>
       <TopAppBar activeTab="Quiz" />
       <main className="flex-1 flex flex-col px-5 max-w-3xl mx-auto w-full gap-6 justify-center min-h-screen pt-20 pb-24 md:pb-8">
-        {isInitializing ? (
-          <div className="flex items-center justify-center gap-3 text-on-surface-variant">
-            <span className="material-symbols-outlined animate-spin">progress_activity</span>
-            <span className="text-sm">Loading quiz…</span>
-          </div>
-        ) : initError ? (
+        {initError ? (
           <div className="flex flex-col items-center gap-3 py-8">
             <span className="text-sm text-error">Failed to start quiz session.</span>
             <button

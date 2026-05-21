@@ -4,6 +4,7 @@ const LINKS = [
   { label: 'GitHub', icon: 'code', href: 'https://github.com/runsdev' },
   { label: 'Quran.com', icon: 'menu_book', href: 'https://quran.com' },
   { label: 'Quran Foundation API', icon: 'api', href: 'https://api-docs.quran.foundation/' },
+  { label: 'Support me', icon: 'volunteer_activism', href: 'https://ko-fi.com/runsha/tip' },
 ];
 
 export default function AboutSection(): React.JSX.Element {
