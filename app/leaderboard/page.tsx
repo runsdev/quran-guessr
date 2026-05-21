@@ -80,7 +80,7 @@ export default async function LeaderboardPage() {
   const globalAvgPageElo =
     pageEntries.length > 0
       ? Math.round(pageEntries.reduce((acc, e) => acc + e.elo, 0) / pageEntries.length)
-      : 1200;
+      : 1000;
 
   const stats = {
     globalAvgPlayerElo,

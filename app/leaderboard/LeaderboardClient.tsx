@@ -132,7 +132,7 @@ export default function LeaderboardClient({
                 <button
                   onClick={() => setPage((p) => Math.max(0, p - 1))}
                   disabled={page === 0}
-                  className="text-on-surface-variant hover:text-primary transition-colors disabled:opacity-30"
+                  className="text-on-surface-variant hover:text-primary active:scale-90 transition-all disabled:opacity-30 disabled:pointer-events-none"
                   aria-label="Previous page"
                 >
                   <span className="material-symbols-outlined">arrow_back_ios</span>
@@ -140,7 +140,7 @@ export default function LeaderboardClient({
                 <button
                   onClick={() => setPage((p) => Math.min(totalPages - 1, p + 1))}
                   disabled={page === totalPages - 1 || totalPages === 0}
-                  className="text-primary transition-colors disabled:opacity-30"
+                  className="text-primary hover:text-on-primary-container active:scale-90 transition-all disabled:opacity-30 disabled:pointer-events-none"
                   aria-label="Next page"
                 >
                   <span className="material-symbols-outlined">arrow_forward_ios</span>

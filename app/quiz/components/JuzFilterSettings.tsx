@@ -26,7 +26,7 @@ interface Props {
   onClose: () => void;
 }
 
-const PILL = 'px-3 py-1.5 rounded-full text-xs font-semibold border transition-colors';
+const PILL = 'px-3 py-1.5 rounded-full text-xs font-semibold border transition-all active:scale-90';
 const ON = 'bg-primary text-on-primary border-primary';
 const OFF = 'bg-transparent text-on-surface-variant border-outline-variant hover:border-primary/50';
 const RANGES = [
@@ -114,7 +114,7 @@ function JuzFilterPanel({ onClose }: { onClose: () => void }) {
               <button
                 key={juz}
                 onClick={() => toggle(juz)}
-                className={`flex items-center justify-center rounded-xl border py-3 text-base font-bold transition-all ${allSelected || selected.has(juz) ? 'bg-primary/15 border-primary/40 text-primary' : 'bg-surface-container-high border-outline-variant/50 text-on-surface-variant hover:border-primary/30'}`}
+                className={`flex items-center justify-center rounded-xl border py-3 text-base font-bold transition-all active:scale-90 ${allSelected || selected.has(juz) ? 'bg-primary/15 border-primary/40 text-primary hover:bg-primary/25' : 'bg-surface-container-high border-outline-variant/50 text-on-surface-variant hover:border-primary/30'}`}
               >
                 {juz}
               </button>
@@ -124,13 +124,13 @@ function JuzFilterPanel({ onClose }: { onClose: () => void }) {
         <div className="flex gap-3 shrink-0 pt-1">
           <button
             onClick={onClose}
-            className="flex-1 py-2.5 rounded-xl border border-outline-variant text-on-surface-variant text-sm font-medium hover:bg-surface-container-high transition-colors"
+            className="flex-1 py-2.5 rounded-xl border border-outline-variant text-on-surface-variant text-sm font-medium hover:bg-surface-container-high active:scale-95 transition-all"
           >
             Cancel
           </button>
           <button
             onClick={handleSave}
-            className="flex-1 py-2.5 rounded-xl bg-primary text-on-primary text-sm font-semibold hover:brightness-110 transition-all"
+            className="flex-1 py-2.5 rounded-xl bg-primary text-on-primary text-sm font-semibold hover:bg-on-primary-container active:scale-95 transition-all"
           >
             Apply Filter
           </button>

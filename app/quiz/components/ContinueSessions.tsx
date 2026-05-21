@@ -99,7 +99,7 @@ export default function ContinueSessions({ sessions: initialSessions }: Props) {
               </a>
               <button
                 onClick={() => handleEnd(s.token, s.gameMode)}
-                className="w-8 h-8 rounded-full flex items-center justify-center transition-colors shrink-0"
+                className="w-8 h-8 rounded-full flex items-center justify-center transition-all hover:text-error hover:bg-error/10 active:scale-90 shrink-0"
                 style={{ color: '#6a6a6a' }}
                 aria-label="End session"
                 title="End session"

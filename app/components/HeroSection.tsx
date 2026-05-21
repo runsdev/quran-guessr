@@ -42,10 +42,8 @@ const HeroSection = (): React.JSX.Element => (
     <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap', justifyContent: 'center' }}>
       <Link
         href="/quiz"
+        className="inline-block bg-primary text-on-primary hover:bg-on-primary-container active:scale-95 transition-all"
         style={{
-          display: 'inline-block',
-          backgroundColor: '#ff385c',
-          color: '#ffffff',
           borderRadius: 8,
           padding: '14px 24px',
           fontSize: 16,
@@ -59,11 +57,9 @@ const HeroSection = (): React.JSX.Element => (
       </Link>
       <Link
         href="/leaderboard"
+        className="inline-block bg-background text-on-background hover:bg-surface-container active:scale-95 transition-all"
         style={{
-          display: 'inline-block',
           padding: '12px 24px',
-          backgroundColor: '#ffffff',
-          color: '#222222',
           borderRadius: 8,
           fontSize: 14,
           fontWeight: 600,

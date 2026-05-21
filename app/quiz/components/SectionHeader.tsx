@@ -25,7 +25,7 @@ export default function SectionHeader({ openJuzPanel, activeJuzCount }: HeaderPr
       </div>
       <button
         onClick={openJuzPanel}
-        className="flex items-center gap-1.5 px-3 py-1.5 rounded-full transition-colors shrink-0"
+        className="flex items-center gap-1.5 px-3 py-1.5 rounded-full transition-all hover:bg-surface-container active:scale-95 shrink-0"
         style={{
           border: '1px solid #dddddd',
           background: '#ffffff',

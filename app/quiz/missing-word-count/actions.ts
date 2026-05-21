@@ -114,7 +114,7 @@ export async function submitAnswer(
   const isCorrect = guess === correctAnswer;
 
   const existingPageElo = await prisma.pageElo.findUnique({ where: { pageNumber } });
-  const currentPageElo = existingPageElo?.elo ?? 1200;
+  const currentPageElo = existingPageElo?.elo ?? 1000;
 
   const session = await auth();
   const userId = (session?.user as { id?: string } | undefined)?.id ?? null;

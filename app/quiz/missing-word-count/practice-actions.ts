@@ -25,7 +25,7 @@ export async function submitPracticeAnswer(
   }
   const { missingCount: correctAnswer, pageNumber } = verified;
   const pageEloRecord = await prisma.pageElo.findUnique({ where: { pageNumber } });
-  const newPageElo = Math.round(pageEloRecord?.elo ?? 1200);
+  const newPageElo = Math.round(pageEloRecord?.elo ?? 1000);
   return {
     isCorrect: guess === correctAnswer,
     correctAnswer,

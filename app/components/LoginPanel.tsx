@@ -49,18 +49,8 @@ const LoginPanel = (): React.JSX.Element => {
               Your progress is being synced. Keep playing to climb the leaderboard!
             </p>
             <button
-              style={{
-                width: '100%',
-                backgroundColor: '#ff385c',
-                color: '#ffffff',
-                borderRadius: 8,
-                padding: '14px 24px',
-                fontSize: 16,
-                fontWeight: 500,
-                border: 'none',
-                cursor: 'pointer',
-                transition: 'opacity 0.15s',
-              }}
+              className="w-full bg-primary text-on-primary text-base font-medium cursor-pointer hover:bg-on-primary-container active:scale-95 transition-all"
+              style={{ borderRadius: 8, padding: '14px 24px' }}
               onClick={() => signOut({ callbackUrl: '/' })}
             >
               Sign Out
@@ -78,19 +68,8 @@ const LoginPanel = (): React.JSX.Element => {
               started.
             </p>
             <button
-              style={{
-                width: '100%',
-                backgroundColor: '#ff385c',
-                color: '#ffffff',
-                borderRadius: 8,
-                padding: '14px 24px',
-                fontSize: 16,
-                fontWeight: 500,
-                border: 'none',
-                cursor: 'pointer',
-                transition: 'opacity 0.15s',
-                opacity: status === 'loading' ? 0.6 : 1,
-              }}
+              className="w-full bg-primary text-on-primary text-base font-medium cursor-pointer hover:bg-on-primary-container active:scale-95 transition-all disabled:opacity-60 disabled:pointer-events-none"
+              style={{ borderRadius: 8, padding: '14px 24px' }}
               onClick={() => signIn('quran-foundation', { callbackUrl: '/' })}
               disabled={status === 'loading'}
             >
@@ -99,6 +78,7 @@ const LoginPanel = (): React.JSX.Element => {
             <p style={{ fontSize: 16, color: '#6a6a6a', lineHeight: 1.5 }}>
               Or{' '}
               <button
+                className="hover:bg-surface-container active:scale-95 transition-all disabled:opacity-60 disabled:pointer-events-none"
                 style={{
                   borderRadius: 8,
                   padding: '2px 4px',
@@ -106,8 +86,6 @@ const LoginPanel = (): React.JSX.Element => {
                   fontWeight: 500,
                   border: '1px solid #dddddd',
                   cursor: 'pointer',
-                  transition: 'opacity 0.15s',
-                  opacity: status === 'loading' ? 0.6 : 1,
                 }}
                 onClick={() => redirect('/quiz')}
                 disabled={status === 'loading'}
