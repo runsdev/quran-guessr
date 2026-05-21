@@ -27,14 +27,16 @@ function PlayerPageStatsCards({ stats, tab }: StatsCardsProps) {
         <div className="bg-surface-container-low border border-primary/10 p-6 rounded-3xl">
           <div className="flex justify-between items-start mb-4">
             <div className="p-2 bg-secondary-container rounded-lg">
-              <span className="material-symbols-outlined text-secondary">workspace_premium</span>
+              <span className="material-symbols-outlined text-secondary">sports_score</span>
             </div>
             <span className="text-[10px] font-bold text-on-surface-variant uppercase tracking-widest">
-              Mastery Rate
+              Total Games
             </span>
           </div>
-          <h4 className="text-3xl font-bold text-on-surface mb-1">{stats.playerMasteryRate}%</h4>
-          <p className="text-sm text-on-surface-variant">Players with ELO above 1,300</p>
+          <h4 className="text-3xl font-bold text-on-surface mb-1">
+            {stats.totalGamesPlayed.toLocaleString()}
+          </h4>
+          <p className="text-sm text-on-surface-variant">Games played globally</p>
         </div>
         <div className="bg-surface-container-low border border-primary/10 p-6 rounded-3xl">
           <div className="flex justify-between items-start mb-4">

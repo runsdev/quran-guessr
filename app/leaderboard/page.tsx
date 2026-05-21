@@ -72,9 +72,10 @@ export default async function LeaderboardPage() {
       ? Math.round(playerEntries.reduce((acc, e) => acc + e.elo, 0) / playerEntries.length)
       : 1000;
 
-  const masteryCount = playerEntries.filter((e) => e.elo >= 1300).length;
-  const playerMasteryRate =
-    playerEntries.length > 0 ? ((masteryCount / playerEntries.length) * 100).toFixed(1) : '0.0';
+  const totalGamesPlayed = playerEntries.reduce(
+    (acc, e) => acc + e.gamesPlayed + e.lvGames + e.nvGames,
+    0,
+  );
 
   const globalAvgPageElo =
     pageEntries.length > 0
@@ -83,7 +84,7 @@ export default async function LeaderboardPage() {
 
   const stats = {
     globalAvgPlayerElo,
-    playerMasteryRate,
+    totalGamesPlayed,
     currentUserElo: currentEntry ? currentEntry.elo : null,
     currentUserEloChange: 0,
     totalPlayerEntries: playerEntries.length,
