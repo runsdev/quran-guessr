@@ -41,22 +41,40 @@ export function LeaderboardTable({ paged, currentUserId, totalEloUsers }: TableP
       <table className="w-full text-left border-collapse">
         <thead>
           <tr className="border-b border-primary/10 bg-surface-container-lowest/20">
-            <th className="px-6 py-4 text-[11px] font-bold text-on-surface-variant uppercase tracking-widest">
+            <th
+              scope="col"
+              className="px-6 py-4 text-[11px] font-bold text-on-surface-variant uppercase tracking-widest"
+            >
               #
             </th>
-            <th className="px-6 py-4 text-[11px] font-bold text-on-surface-variant uppercase tracking-widest">
+            <th
+              scope="col"
+              className="px-6 py-4 text-[11px] font-bold text-on-surface-variant uppercase tracking-widest"
+            >
               Player
             </th>
-            <th className="px-6 py-4 text-[11px] font-bold text-on-surface-variant uppercase tracking-widest">
+            <th
+              scope="col"
+              className="px-6 py-4 text-[11px] font-bold text-on-surface-variant uppercase tracking-widest"
+            >
               Player ELO
             </th>
-            <th className="px-6 py-4 text-[11px] font-bold text-on-surface-variant uppercase tracking-widest">
+            <th
+              scope="col"
+              className="px-6 py-4 text-[11px] font-bold text-on-surface-variant uppercase tracking-widest"
+            >
               Tier
             </th>
-            <th className="px-6 py-4 text-[11px] font-bold text-on-surface-variant uppercase tracking-widest text-center">
+            <th
+              scope="col"
+              className="px-6 py-4 text-[11px] font-bold text-on-surface-variant uppercase tracking-widest text-center"
+            >
               MWC Win%
             </th>
-            <th className="px-6 py-4 text-[11px] font-bold text-on-surface-variant uppercase tracking-widest text-center">
+            <th
+              scope="col"
+              className="px-6 py-4 text-[11px] font-bold text-on-surface-variant uppercase tracking-widest text-center"
+            >
               Games
             </th>
           </tr>
@@ -75,6 +93,7 @@ export function LeaderboardTable({ paged, currentUserId, totalEloUsers }: TableP
             return (
               <tr
                 key={entry.userId}
+                aria-current={isMe ? 'true' : undefined}
                 className={`transition-colors ${isMe ? 'bg-primary/5' : 'hover:bg-primary/2'}`}
               >
                 <td className={`px-6 py-5 text-sm font-medium tabular-nums ${rankCls}`}>

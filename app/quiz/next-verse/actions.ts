@@ -5,6 +5,7 @@ import { getRandomQuestion } from './getQuestion';
 import type { Question, SubmitResult } from './types';
 
 import { auth } from '@/auth';
+import { recordGameEvent } from '@/lib/game-events';
 import { prisma } from '@/lib/prisma';
 import { recordQfActivityDay } from '@/lib/qf-api';
 import {
@@ -116,6 +117,7 @@ export async function submitAnswer(
   }
 
   const submitResult: SubmitResult = { isCorrect, correctIndex, verseKey };
+  void recordGameEvent({ userId, gameMode: GAME_MODE, correct: isCorrect });
   await saveQuizSubmitResult(sessionToken, submitResult, isCorrect ? 1 : 0);
   return submitResult;
 }

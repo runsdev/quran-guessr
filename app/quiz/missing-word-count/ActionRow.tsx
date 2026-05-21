@@ -30,52 +30,54 @@ export default function ActionRow({
 }: ActionRowProps) {
   return (
     <div className="w-full flex items-center justify-between min-h-12">
-      {submitted && missingCount !== null ? (
-        <div className="flex flex-col gap-1">
-          <p className={`text-sm font-medium ${isCorrect ? 'text-green-700' : 'text-red-700'}`}>
-            {isCorrect
-              ? 'Correct!'
-              : timedOut
-                ? `Time's up! The answer was ${missingCount} missing word${missingCount !== 1 ? 's' : ''}.`
-                : `The answer was ${missingCount} missing word${missingCount !== 1 ? 's' : ''}.`}
-          </p>
-          {userEloDelta !== null && newUserElo !== null ? (
-            <p className="text-xs text-on-surface-variant">
-              ELO:{' '}
-              <span className={userEloDelta >= 0 ? 'text-green-700' : 'text-red-700'}>
-                {userEloDelta >= 0 ? '+' : ''}
-                {userEloDelta}
-              </span>{' '}
-              → <span className="font-semibold text-on-background">{Math.round(newUserElo)}</span>
+      <div role="status" aria-live="polite" aria-atomic="true" className="flex-1">
+        {submitted && missingCount !== null ? (
+          <div className="flex flex-col gap-1">
+            <p className={`text-sm font-medium ${isCorrect ? 'text-green-700' : 'text-red-700'}`}>
+              {isCorrect
+                ? 'Correct!'
+                : timedOut
+                  ? `Time's up! The answer was ${missingCount} missing word${missingCount !== 1 ? 's' : ''}.`
+                  : `The answer was ${missingCount} missing word${missingCount !== 1 ? 's' : ''}.`}
             </p>
-          ) : ranked === false && userEloDelta === null ? (
-            <p className="text-xs text-on-surface-variant opacity-60">
-              Unranked — daily limit reached
-            </p>
-          ) : null}
-        </div>
-      ) : (
-        <span />
-      )}
-      {submitted ? (
-        <button onClick={onNext} className={BTN}>
-          Next Question
-          <span className="material-symbols-outlined" style={{ fontSize: 18 }}>
-            arrow_forward
-          </span>
-        </button>
-      ) : (
-        <button
-          onClick={onSubmit}
-          disabled={selected === null || loading}
-          className={`${BTN} disabled:opacity-40 disabled:cursor-not-allowed`}
-        >
-          Submit
-          <span className="material-symbols-outlined" style={{ fontSize: 18 }}>
-            arrow_forward
-          </span>
-        </button>
-      )}
+            {userEloDelta !== null && newUserElo !== null ? (
+              <p className="text-xs text-on-surface-variant">
+                ELO:{' '}
+                <span className={userEloDelta >= 0 ? 'text-green-700' : 'text-red-700'}>
+                  {userEloDelta >= 0 ? '+' : ''}
+                  {userEloDelta}
+                </span>{' '}
+                → <span className="font-semibold text-on-background">{Math.round(newUserElo)}</span>
+              </p>
+            ) : ranked === false && userEloDelta === null ? (
+              <p className="text-xs text-on-surface-variant opacity-60">
+                Unranked — daily limit reached
+              </p>
+            ) : null}
+          </div>
+        ) : null}
+      </div>
+      <div className="shrink-0">
+        {submitted ? (
+          <button onClick={onNext} className={BTN}>
+            Next Question
+            <span className="material-symbols-outlined" style={{ fontSize: 18 }}>
+              arrow_forward
+            </span>
+          </button>
+        ) : (
+          <button
+            onClick={onSubmit}
+            disabled={selected === null || loading}
+            className={`${BTN} disabled:opacity-40 disabled:cursor-not-allowed`}
+          >
+            Submit
+            <span className="material-symbols-outlined" style={{ fontSize: 18 }}>
+              arrow_forward
+            </span>
+          </button>
+        )}
+      </div>
     </div>
   );
 }

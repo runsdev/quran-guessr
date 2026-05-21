@@ -7,6 +7,7 @@ import { updateRankedElo } from './updateRankedElo';
 
 import type { VerseWord } from '@/app/quiz/types';
 import { auth } from '@/auth';
+import { recordGameEvent } from '@/lib/game-events';
 import { prisma } from '@/lib/prisma';
 import { recordQfActivityDay } from '@/lib/qf-api';
 import {
@@ -131,6 +132,7 @@ export async function submitAnswer(
   };
 
   if (!userId) {
+    void recordGameEvent({ userId: null, gameMode: GAME_MODE, correct: isCorrect });
     await saveQuizSubmitResult(sessionToken, unranked, isCorrect ? 1 : 0);
     return unranked;
   }
@@ -144,6 +146,7 @@ export async function submitAnswer(
   });
 
   if (daily.count >= DAILY_RANKED_LIMIT) {
+    void recordGameEvent({ userId, gameMode: GAME_MODE, correct: isCorrect, ranked: false });
     await saveQuizSubmitResult(sessionToken, unranked, isCorrect ? 1 : 0);
     return unranked;
   }
@@ -169,6 +172,7 @@ export async function submitAnswer(
     newPageElo: eloResult.newPageElo,
     ranked: true,
   };
+  void recordGameEvent({ userId, gameMode: GAME_MODE, correct: isCorrect, ranked: true });
   await saveQuizSubmitResult(sessionToken, submitResult, isCorrect ? 1 : 0);
   return submitResult;
 }

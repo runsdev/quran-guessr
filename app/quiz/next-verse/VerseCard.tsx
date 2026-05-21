@@ -38,7 +38,7 @@ export default function VerseCard({
       )}
 
       {!loading && !error && verseWords && verseWords.length > 0 && (
-        <p className="quran-text text-on-surface relative z-10 text-center">
+        <p lang="ar" dir="rtl" className="quran-text text-on-surface relative z-10 text-center">
           {verseWords.map((word, i) => {
             if (word.char_type_name === 'end') {
               return null;

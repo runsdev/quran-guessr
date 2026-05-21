@@ -5,6 +5,8 @@ import { getRandomQuestion } from './getQuestion';
 import type { Question, SubmitResult } from './types';
 
 import type { VerseWord } from '@/app/quiz/types';
+import { auth } from '@/auth';
+import { recordGameEvent } from '@/lib/game-events';
 import { prisma } from '@/lib/prisma';
 
 export async function fetchPracticeQuestion(pageNumber: number): Promise<Question> {
@@ -26,8 +28,17 @@ export async function submitPracticeAnswer(
   const { missingCount: correctAnswer, pageNumber } = verified;
   const pageEloRecord = await prisma.pageElo.findUnique({ where: { pageNumber } });
   const newPageElo = Math.round(pageEloRecord?.elo ?? 1000);
+  const isCorrect = guess === correctAnswer;
+  const practiceSession = await auth();
+  const userId = (practiceSession?.user as { id?: string } | undefined)?.id ?? null;
+  void recordGameEvent({
+    userId,
+    gameMode: 'missing-word-count',
+    correct: isCorrect,
+    practice: true,
+  });
   return {
-    isCorrect: guess === correctAnswer,
+    isCorrect,
     correctAnswer,
     verseKey,
     hiddenWords,

@@ -2,6 +2,8 @@ import Image from 'next/image';
 import { redirect } from 'next/navigation';
 
 import GameStats from './GameStats';
+import LogoutButton from './LogoutButton';
+import { timeAgo } from './utils';
 
 import BottomNav from '@/app/components/BottomNav';
 import TopAppBar from '@/app/components/TopAppBar';
@@ -34,10 +36,6 @@ export default async function ProfilePage() {
       nvGames: true,
       nvCorrect: true,
       createdAt: true,
-      dailyAttempts: {
-        orderBy: { date: 'desc' },
-        take: 30,
-      },
     },
   });
 
@@ -45,7 +43,14 @@ export default async function ProfilePage() {
     redirect('/auth/signin');
   }
 
-  const [streak] = await Promise.all([fetchQfStreak(userId)]);
+  const [streak, recentEvents] = await Promise.all([
+    fetchQfStreak(userId),
+    prisma.gameEvent.findMany({
+      where: { userId },
+      orderBy: { createdAt: 'desc' },
+      take: 15,
+    }),
+  ]);
   const eloFormatted = Math.round(user.elo).toLocaleString();
   const joinDate = user.createdAt.toLocaleDateString('en-US', {
     year: 'numeric',
@@ -53,7 +58,29 @@ export default async function ProfilePage() {
     day: 'numeric',
   });
 
-  const recentActivity = user.dailyAttempts.slice(0, 7);
+  const MODE_DISPLAY: Record<
+    string,
+    { label: string; icon: string; iconCls: string; dotCls: string }
+  > = {
+    'missing-word-count': {
+      label: 'Word Count',
+      icon: 'find_replace',
+      iconCls: 'text-primary',
+      dotCls: 'bg-primary/10',
+    },
+    'locate-verse': {
+      label: 'Locate Verse',
+      icon: 'my_location',
+      iconCls: 'text-tertiary',
+      dotCls: 'bg-tertiary/10',
+    },
+    'next-verse': {
+      label: 'Next Verse',
+      icon: 'format_quote',
+      iconCls: 'text-secondary',
+      dotCls: 'bg-secondary/10',
+    },
+  };
 
   return (
     <>
@@ -61,38 +88,45 @@ export default async function ProfilePage() {
       <main className="min-h-screen bg-surface text-on-surface pt-20 pb-24 md:pb-8">
         <div className="max-w-2xl mx-auto p-4 md:p-8 space-y-6">
           {/* Profile header */}
-          <div className="bg-surface-container-low border border-primary/10 rounded-3xl p-6 flex items-center gap-5">
-            <div className="w-20 h-20 rounded-full overflow-hidden border-2 border-primary/30 shrink-0">
-              {user.image ? (
-                <Image
-                  src={user.image}
-                  alt={user.name ?? 'User avatar'}
-                  width={80}
-                  height={80}
-                  className="w-full h-full object-cover"
-                  unoptimized
-                />
-              ) : (
-                <div className="w-full h-full bg-primary/20 flex items-center justify-center">
-                  <span className="material-symbols-outlined text-primary text-4xl">person</span>
+          <div className="bg-surface-container-low border border-primary/10 rounded-3xl p-6">
+            <div className="flex items-start gap-5">
+              <div className="w-20 h-20 rounded-full overflow-hidden border-2 border-primary/30 shrink-0">
+                {user.image ? (
+                  <Image
+                    src={user.image}
+                    alt={user.name ?? 'User avatar'}
+                    width={80}
+                    height={80}
+                    className="w-full h-full object-cover"
+                    unoptimized
+                  />
+                ) : (
+                  <div className="w-full h-full bg-primary/20 flex items-center justify-center">
+                    <span className="material-symbols-outlined text-primary text-4xl">person</span>
+                  </div>
+                )}
+              </div>
+              <div className="min-w-0 flex-1">
+                <div className="flex items-start justify-between gap-2">
+                  <div className="min-w-0">
+                    <h1 className="text-2xl font-bold text-on-surface truncate">
+                      {user.name ?? 'Anonymous'}
+                    </h1>
+                    {user.email && (
+                      <p className="text-sm text-on-surface-variant truncate">{user.email}</p>
+                    )}
+                    <p className="text-xs text-on-surface-variant mt-1">Joined {joinDate}</p>
+                  </div>
+                  <LogoutButton />
                 </div>
-              )}
-            </div>
-            <div className="min-w-0">
-              <h1 className="text-2xl font-bold text-on-surface truncate">
-                {user.name ?? 'Anonymous'}
-              </h1>
-              {user.email && (
-                <p className="text-sm text-on-surface-variant truncate">{user.email}</p>
-              )}
-              <p className="text-xs text-on-surface-variant mt-1">Joined {joinDate}</p>
+              </div>
             </div>
           </div>
 
           <GameStats streak={streak} eloFormatted={eloFormatted} user={user} />
 
           {/* Recent activity */}
-          {recentActivity.length > 0 && (
+          {recentEvents.length > 0 && (
             <div className="bg-surface-container-low border border-primary/10 rounded-3xl p-5">
               <h2 className="text-base font-semibold text-on-surface mb-4 flex items-center gap-2">
                 <span className="material-symbols-outlined text-primary text-[18px]">
@@ -100,20 +134,63 @@ export default async function ProfilePage() {
                 </span>
                 Recent Activity
               </h2>
-              <div className="space-y-2">
-                {recentActivity.map((attempt) => (
-                  <div
-                    key={attempt.id}
-                    className="flex items-center justify-between py-2 border-b border-outline-variant/30 last:border-0"
-                  >
-                    <span className="text-sm text-on-surface-variant">{attempt.date}</span>
-                    <span className="text-sm font-medium text-on-surface">
-                      {attempt.count > 0
-                        ? `${attempt.count} ranked ${attempt.count === 1 ? 'game' : 'games'}`
-                        : 'Played'}
-                    </span>
-                  </div>
-                ))}
+              <div className="space-y-0.5">
+                {recentEvents.map((event) => {
+                  const meta = MODE_DISPLAY[event.gameMode] ?? {
+                    label: event.gameMode,
+                    icon: 'sports_esports',
+                    iconCls: 'text-on-surface-variant',
+                    dotCls: 'bg-surface-container',
+                  };
+                  return (
+                    <div
+                      key={event.id}
+                      className="flex items-center justify-between py-2.5 border-b border-outline-variant/30 last:border-0"
+                    >
+                      <div className="flex items-center gap-3">
+                        <div
+                          className={`w-8 h-8 rounded-xl flex items-center justify-center shrink-0 ${meta.dotCls}`}
+                        >
+                          <span className={`material-symbols-outlined text-[16px] ${meta.iconCls}`}>
+                            {meta.icon}
+                          </span>
+                        </div>
+                        <div>
+                          <p className="text-sm font-medium text-on-surface">{meta.label}</p>
+                          <div className="flex items-center gap-1.5 mt-0.5">
+                            {event.ranked && (
+                              <span className="text-[10px] font-semibold bg-primary/10 text-primary px-1.5 py-0.5 rounded-full">
+                                Ranked
+                              </span>
+                            )}
+                            {event.practice && (
+                              <span className="text-[10px] font-semibold bg-surface-container text-on-surface-variant px-1.5 py-0.5 rounded-full">
+                                Practice
+                              </span>
+                            )}
+                            {!event.ranked && !event.practice && (
+                              <span className="text-[10px] font-semibold bg-surface-container text-on-surface-variant px-1.5 py-0.5 rounded-full">
+                                Casual
+                              </span>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-2.5 shrink-0">
+                        <span
+                          className={`material-symbols-outlined text-[20px] ${
+                            event.correct ? 'text-green-500' : 'text-red-400'
+                          }`}
+                        >
+                          {event.correct ? 'check_circle' : 'cancel'}
+                        </span>
+                        <span className="text-xs text-on-surface-variant min-w-14 text-right">
+                          {timeAgo(event.createdAt)}
+                        </span>
+                      </div>
+                    </div>
+                  );
+                })}
               </div>
             </div>
           )}

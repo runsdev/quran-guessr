@@ -52,10 +52,16 @@ export function LeaderboardTabBar({
 }: Props) {
   return (
     <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-      <div className="flex gap-1 shrink-0 bg-surface-container border border-outline-variant rounded-xl p-1">
+      <div
+        role="tablist"
+        aria-label="Leaderboard categories"
+        className="flex gap-1 shrink-0 bg-surface-container border border-outline-variant rounded-xl p-1"
+      >
         {TABS.map(({ id, label, icon }) => (
           <button
             key={id}
+            role="tab"
+            aria-selected={tab === id}
             onClick={() => onTabChange(id)}
             className={`px-4 py-2 rounded-lg text-sm font-semibold transition-all active:scale-95 ${tab === id ? 'bg-primary text-on-primary' : 'text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high'}`}
           >
@@ -72,6 +78,7 @@ export function LeaderboardTabBar({
         </span>
         <input
           type="search"
+          aria-label="Search leaderboard"
           value={search}
           onChange={(e) => onSearchChange(e.target.value)}
           placeholder={placeholder}
