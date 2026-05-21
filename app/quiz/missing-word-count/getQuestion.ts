@@ -193,7 +193,7 @@ export async function getRandomQuestion(
       answerToken: signAnswer(verse.verse_key, missingCount, pageNumber, wordCount),
       encryptedHiddenWords: encryptHiddenWords(hiddenWords),
       totalWords: wordCount,
-      pageElo: pageEloRecord ? Math.round(pageEloRecord.elo) : 1200,
+      pageElo: pageEloRecord ? Math.round(pageEloRecord.elo) : 1000,
     };
   }
 
