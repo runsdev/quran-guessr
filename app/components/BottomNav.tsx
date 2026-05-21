@@ -8,6 +8,7 @@ import { usePathname } from 'next/navigation';
 const navItems = [
   { icon: 'quiz', label: 'Quiz', href: '/quiz' },
   { icon: 'leaderboard', label: 'Rankings', href: '/leaderboard' },
+  { icon: 'bar_chart', label: 'Stats', href: '/stats' },
   { icon: 'person', label: 'Profile', href: '/profile' },
 ];
 
