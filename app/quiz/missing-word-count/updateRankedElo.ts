@@ -63,8 +63,8 @@ export async function updateRankedElo(
     }),
   ]);
 
-  revalidateTag('leaderboard-players');
-  revalidateTag('leaderboard-pages');
+  revalidateTag('leaderboard-players', {});
+  revalidateTag('leaderboard-pages', {});
 
   return result;
 }

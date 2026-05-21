@@ -131,7 +131,7 @@ export async function submitDailyAnswer(
           },
         });
         if (completed) {
-          revalidateTag('leaderboard-daily');
+          revalidateTag('leaderboard-daily', {});
         }
       }
     }
