@@ -6,6 +6,7 @@ import type { Question, SubmitResult } from './types';
 import { TIMER_LIMIT } from './types';
 
 import { auth } from '@/auth';
+import { recordGameEvent } from '@/lib/game-events';
 import { prisma } from '@/lib/prisma';
 import { recordQfActivityDay } from '@/lib/qf-api';
 import {
@@ -151,6 +152,7 @@ export async function submitAnswer(
     roundScore,
   };
 
+  void recordGameEvent({ userId, gameMode: GAME_MODE, correct: guessedPage === correctPage });
   await saveQuizSubmitResult(sessionToken, submitResult, roundScore);
 
   return submitResult;

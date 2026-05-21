@@ -4,6 +4,9 @@ import { decryptVerseKey, verifyAnswer } from './answerToken';
 import { getRandomQuestion } from './getQuestion';
 import type { Question, SubmitResult } from './types';
 
+import { auth } from '@/auth';
+import { recordGameEvent } from '@/lib/game-events';
+
 export async function fetchPracticeQuestion(pageNumber: number): Promise<Question> {
   return getRandomQuestion(undefined, pageNumber);
 }
@@ -18,5 +21,9 @@ export async function submitPracticeAnswer(
   if (correctIndex === null) {
     throw new Error('Invalid answer token');
   }
-  return { isCorrect: guess === correctIndex, correctIndex, verseKey };
+  const isCorrect = guess === correctIndex;
+  const practiceSession = await auth();
+  const userId = (practiceSession?.user as { id?: string } | undefined)?.id ?? null;
+  void recordGameEvent({ userId, gameMode: 'next-verse', correct: isCorrect, practice: true });
+  return { isCorrect, correctIndex, verseKey };
 }

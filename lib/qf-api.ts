@@ -99,7 +99,6 @@ export async function fetchQfStreak(userId: string): Promise<number> {
       },
       next: { revalidate: 0 },
     });
-    console.log('QF streak response', res);
     if (!res.ok) {
       return 0;
     }

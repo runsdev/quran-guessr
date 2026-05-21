@@ -30,6 +30,7 @@ model User {
   dailyAttempts         DailyAttempt[]
   dailyChallengeResults DailyChallengeResult[]
   quizSessions          QuizSession[]
+  gameEvents            GameEvent[]
 }
 
 model Account {
@@ -130,6 +131,20 @@ model QuizSession {
   expiresAt         DateTime
   createdAt         DateTime @default(now())
   updatedAt         DateTime @updatedAt
+
+  user User? @relation(fields: [userId], references: [id], onDelete: SetNull)
+}
+
+// Records every game attempt — authenticated or anonymous, ranked or casual.
+// Useful for aggregate analytics and per-user activity history.
+model GameEvent {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  userId    String?  @db.ObjectId // null = anonymous guest
+  gameMode  String   // "missing-word-count" | "locate-verse" | "next-verse"
+  practice  Boolean  @default(false)
+  correct   Boolean
+  ranked    Boolean  @default(false) // true only for ELO-affecting MWC games
+  createdAt DateTime @default(now())
 
   user User? @relation(fields: [userId], references: [id], onDelete: SetNull)
 }
