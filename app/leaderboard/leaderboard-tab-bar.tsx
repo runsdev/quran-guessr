@@ -57,7 +57,7 @@ export function LeaderboardTabBar({
           <button
             key={id}
             onClick={() => onTabChange(id)}
-            className={`px-4 py-2 rounded-lg text-sm font-semibold transition-colors ${tab === id ? 'bg-primary text-on-primary' : 'text-on-surface-variant hover:text-on-surface'}`}
+            className={`px-4 py-2 rounded-lg text-sm font-semibold transition-all active:scale-95 ${tab === id ? 'bg-primary text-on-primary' : 'text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high'}`}
           >
             <span className="flex items-center gap-1.5">
               <span className="material-symbols-outlined text-[16px]">{icon}</span>

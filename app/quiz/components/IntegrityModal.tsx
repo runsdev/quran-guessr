@@ -92,14 +92,14 @@ export default function IntegrityModal({ open, onClose, onConfirm }: Props) {
           <div className="flex gap-3">
             <button
               onClick={onClose}
-              className="flex-1 h-12 rounded-lg border border-outline text-on-surface hover:border-on-surface-variant transition-colors duration-200 font-medium text-sm bg-background"
+              className="flex-1 h-12 rounded-lg border border-outline text-on-surface hover:border-on-surface-variant hover:bg-surface-container active:scale-95 transition-all duration-200 font-medium text-sm bg-background"
             >
               Cancel
             </button>
             <button
               onClick={onConfirm}
               disabled={!pledged}
-              className="flex-1 h-12 rounded-lg font-medium text-sm transition-colors duration-200 bg-primary text-on-primary disabled:bg-primary-container disabled:text-on-surface-variant disabled:cursor-not-allowed hover:bg-on-primary-container"
+              className="flex-1 h-12 rounded-lg font-medium text-sm transition-all duration-200 bg-primary text-on-primary disabled:bg-primary-container disabled:text-on-surface-variant disabled:cursor-not-allowed disabled:pointer-events-none hover:bg-on-primary-container active:scale-95"
             >
               Begin Game
             </button>

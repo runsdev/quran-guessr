@@ -91,11 +91,8 @@ export default function QuizCardItem({ quiz, innerRef, priority = false }: Props
 
         <Link
           href={quiz.href}
+          className="inline-block self-start bg-primary text-on-primary hover:bg-on-primary-container active:scale-95 transition-all"
           style={{
-            display: 'inline-block',
-            alignSelf: 'flex-start',
-            backgroundColor: '#ff385c',
-            color: '#ffffff',
             borderRadius: 8,
             padding: '12px 24px',
             fontSize: 15,
