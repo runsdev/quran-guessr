@@ -1,12 +1,17 @@
 'use client';
 
+import { useTransition } from 'react';
+
 import Image from 'next/image';
 import Link from 'next/link';
-import { signIn, signOut, useSession } from 'next-auth/react';
+import { signIn, useSession } from 'next-auth/react';
+
+import { oidcLogout } from '@/app/actions/auth';
 
 /** Login / profile panel — Apple utility card style. */
 const LoginPanel = (): React.JSX.Element => {
   const { data: session, status } = useSession();
+  const [isPending, startTransition] = useTransition();
 
   return (
     <div
@@ -49,11 +54,12 @@ const LoginPanel = (): React.JSX.Element => {
               Your progress is being synced. Keep playing to climb the leaderboard!
             </p>
             <button
-              className="w-full bg-primary text-on-primary text-base font-medium cursor-pointer hover:bg-on-primary-container active:scale-95 transition-all"
+              className="w-full bg-primary text-on-primary text-base font-medium cursor-pointer hover:bg-on-primary-container active:scale-95 transition-all disabled:opacity-60 disabled:pointer-events-none"
               style={{ borderRadius: 8, padding: '14px 24px' }}
-              onClick={() => signOut({ callbackUrl: '/' })}
+              onClick={() => startTransition(() => oidcLogout())}
+              disabled={isPending}
             >
-              Sign Out
+              {isPending ? 'Signing out…' : 'Sign Out'}
             </button>
           </>
         ) : (
