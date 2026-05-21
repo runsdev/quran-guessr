@@ -1,7 +1,8 @@
 {
-  "name": "quran-guesssr",
-  "version": "0.1.0",
+  "name": "quran-guessr",
+  "version": "1.0.0",
   "private": true,
+  "license": "MIT",
   "scripts": {
     "dev": "next dev",
     "build": "next build",
@@ -72,5 +73,11 @@
       "prettier --write"
     ],
     "*.{js,mjs,mts,json,md}": "prettier --write"
-  }
+  },
+  "browserslist": [
+    "chrome >= 93",
+    "edge >= 93",
+    "safari >= 15.4",
+    "firefox >= 90"
+  ]
 }

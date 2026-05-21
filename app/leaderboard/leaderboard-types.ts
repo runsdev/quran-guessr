@@ -29,7 +29,7 @@ export interface PageEloEntry {
 export interface LeaderboardStats {
   // Player ELO stats
   globalAvgPlayerElo: number;
-  playerMasteryRate: string;
+  totalGamesPlayed: number;
   currentUserElo: number | null;
   currentUserEloChange: number;
   totalPlayerEntries: number;

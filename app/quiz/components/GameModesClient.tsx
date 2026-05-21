@@ -2,13 +2,17 @@
 
 import { useState } from 'react';
 
+import dynamic from 'next/dynamic';
+
 import type { ActiveSession } from '../page';
 
 import ChallengeCategories from './ChallengeCategories';
-import IntegrityModal from './IntegrityModal';
-import JuzFilterSettings, { loadJuzFilter } from './JuzFilterSettings';
+import { loadJuzFilter } from './JuzFilterSettings';
 import PrimaryGameModes from './PrimaryGameModes';
 import { useGameModesState } from './useGameModesState';
+
+const IntegrityModal = dynamic(() => import('./IntegrityModal'), { ssr: false });
+const JuzFilterSettings = dynamic(() => import('./JuzFilterSettings'), { ssr: false });
 
 interface Props {
   elo: number;

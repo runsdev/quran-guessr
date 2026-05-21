@@ -1,12 +1,5 @@
 @import 'tailwindcss';
 
-@font-face {
-  font-family: 'Scheherazade New';
-  src: url('https://fonts.googleapis.com/css2?family=Scheherazade+New:wght@400;700&display=swap')
-    format('woff2');
-  font-display: swap;
-}
-
 /* ── Airbnb-inspired design tokens ── */
 :root {
   /* ── Canvas / Background ── */
@@ -215,7 +208,7 @@ body {
 }
 
 .quran-text {
-  font-family: 'Scheherazade New', 'Traditional Arabic', serif;
+  font-family: var(--font-scheherazade), 'Traditional Arabic', serif;
   font-size: 28px;
   line-height: 2;
   direction: rtl;
