@@ -4,36 +4,19 @@ import BottomNav from '@/app/components/BottomNav';
 import TopAppBar from '@/app/components/TopAppBar';
 import { auth } from '@/auth';
 import { getOrCreateDailyChallenge, getUtcDateStr } from '@/lib/daily-challenge';
-import { prisma } from '@/lib/prisma';
+import {
+  getCachedPlayerLeaderboard,
+  getCachedPageLeaderboard,
+  getCachedDailyLeaderboard,
+} from '@/lib/leaderboard-queries';
 import { getJuzForPage, getSurahsForPage } from '@/lib/quran-pages';
-
-export const dynamic = 'force-dynamic';
 
 export default async function LeaderboardPage() {
   const session = await auth();
   const currentUserId = (session?.user as { id?: string } | undefined)?.id;
 
   // ── Player ELO leaderboard ────────────────────────────────────────────────
-  const [topUsers, totalEloUsers] = await Promise.all([
-    prisma.user.findMany({
-      where: { elo: { not: 1000 } },
-      orderBy: { elo: 'desc' },
-      take: 50,
-      select: {
-        id: true,
-        name: true,
-        image: true,
-        elo: true,
-        gamesPlayed: true,
-        mwcCorrect: true,
-        lvGames: true,
-        lvCorrect: true,
-        nvGames: true,
-        nvCorrect: true,
-      },
-    }),
-    prisma.user.count({ where: { elo: { not: 1000 } } }),
-  ]);
+  const { topUsers, totalEloUsers } = await getCachedPlayerLeaderboard();
 
   const playerEntries = topUsers.map((u, idx) => ({
     rank: idx + 1,
@@ -51,9 +34,7 @@ export default async function LeaderboardPage() {
   }));
 
   // ── Page ELO leaderboard (hardest pages first) ────────────────────────────
-  const pageEloRecords = await prisma.pageElo.findMany({
-    orderBy: { elo: 'desc' },
-  });
+  const pageEloRecords = await getCachedPageLeaderboard();
 
   const pageEntries = pageEloRecords.map((p, idx) => ({
     rank: idx + 1,
@@ -70,14 +51,7 @@ export default async function LeaderboardPage() {
   const today = getUtcDateStr();
   const dailyChallenge = await getOrCreateDailyChallenge(today);
 
-  const dailyResults = await prisma.dailyChallengeResult.findMany({
-    where: { challengeId: dailyChallenge.id, completed: true },
-    orderBy: [{ totalScore: 'desc' }, { completedAt: 'asc' }],
-    take: 50,
-    include: {
-      user: { select: { name: true, image: true } },
-    },
-  });
+  const dailyResults = await getCachedDailyLeaderboard(dailyChallenge.id);
 
   const dailyEntries = dailyResults.map((r, idx) => ({
     rank: idx + 1,

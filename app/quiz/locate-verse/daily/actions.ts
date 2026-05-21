@@ -1,5 +1,7 @@
 'use server';
 
+import { revalidateTag } from 'next/cache';
+
 import { decryptVerseKey, verifyAnswer } from '@/app/quiz/locate-verse/answerToken';
 import type { Question, SubmitResult } from '@/app/quiz/locate-verse/types';
 import { TIMER_LIMIT } from '@/app/quiz/locate-verse/types';
@@ -128,6 +130,9 @@ export async function submitDailyAnswer(
             completedAt: completed ? new Date() : null,
           },
         });
+        if (completed) {
+          revalidateTag('leaderboard-daily');
+        }
       }
     }
   }
