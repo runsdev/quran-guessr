@@ -26,6 +26,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
           scope: 'openid offline_access user streak reading_session activity_day',
           // eslint-disable-next-line @typescript-eslint/naming-convention
           response_type: 'code',
+          prompt: 'login',
         },
       },
       token: {
@@ -67,6 +68,16 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
       // Expose the database user id in the session
       session.user.id = user.id;
       return session;
+    },
+  },
+
+  events: {
+    linkAccount({ account }) {
+      if (!account.id_token) {
+        console.warn(
+          '[auth] id_token not stored for account — RP-Initiated Logout will fall back to local-only sign-out',
+        );
+      }
     },
   },
 
