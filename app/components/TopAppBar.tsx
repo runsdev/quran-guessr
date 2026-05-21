@@ -5,6 +5,7 @@ import Link from 'next/link';
 const navItems = [
   { label: 'Quiz', href: '/quiz' },
   { label: 'Rankings', href: '/leaderboard' },
+  { label: 'Stats', href: '/stats' },
 ];
 
 interface TopAppBarProps {
