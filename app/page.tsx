@@ -18,11 +18,11 @@ export default function Home() {
   const searchParams = useSearchParams();
 
   useEffect(() => {
-    // If there are any search params, redirect to the clean pathname
     if (searchParams.toString().length > 0) {
       router.replace(pathname, { scroll: false });
     }
   }, [pathname, searchParams, router]);
+
   return (
     <>
       <TopAppBar />

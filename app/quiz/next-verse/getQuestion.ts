@@ -191,8 +191,8 @@ export async function getRandomQuestion(
   while (distractorWordSets.length < 3) {
     const extra = await fetchRandomVerseInAyahRange(
       nextSurah,
-      nextAyah - 10,
-      nextAyah + 10,
+      nextAyah - 5,
+      nextAyah + 5,
       fetchVerseByKey,
     );
     if (!usedKeys.has(extra.verseKey)) {

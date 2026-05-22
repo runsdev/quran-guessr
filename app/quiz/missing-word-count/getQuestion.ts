@@ -134,7 +134,7 @@ export async function getRandomQuestion(
   juzFilter?: number[],
 ): Promise<Question> {
   // Retry up to 5 times to find a verse with at least 4 words (so at least 1
-  // can be hidden without leaving fewer than 3 visible).
+  // can be hidden without leaving fewer than 2 visible).
   for (let attempt = 0; attempt < 5; attempt++) {
     const verse = await fetchVerse(targetPageNumber, juzFilter);
 
@@ -143,7 +143,7 @@ export async function getRandomQuestion(
       .sort((a, b) => a.position - b.position);
 
     const wordCount = words.length;
-    const maxMissing = Math.min(4, Math.max(0, wordCount - 3));
+    const maxMissing = Math.min(4, Math.max(0, wordCount - 2));
 
     // Require at least 1 word to be hidden
     if (maxMissing < 1) {
