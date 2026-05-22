@@ -48,6 +48,7 @@ export default async function RootLayout({
         <link rel="preconnect" href="https://verses.quran.foundation" crossOrigin="anonymous" />
       </head>
       <GoogleTagManager gtmId="GTM-5B2K62HZ" />
+      <GoogleTagManager gtmId="G-GNR9C7CWZ3" />
       <body className="min-h-full flex flex-col">
         <SessionProvider session={session}>{children}</SessionProvider>
         <MaterialSymbolsLoader />
