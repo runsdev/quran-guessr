@@ -15,9 +15,10 @@ model User {
   email         String?   @unique
   emailVerified DateTime?
   image         String?
-  elo           Float     @default(1000)
-  gamesPlayed   Int       @default(0)
-  mwcCorrect    Int       @default(0)
+  elo                  Float     @default(1000)
+  gamesPlayed          Int       @default(0)
+  mwcCorrect           Int       @default(0)
+  showOnLeaderboard    Boolean   @default(false)
   lvGames       Int       @default(0)
   lvCorrect     Int       @default(0)
   nvGames       Int       @default(0)

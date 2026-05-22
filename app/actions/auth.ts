@@ -50,3 +50,17 @@ export async function oidcLogout() {
   // Fallback: id_token not stored — local session is already cleared, go home.
   redirect('/');
 }
+
+export async function updateLeaderboardConsent(showOnLeaderboard: boolean) {
+  const session = await auth();
+  const userId = (session?.user as { id?: string } | undefined)?.id;
+
+  if (!userId) {
+    throw new Error('Not authenticated');
+  }
+
+  await prisma.user.update({
+    where: { id: userId },
+    data: { showOnLeaderboard },
+  });
+}

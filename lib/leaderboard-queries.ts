@@ -20,6 +20,7 @@ export const getCachedPlayerLeaderboard = unstable_cache(
           lvCorrect: true,
           nvGames: true,
           nvCorrect: true,
+          showOnLeaderboard: true,
         },
       }),
       prisma.user.count({ where: { elo: { not: 1000 } } }),
@@ -47,7 +48,7 @@ export const getCachedDailyLeaderboard = unstable_cache(
       orderBy: [{ totalScore: 'desc' }, { completedAt: 'asc' }],
       take: 50,
       include: {
-        user: { select: { name: true, image: true } },
+        user: { select: { name: true, image: true, showOnLeaderboard: true } },
       },
     });
   },
