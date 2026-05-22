@@ -21,8 +21,8 @@ export default async function LeaderboardPage() {
   const playerEntries = topUsers.map((u, idx) => ({
     rank: idx + 1,
     userId: u.id,
-    name: u.name ?? 'Anonymous',
-    image: u.image ?? null,
+    name: u.showOnLeaderboard ? (u.name ?? 'Abdullah') : 'Abdullah',
+    image: u.showOnLeaderboard ? (u.image ?? null) : null,
     elo: Math.round(u.elo),
     eloChange: 0,
     gamesPlayed: u.gamesPlayed,
@@ -56,8 +56,8 @@ export default async function LeaderboardPage() {
   const dailyEntries = dailyResults.map((r, idx) => ({
     rank: idx + 1,
     userId: r.userId,
-    name: r.user.name ?? 'Anonymous',
-    image: r.user.image ?? null,
+    name: r.user.showOnLeaderboard ? (r.user.name ?? 'Abdullah') : 'Abdullah',
+    image: r.user.showOnLeaderboard ? (r.user.image ?? null) : null,
     totalScore: r.totalScore,
     completedAt: r.completedAt!,
   }));

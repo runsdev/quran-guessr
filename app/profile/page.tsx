@@ -2,6 +2,7 @@ import Image from 'next/image';
 import { redirect } from 'next/navigation';
 
 import GameStats from './GameStats';
+import LeaderboardConsentToggle from './LeaderboardConsentToggle';
 import LogoutButton from './LogoutButton';
 import { timeAgo } from './utils';
 
@@ -35,6 +36,7 @@ export default async function ProfilePage() {
       lvCorrect: true,
       nvGames: true,
       nvCorrect: true,
+      showOnLeaderboard: true,
       createdAt: true,
     },
   });
@@ -124,6 +126,8 @@ export default async function ProfilePage() {
           </div>
 
           <GameStats streak={streak} eloFormatted={eloFormatted} user={user} />
+
+          <LeaderboardConsentToggle initialValue={user.showOnLeaderboard} />
 
           {/* Recent activity */}
           {recentEvents.length > 0 && (
