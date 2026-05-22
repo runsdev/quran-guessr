@@ -1,3 +1,4 @@
+import { GoogleTagManager } from '@next/third-parties/google';
 import { GeistMono } from 'geist/font/mono';
 import type { Metadata } from 'next';
 import { Inter, Scheherazade_New } from 'next/font/google';
@@ -46,6 +47,7 @@ export default async function RootLayout({
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
         <link rel="preconnect" href="https://verses.quran.foundation" crossOrigin="anonymous" />
       </head>
+      <GoogleTagManager gtmId="GTM-5B2K62HZ" />
       <body className="min-h-full flex flex-col">
         <SessionProvider session={session}>{children}</SessionProvider>
         <MaterialSymbolsLoader />
