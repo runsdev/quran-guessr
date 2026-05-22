@@ -59,7 +59,11 @@ export default function ActionRow({
       </div>
       <div className="shrink-0">
         {submitted ? (
-          <button onClick={onNext} className={BTN}>
+          <button
+            onClick={onNext}
+            disabled={loading}
+            className={`${BTN} disabled:opacity-40 disabled:cursor-not-allowed`}
+          >
             Next Question
             <span className="material-symbols-outlined" style={{ fontSize: 18 }}>
               arrow_forward
