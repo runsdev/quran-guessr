@@ -2,7 +2,7 @@ import { unstable_cache } from 'next/cache';
 
 import { prisma } from './prisma';
 
-export type GameMode = 'missing-word-count' | 'locate-verse' | 'next-verse';
+export type GameMode = 'missing-word-count' | 'locate-verse' | 'next-verse' | 'translation-quiz';
 
 export interface ModeStats {
   gameMode: string;
@@ -117,7 +117,12 @@ export const getCachedStats = unstable_cache(
       }
     }
 
-    const MODE_ORDER: GameMode[] = ['missing-word-count', 'locate-verse', 'next-verse'];
+    const MODE_ORDER: GameMode[] = [
+      'missing-word-count',
+      'locate-verse',
+      'next-verse',
+      'translation-quiz',
+    ];
     const modeStats = MODE_ORDER.map(
       (m) =>
         modeMap.get(m) ?? {

@@ -9,6 +9,7 @@ import type { Question, SubmitResult } from './types';
 
 import { abandonSession } from '@/app/quiz/actions';
 import { loadJuzFilter } from '@/app/quiz/components/JuzFilterSettings';
+import { TRANSLATION_OPTIONS } from '@/lib/qdc-translations';
 
 const SESSION_KEY = 'quizSession:translation-quiz';
 
@@ -17,7 +18,9 @@ export function useTranslationQuizState() {
   const [isInitializing, setIsInitializing] = useState(true);
   const [initError, setInitError] = useState(false);
   const [juzFilter, setJuzFilter] = useState<number[]>([]);
-  const [translationId, setTranslationId] = useState<number>(() => loadTranslationId());
+  const [translationId, setTranslationId] = useState<number>(
+    () => loadTranslationId() ?? TRANSLATION_OPTIONS[0].id,
+  );
   const [isPractice] = useState(
     () =>
       typeof window !== 'undefined' &&

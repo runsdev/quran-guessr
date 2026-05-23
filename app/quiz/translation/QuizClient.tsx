@@ -5,14 +5,13 @@ import { toast } from 'sonner';
 
 import { TranslationQuizSkeleton } from './loading';
 import TranslationChoicesGrid from './TranslationChoicesGrid';
-import TranslationSelector from './TranslationSelector';
 import { useTranslationQuizState } from './useTranslationQuizState';
 
 import BottomNav from '@/app/components/BottomNav';
 import TopAppBar from '@/app/components/TopAppBar';
 import ActionRow from '@/app/quiz/next-verse/ActionRow';
-import QuizProgressHeader from '@/app/quiz/next-verse/QuizProgressHeader';
 import VerseCard from '@/app/quiz/next-verse/VerseCard';
+import QuizProgressHeader from '@/app/quiz/translation/QuizProgressHeader';
 import { useQcfFontLoader } from '@/app/quiz/useQcfFontLoader';
 
 export default function QuizClient() {
@@ -29,8 +28,6 @@ export default function QuizClient() {
     submitted,
     isCorrect,
     score,
-    translationId,
-    handleTranslationChange,
     handleSubmit,
     handleNext,
     handleRetry,
@@ -96,13 +93,6 @@ export default function QuizClient() {
                   <p className="text-sm text-on-surface-variant">
                     Select the matching translation for this Ayah.
                   </p>
-                  <div className="mt-1">
-                    <TranslationSelector
-                      value={translationId}
-                      onChange={handleTranslationChange}
-                      disabled={submitted || isPending}
-                    />
-                  </div>
                 </div>
 
                 {question && (

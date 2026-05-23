@@ -34,4 +34,11 @@ export const MODE_META: Record<
     bgCls: 'bg-secondary/10',
     desc: 'Casual · Verse continuation',
   },
+  'translation-quiz': {
+    label: 'Translation Quiz',
+    icon: 'translate',
+    iconCls: 'text-green-700',
+    bgCls: 'bg-green-100',
+    desc: 'Casual · Translation knowledge',
+  },
 };
