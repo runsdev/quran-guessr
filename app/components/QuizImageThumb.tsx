@@ -15,9 +15,9 @@ export default function QuizImageThumb({ src, alt, onOpen, priority = false }: P
       aria-label={`Zoom preview of ${alt}`}
       style={{
         flex: '0 0 300px',
-        background: '#f7f7f7',
+        background: 'var(--color-surface-container-low)',
         borderRadius: 10,
-        border: '1px solid #dddddd',
+        border: '1px solid var(--color-outline)',
         flexDirection: 'column',
         alignItems: 'center',
         justifyContent: 'center',
@@ -52,7 +52,7 @@ export default function QuizImageThumb({ src, alt, onOpen, priority = false }: P
           className="material-symbols-outlined image-zoom-icon"
           style={{
             fontSize: 32,
-            color: '#ffffff',
+            color: 'var(--color-on-primary)',
             opacity: 0,
             transition: 'opacity 0.2s',
             filter: 'drop-shadow(0 1px 3px rgba(0,0,0,0.5))',

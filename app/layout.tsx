@@ -6,6 +6,7 @@ import { Toaster } from 'sonner';
 
 import MaterialSymbolsLoader from './components/MaterialSymbolsLoader';
 import SessionProvider from './components/providers/SessionProvider';
+import ThemeProvider from './components/providers/ThemeProvider';
 
 import { auth } from '@/auth';
 
@@ -41,6 +42,7 @@ export default async function RootLayout({
     <html
       lang="en"
       className={`${GeistMono.variable} ${inter.variable} ${scheherazadeNew.variable} h-full antialiased`}
+      suppressHydrationWarning
     >
       <head>
         <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -50,9 +52,11 @@ export default async function RootLayout({
       <GoogleTagManager gtmId="GTM-5B2K62HZ" />
       <GoogleTagManager gtmId="G-GNR9C7CWZ3" />
       <body className="min-h-full flex flex-col">
-        <SessionProvider session={session}>{children}</SessionProvider>
-        <MaterialSymbolsLoader />
-        <Toaster position="bottom-center" richColors closeButton />
+        <ThemeProvider>
+          <SessionProvider session={session}>{children}</SessionProvider>
+          <MaterialSymbolsLoader />
+          <Toaster position="bottom-center" richColors closeButton />
+        </ThemeProvider>
       </body>
     </html>
   );

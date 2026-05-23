@@ -99,7 +99,13 @@ export default async function QuizHubPage() {
       <TopAppBar activeTab="Quiz" />
 
       {/* ── Band 1: white — welcome header ── */}
-      <section style={{ backgroundColor: '#ffffff', paddingTop: 80 + 48, paddingBottom: 48 }}>
+      <section
+        style={{
+          backgroundColor: 'var(--color-background)',
+          paddingTop: 80 + 48,
+          paddingBottom: 48,
+        }}
+      >
         <div className="max-w-7xl mx-auto px-6 md:px-8">
           <DashboardHeader
             userName={userName}
@@ -113,7 +119,11 @@ export default async function QuizHubPage() {
 
       {/* ── Band 2: soft — game modes ── */}
       <section
-        style={{ backgroundColor: '#f7f7f7', paddingTop: 64, paddingBottom: 96 }}
+        style={{
+          backgroundColor: 'var(--color-surface-container-low)',
+          paddingTop: 64,
+          paddingBottom: 96,
+        }}
         className="pb-32 md:pb-24"
       >
         <div className="max-w-7xl mx-auto px-6 md:px-8 space-y-10">

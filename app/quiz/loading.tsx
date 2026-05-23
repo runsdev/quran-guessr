@@ -6,7 +6,10 @@ function GameCardSkeleton() {
   return (
     <div
       className="flex flex-col w-full p-8 rounded-2xl"
-      style={{ background: '#ffffff', border: '1px solid #dddddd' }}
+      style={{
+        background: 'var(--color-surface-container-lowest)',
+        border: '1px solid var(--color-outline)',
+      }}
     >
       {/* Icon + badge row */}
       <div className="flex justify-between items-start mb-6 w-full">
@@ -21,7 +24,10 @@ function GameCardSkeleton() {
       {/* Footer */}
       <div
         className="mt-auto flex items-center justify-between rounded-xl p-4 w-full"
-        style={{ background: '#f2f2f2', border: '1px solid #dddddd' }}
+        style={{
+          background: 'var(--color-surface-container)',
+          border: '1px solid var(--color-outline)',
+        }}
       >
         <Skeleton className="w-36 h-4" />
         <Skeleton className="w-20 h-9 rounded-lg" />
@@ -32,7 +38,13 @@ function GameCardSkeleton() {
 
 function SmallCardSkeleton() {
   return (
-    <div className="p-6 rounded-2xl" style={{ background: '#ffffff', border: '1px solid #dddddd' }}>
+    <div
+      className="p-6 rounded-2xl"
+      style={{
+        background: 'var(--color-surface-container-lowest)',
+        border: '1px solid var(--color-outline)',
+      }}
+    >
       <Skeleton className="w-12 h-12 rounded-xl mb-4" />
       <Skeleton className="w-28 h-5 mb-2" />
       <Skeleton className="w-full h-4" />
@@ -47,7 +59,13 @@ export default function QuizLoading() {
       <TopAppBar activeTab="Quiz" />
 
       {/* Band 1: white — dashboard header */}
-      <section style={{ backgroundColor: '#ffffff', paddingTop: 80 + 48, paddingBottom: 48 }}>
+      <section
+        style={{
+          backgroundColor: 'var(--color-background)',
+          paddingTop: 80 + 48,
+          paddingBottom: 48,
+        }}
+      >
         <div className="max-w-7xl mx-auto px-6 md:px-8">
           <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-8">
             {/* Left: greeting */}
@@ -59,7 +77,10 @@ export default function QuizLoading() {
             {/* Right: stat chips panel */}
             <div
               className="flex flex-wrap gap-4 items-center p-4 rounded-2xl shrink-0"
-              style={{ background: '#f7f7f7', border: '1px solid #dddddd' }}
+              style={{
+                background: 'var(--color-surface-container-low)',
+                border: '1px solid var(--color-outline)',
+              }}
             >
               <div className="flex items-center gap-3 px-2">
                 <Skeleton className="w-10 h-10 rounded-full" />
@@ -83,7 +104,11 @@ export default function QuizLoading() {
 
       {/* Band 2: soft gray — game modes */}
       <section
-        style={{ backgroundColor: '#f7f7f7', paddingTop: 64, paddingBottom: 96 }}
+        style={{
+          backgroundColor: 'var(--color-surface-container-low)',
+          paddingTop: 64,
+          paddingBottom: 96,
+        }}
         className="pb-32 md:pb-24"
       >
         <div className="max-w-7xl mx-auto px-6 md:px-8 space-y-10">

@@ -24,10 +24,10 @@ const BottomNav = (): React.JSX.Element => {
       className="md:hidden fixed bottom-0 w-full z-50 flex justify-around items-center rounded-t-2xl"
       style={{
         height: 68,
-        background: 'rgba(255,255,255,0.85)',
+        background: 'var(--color-bottom-nav-bg)',
         backdropFilter: 'blur(20px)',
         WebkitBackdropFilter: 'blur(20px)',
-        borderTop: '1px solid rgba(0,0,0,0.08)',
+        borderTop: '1px solid var(--color-bottom-nav-border)',
         fontFamily: 'var(--font-inter), system-ui, -apple-system, sans-serif',
       }}
     >
@@ -41,7 +41,7 @@ const BottomNav = (): React.JSX.Element => {
             aria-current={isActive ? 'page' : undefined}
             className="flex flex-col items-center justify-center gap-0.5 px-4 py-1 active:opacity-60 transition-all"
             style={{
-              color: isActive ? '#ff385c' : '#6a6a6a',
+              color: isActive ? 'var(--color-primary)' : 'var(--color-on-surface-variant)',
               textDecoration: 'none',
             }}
           >

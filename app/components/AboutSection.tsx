@@ -9,14 +9,17 @@ const LINKS = [
 
 export default function AboutSection(): React.JSX.Element {
   return (
-    <section id="about" style={{ backgroundColor: '#f7f7f7', padding: '80px 24px' }}>
+    <section
+      id="about"
+      style={{ backgroundColor: 'var(--color-surface-container-low)', padding: '80px 24px' }}
+    >
       <div className="max-w-5xl mx-auto">
         {/* ── Header ── */}
         <p
           style={{
             fontSize: 13,
             fontWeight: 700,
-            color: '#ff385c',
+            color: 'var(--color-primary)',
             letterSpacing: '0.1em',
             textTransform: 'uppercase',
             marginBottom: 10,
@@ -28,7 +31,7 @@ export default function AboutSection(): React.JSX.Element {
           style={{
             fontSize: 28,
             fontWeight: 700,
-            color: '#222222',
+            color: 'var(--color-on-surface)',
             lineHeight: 1.3,
             marginBottom: 48,
           }}
@@ -40,8 +43,8 @@ export default function AboutSection(): React.JSX.Element {
         <div
           className="flex flex-col md:flex-row"
           style={{
-            background: '#ffffff',
-            border: '1px solid #dddddd',
+            background: 'var(--color-surface-container-lowest)',
+            border: '1px solid var(--color-outline)',
             borderRadius: 14,
             overflow: 'hidden',
           }}
@@ -53,13 +56,16 @@ export default function AboutSection(): React.JSX.Element {
               width: '100%',
               maxWidth: 240,
               minHeight: 240,
-              background: '#ebebeb',
+              background: 'var(--color-outline-variant)',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
             }}
           >
-            <span className="material-symbols-outlined" style={{ fontSize: 72, color: '#bbbbbb' }}>
+            <span
+              className="material-symbols-outlined"
+              style={{ fontSize: 72, color: 'var(--color-outline)' }}
+            >
               person
             </span>
           </div>
@@ -70,7 +76,7 @@ export default function AboutSection(): React.JSX.Element {
               style={{
                 fontSize: 22,
                 fontWeight: 700,
-                color: '#222222',
+                color: 'var(--color-on-surface)',
                 marginBottom: 4,
               }}
             >
@@ -79,7 +85,7 @@ export default function AboutSection(): React.JSX.Element {
             <p
               style={{
                 fontSize: 14,
-                color: '#ff385c',
+                color: 'var(--color-primary)',
                 fontWeight: 600,
                 marginBottom: 16,
               }}
@@ -89,7 +95,7 @@ export default function AboutSection(): React.JSX.Element {
             <p
               style={{
                 fontSize: 16,
-                color: '#6a6a6a',
+                color: 'var(--color-on-surface-variant)',
                 lineHeight: 1.65,
                 marginBottom: 28,
                 textAlign: 'justify',
@@ -114,13 +120,13 @@ export default function AboutSection(): React.JSX.Element {
                     alignItems: 'center',
                     gap: 8,
                     padding: '10px 18px',
-                    border: '1px solid #dddddd',
+                    border: '1px solid var(--color-outline)',
                     borderRadius: 8,
                     fontSize: 14,
                     fontWeight: 600,
-                    color: '#222222',
+                    color: 'var(--color-on-surface)',
                     textDecoration: 'none',
-                    background: '#ffffff',
+                    background: 'var(--color-surface-container-lowest)',
                   }}
                 >
                   <span className="material-symbols-outlined" style={{ fontSize: 18 }}>

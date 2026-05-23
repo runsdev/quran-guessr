@@ -36,7 +36,7 @@ export default function AnswerGrid({
         const isAnswer = submitted && num === correctAnswer;
         const isWrongPick = submitted && isSelected && !isCorrect;
         let btnStyle =
-          'bg-[#f7f7f7] border-outline-variant text-on-surface hover:border-primary hover:bg-[#ffd1da] hover:text-primary';
+          'bg-surface-container-low border-outline-variant text-on-surface hover:border-primary hover:bg-primary-container hover:text-primary';
         if (isAnswer) {
           btnStyle = 'bg-green-50 border-green-500 text-green-700';
         } else if (isWrongPick) {

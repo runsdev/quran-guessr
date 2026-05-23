@@ -8,7 +8,7 @@ import Link from 'next/link';
 const HeroSection = (): React.JSX.Element => (
   <section
     className="w-full flex flex-col items-center text-center"
-    style={{ backgroundColor: '#ffffff', padding: '64px 24px' }}
+    style={{ backgroundColor: 'var(--color-background)', padding: '64px 24px' }}
   >
     {/* Hero headline — 28px/700 per Airbnb spec */}
     <h1
@@ -16,7 +16,7 @@ const HeroSection = (): React.JSX.Element => (
         fontSize: 28,
         fontWeight: 700,
         lineHeight: 1.43,
-        color: '#222222',
+        color: 'var(--color-on-surface)',
         maxWidth: 640,
         marginBottom: 8,
       }}
@@ -30,7 +30,7 @@ const HeroSection = (): React.JSX.Element => (
         fontSize: 16,
         fontWeight: 400,
         lineHeight: 1.5,
-        color: '#6a6a6a',
+        color: 'var(--color-on-surface-variant)',
         maxWidth: 480,
         marginBottom: 36,
       }}
@@ -64,7 +64,7 @@ const HeroSection = (): React.JSX.Element => (
           fontSize: 14,
           fontWeight: 600,
           textDecoration: 'none',
-          border: '1px solid #222222',
+          border: '1px solid var(--color-on-surface)',
         }}
       >
         View Leaderboard
