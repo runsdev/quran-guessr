@@ -3,15 +3,15 @@
 import { AnimatePresence, motion } from 'framer-motion';
 import { toast } from 'sonner';
 
-import ActionRow from './ActionRow';
-import ChoicesGrid from './ChoicesGrid';
-import { NextVerseSkeleton } from './loading';
-import QuizProgressHeader from './QuizProgressHeader';
-import { useNextVerseState } from './useNextVerseState';
-import VerseCard from './VerseCard';
+import { TranslationQuizSkeleton } from './loading';
+import TranslationChoicesGrid from './TranslationChoicesGrid';
+import { useTranslationQuizState } from './useTranslationQuizState';
 
 import BottomNav from '@/app/components/BottomNav';
 import TopAppBar from '@/app/components/TopAppBar';
+import ActionRow from '@/app/quiz/next-verse/ActionRow';
+import VerseCard from '@/app/quiz/next-verse/VerseCard';
+import QuizProgressHeader from '@/app/quiz/translation/QuizProgressHeader';
 import { useQcfFontLoader } from '@/app/quiz/useQcfFontLoader';
 
 export default function QuizClient() {
@@ -29,16 +29,19 @@ export default function QuizClient() {
     isCorrect,
     score,
     timeLeft,
-    pageNumbers,
     handleSubmit,
     handleNext,
     handleRetry,
     handleEndSession,
-  } = useNextVerseState();
-  const loadedPages = useQcfFontLoader(pageNumbers);
+  } = useTranslationQuizState();
+
+  const pageNumbers =
+    question?.verseWords.filter((w) => w.page_number !== undefined).map((w) => w.page_number!) ??
+    [];
+  const loadedPages = useQcfFontLoader([...new Set(pageNumbers)]);
 
   if (isInitializing) {
-    return <NextVerseSkeleton />;
+    return <TranslationQuizSkeleton />;
   }
 
   return (
@@ -85,22 +88,21 @@ export default function QuizClient() {
                   onRetry={handleRetry}
                 />
 
-                <div className="w-full text-center">
+                <div className="w-full flex flex-col items-center gap-2">
                   <h2 className="text-2xl font-semibold text-on-background">
-                    What is the next Ayah?
+                    Which is the correct translation?
                   </h2>
-                  <p className="text-sm text-on-surface-variant mt-1">
-                    Select the correct continuation.
+                  <p className="text-sm text-on-surface-variant">
+                    Select the matching translation for this Ayah.
                   </p>
                 </div>
 
                 {question && (
-                  <ChoicesGrid
+                  <TranslationChoicesGrid
                     choices={question.choices}
                     selected={selected}
                     submitted={submitted}
                     correctIndex={submitResult?.correctIndex ?? null}
-                    loadedPages={loadedPages}
                     onSelect={setSelected}
                   />
                 )}

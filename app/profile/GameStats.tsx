@@ -10,6 +10,8 @@ interface GameStatsProps {
     lvCorrect: number;
     nvGames: number;
     nvCorrect: number;
+    tqGames: number;
+    tqCorrect: number;
   };
 }
 
@@ -127,6 +129,29 @@ export default function GameStats({ streak, eloFormatted, user }: GameStatsProps
             </p>
             <p className="text-xs text-on-surface-variant">
               {pct(user.nvCorrect, user.nvGames)} accuracy
+            </p>
+          </div>
+        </div>
+
+        {/* Translation Quiz */}
+        <div className="flex items-center justify-between py-3">
+          <div className="flex items-center gap-3">
+            <div className="w-9 h-9 rounded-xl bg-green-100 flex items-center justify-center">
+              <span className="material-symbols-outlined text-green-700 text-[18px]">
+                translate
+              </span>
+            </div>
+            <div>
+              <p className="text-sm font-medium text-on-surface">Translation Quiz</p>
+              <p className="text-xs text-on-surface-variant">Casual · Translation knowledge</p>
+            </div>
+          </div>
+          <div className="text-right">
+            <p className="text-sm font-bold text-on-surface">
+              {user.tqGames?.toLocaleString()} games
+            </p>
+            <p className="text-xs text-on-surface-variant">
+              {pct(user.tqCorrect, user.tqGames)} accuracy
             </p>
           </div>
         </div>

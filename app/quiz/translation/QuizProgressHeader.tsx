@@ -29,7 +29,7 @@ export default function QuizProgressHeader({
             )}
             <div className="flex flex-col gap-0.5">
               <span className="text-xs font-medium text-on-surface-variant uppercase tracking-wider">
-                Next Verse
+                Verse Translation
               </span>
               <span className="text-base font-medium text-on-background">
                 Question {questionNumber}

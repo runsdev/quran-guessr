@@ -32,6 +32,15 @@ const QUIZ_MODES = [
     image: '/img/next-verse.png',
     href: '/quiz/next-verse',
   },
+  {
+    index: '04',
+    badge: 'Casual',
+    badgeColors: { bg: '#cfe2ff', text: '#084298' },
+    title: 'Translation Quiz',
+    desc: 'Test your knowledge of Quran translations. Given a verse, identify the correct meaning from four options.',
+    image: '/img/translation-quiz.png',
+    href: '/quiz',
+  },
 ];
 
 const NAV_HEIGHT = 80;

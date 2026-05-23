@@ -23,6 +23,8 @@ model User {
   lvCorrect     Int       @default(0)
   nvGames       Int       @default(0)
   nvCorrect     Int       @default(0)
+  tqGames       Int       @default(0)
+  tqCorrect     Int       @default(0)
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
 

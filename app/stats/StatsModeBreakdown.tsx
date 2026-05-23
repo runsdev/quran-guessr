@@ -1,6 +1,7 @@
-import { fmt, MODE_META, pct } from './stats-helpers';
+import { fmt, pct } from './stats-helpers';
 
 import type { ModeStats } from '@/lib/stats-queries';
+import { MODE_META } from '@/types/game-mode';
 
 interface Props {
   modeStats: ModeStats[];

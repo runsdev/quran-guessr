@@ -9,6 +9,7 @@ const HREF_TO_GAME_MODE: Record<string, string> = {
   '/quiz/next-verse': 'next-verse',
   '/quiz/missing-word-count': 'missing-word-count',
   '/quiz/locate-verse/daily': 'locate-verse-daily',
+  '/quiz/translation': 'translation-quiz',
 };
 
 export function useGameModesState(

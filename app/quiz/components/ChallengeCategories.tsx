@@ -1,3 +1,12 @@
+'use client';
+
+import { useState } from 'react';
+
+import TranslationSelector, {
+  loadTranslationId,
+  saveTranslationId,
+} from '@/app/quiz/translation/TranslationSelector';
+
 interface Props {
   rankedLimitReached: boolean;
   openModal: (href: string) => void;
@@ -5,6 +14,18 @@ interface Props {
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 export default function ChallengeCategories({ rankedLimitReached, openModal }: Props) {
+  const [translationId, setTranslationId] = useState<number | null>(() => {
+    if (typeof window === 'undefined') {
+      return null;
+    }
+    return loadTranslationId();
+  });
+
+  const handleTranslationChange = (id: number) => {
+    saveTranslationId(id);
+    setTranslationId(id);
+  };
+
   return (
     <section className="space-y-8">
       <div>
@@ -71,31 +92,34 @@ export default function ChallengeCategories({ rankedLimitReached, openModal }: P
           </p>
         </button>
 
-        {/* Meaning Match — coming soon */}
+        {/* Meaning Match */}
         <div
-          className="p-6 rounded-2xl cursor-not-allowed opacity-50"
-          style={{ background: '#f7f7f7', border: '1px solid #dddddd' }}
+          className="game-card card-shadow p-6 rounded-2xl text-left w-full flex flex-col gap-3"
+          style={{ background: '#ffffff', border: '1px solid #dddddd' }}
         >
           <div
-            className="w-12 h-12 rounded-xl flex items-center justify-center mb-4"
-            style={{ background: '#ebebeb' }}
+            className="w-12 h-12 rounded-xl flex items-center justify-center"
+            style={{ background: '#ffd1da' }}
           >
-            <span className="material-symbols-outlined" style={{ color: '#6a6a6a' }}>
+            <span className="material-symbols-outlined" style={{ color: '#ff385c' }}>
               translate
             </span>
           </div>
-          <h5 className="font-bold mb-2" style={{ color: '#222222' }}>
+          <h5 className="font-bold" style={{ color: '#222222' }}>
             Meaning Match
           </h5>
           <p className="text-sm leading-relaxed" style={{ color: '#6a6a6a' }}>
             Identify the correct translation.
           </p>
-          <span
-            className="inline-block mt-3 text-xs font-bold uppercase tracking-widest px-2 py-0.5 rounded-full"
-            style={{ color: '#6a6a6a', border: '1px solid #dddddd' }}
+          <TranslationSelector value={translationId} onChange={handleTranslationChange} />
+          <button
+            onClick={() => openModal('/quiz/translation')}
+            disabled={translationId === null}
+            className="mt-1 w-full rounded-lg py-2 text-sm font-semibold transition-all disabled:opacity-40 disabled:cursor-not-allowed"
+            style={{ background: '#ff385c', color: '#ffffff' }}
           >
-            Coming Soon
-          </span>
+            {translationId === null ? 'Select a translation first' : 'Play'}
+          </button>
         </div>
       </div>
     </section>

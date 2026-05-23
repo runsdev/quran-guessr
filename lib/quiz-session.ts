@@ -4,7 +4,12 @@ import type { Prisma } from '@prisma/client';
 
 import { prisma } from './prisma';
 
-export type GameMode = 'locate-verse' | 'next-verse' | 'missing-word-count' | 'locate-verse-daily';
+export type GameMode =
+  | 'locate-verse'
+  | 'next-verse'
+  | 'missing-word-count'
+  | 'locate-verse-daily'
+  | 'translation-quiz';
 
 const SESSION_TTL_HOURS = 24;
 
