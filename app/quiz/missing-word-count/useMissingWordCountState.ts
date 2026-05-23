@@ -76,7 +76,7 @@ export function useMissingWordCountState() {
         setInitError(true);
         setIsInitializing(false);
       });
-  }, []);
+  }, [isPractice, practicePageNumber]);
 
   const submitted = isSubmitting || submitResult !== null;
 

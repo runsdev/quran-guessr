@@ -11,6 +11,7 @@ import TopAppBar from '@/app/components/TopAppBar';
 import { auth } from '@/auth';
 import { prisma } from '@/lib/prisma';
 import { fetchQfStreak } from '@/lib/qf-api';
+import { MODE_DISPLAY } from '@/types/game-mode';
 
 export const dynamic = 'force-dynamic';
 
@@ -38,6 +39,8 @@ export default async function ProfilePage() {
       nvCorrect: true,
       showOnLeaderboard: true,
       createdAt: true,
+      tqGames: true,
+      tqCorrect: true,
     },
   });
 
@@ -59,30 +62,6 @@ export default async function ProfilePage() {
     month: 'long',
     day: 'numeric',
   });
-
-  const MODE_DISPLAY: Record<
-    string,
-    { label: string; icon: string; iconCls: string; dotCls: string }
-  > = {
-    'missing-word-count': {
-      label: 'Word Count',
-      icon: 'find_replace',
-      iconCls: 'text-primary',
-      dotCls: 'bg-primary/10',
-    },
-    'locate-verse': {
-      label: 'Locate Verse',
-      icon: 'my_location',
-      iconCls: 'text-tertiary',
-      dotCls: 'bg-tertiary/10',
-    },
-    'next-verse': {
-      label: 'Next Verse',
-      icon: 'format_quote',
-      iconCls: 'text-secondary',
-      dotCls: 'bg-secondary/10',
-    },
-  };
 
   return (
     <>

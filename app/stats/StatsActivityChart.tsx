@@ -6,6 +6,8 @@ interface Props {
 }
 
 export default function StatsActivityChart({ last30Days, maxDayTotal }: Props) {
+  const maxHeight = 100; // px
+  const maxTotal = Math.max(...last30Days.map((day) => day.total), 0);
   return (
     <div className="bg-surface-container-low border border-primary/10 rounded-3xl p-5">
       <h2 className="text-base font-semibold text-on-surface mb-5 flex items-center gap-2">
@@ -40,9 +42,14 @@ export default function StatsActivityChart({ last30Days, maxDayTotal }: Props) {
                 />
               ) : (
                 <div
-                  className="w-full rounded-sm bg-primary/70 hover:bg-primary transition-colors"
-                  style={{ height: `${Math.max(heightPct, 4)}%` }}
-                />
+                  className="w-full rounded-sm overflow-hidden flex flex-col-reverse bg-primary/70 hover:bg-primary transition-colors"
+                  style={{ height: `${Math.max((heightPct / maxTotal) * maxHeight, 4)}px` }}
+                >
+                  <div
+                    className="w-full bg-green-500/70 hover:bg-green-500 transition-colors shrink-0"
+                    style={{ height: `${accuracyPct}%` }}
+                  />
+                </div>
               )}
             </div>
           );

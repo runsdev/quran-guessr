@@ -1,10 +1,12 @@
 export default function QuizProgressHeader({
   questionNumber,
   score,
+  timeLeft,
   onEndSession,
 }: {
   questionNumber: number;
   score?: number;
+  timeLeft?: number;
   onEndSession?: () => void;
 }) {
   const totalAnswered = questionNumber - 1;
@@ -34,16 +36,34 @@ export default function QuizProgressHeader({
               </span>
             </div>
           </div>
-          {totalAnswered > 0 && score !== undefined && (
-            <div className="flex items-center gap-2 bg-surface-container-high rounded-full px-4 py-2 border border-outline-variant">
-              <span className="material-symbols-outlined text-secondary" style={{ fontSize: 16 }}>
-                check_circle
-              </span>
-              <span className="text-sm font-semibold text-secondary">
-                {score}/{totalAnswered}
-              </span>
-            </div>
-          )}
+          <div className="flex items-center gap-2">
+            {timeLeft !== undefined && (
+              <div
+                className={`flex items-center gap-1.5 rounded-full px-3 py-2 border ${
+                  timeLeft <= 10
+                    ? 'bg-error/10 border-error/30 text-error animate-pulse'
+                    : timeLeft <= 30
+                      ? 'bg-tertiary/10 border-tertiary/30 text-tertiary'
+                      : 'bg-surface-container-high border-outline-variant text-on-surface-variant'
+                }`}
+              >
+                <span className="material-symbols-outlined" style={{ fontSize: 16 }}>
+                  timer
+                </span>
+                <span className="text-sm font-semibold tabular-nums">{timeLeft}s</span>
+              </div>
+            )}
+            {totalAnswered > 0 && score !== undefined && (
+              <div className="flex items-center gap-2 bg-surface-container-high rounded-full px-4 py-2 border border-outline-variant">
+                <span className="material-symbols-outlined text-secondary" style={{ fontSize: 16 }}>
+                  check_circle
+                </span>
+                <span className="text-sm font-semibold text-secondary">
+                  {score}/{totalAnswered}
+                </span>
+              </div>
+            )}
+          </div>
         </div>
         {totalAnswered > 0 && (
           <div

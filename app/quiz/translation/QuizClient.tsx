@@ -28,6 +28,7 @@ export default function QuizClient() {
     submitted,
     isCorrect,
     score,
+    timeLeft,
     handleSubmit,
     handleNext,
     handleRetry,
@@ -62,6 +63,7 @@ export default function QuizClient() {
             <QuizProgressHeader
               questionNumber={questionNumber}
               score={score}
+              timeLeft={timeLeft}
               onEndSession={async () => {
                 toast.info('Session ended');
                 await handleEndSession();

@@ -10,6 +10,7 @@ import { abandonSession } from '@/app/quiz/actions';
 import { loadJuzFilter } from '@/app/quiz/components/JuzFilterSettings';
 
 const SESSION_KEY = 'quizSession:next-verse';
+const QUESTION_TIME_LIMIT = 90;
 
 export function useNextVerseState() {
   const [sessionToken, setSessionToken] = useState<string | null>(null);
@@ -36,6 +37,7 @@ export function useNextVerseState() {
   const [submitResult, setSubmitResult] = useState<SubmitResult | null>(null);
   const [questionNumber, setQuestionNumber] = useState(1);
   const [score, setScore] = useState(0);
+  const [timeLeft, setTimeLeft] = useState(QUESTION_TIME_LIMIT);
 
   useEffect(() => {
     if (isPractice && practicePageNumber) {
@@ -95,19 +97,19 @@ export function useNextVerseState() {
     return [...new Set(nums)];
   }, [question]);
 
-  const handleSubmit = () => {
-    if ((!sessionToken && !isPractice) || selected === null || !question || submitResult !== null) {
+  const doSubmit = (guess: number) => {
+    if ((!sessionToken && !isPractice) || !question || submitResult !== null) {
       return;
     }
     startTransition(async () => {
       try {
         const result = isPractice
-          ? await submitPracticeAnswer(question.encryptedVerseKey, question.answerToken, selected)
+          ? await submitPracticeAnswer(question.encryptedVerseKey, question.answerToken, guess)
           : await submitAnswer(
               sessionToken!,
               question.encryptedVerseKey,
               question.answerToken,
-              selected,
+              guess,
             );
         setSubmitResult(result);
         if (result.isCorrect) {
@@ -117,6 +119,34 @@ export function useNextVerseState() {
         setFetchError(true);
       }
     });
+  };
+
+  // Reset timer when a new question arrives
+
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setTimeLeft(QUESTION_TIME_LIMIT);
+  }, [question?.encryptedVerseKey]);
+
+  // Count down and auto-submit on expiry
+  useEffect(() => {
+    if (submitted || !question) {
+      return;
+    }
+    if (timeLeft <= 0) {
+      doSubmit(selected ?? 0);
+      return;
+    }
+    const id = setTimeout(() => setTimeLeft((t) => t - 1), 1000);
+    return () => clearTimeout(id);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [timeLeft, submitted, question?.encryptedVerseKey]);
+
+  const handleSubmit = () => {
+    if (selected === null) {
+      return;
+    }
+    doSubmit(selected);
   };
 
   const fetchNext = () => {
@@ -179,6 +209,7 @@ export function useNextVerseState() {
     submitted,
     isCorrect,
     score,
+    timeLeft,
     masteryPercent,
     progressWidth,
     pageNumbers,
