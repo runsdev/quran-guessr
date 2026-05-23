@@ -16,7 +16,12 @@ const LoginPanel = (): React.JSX.Element => {
   return (
     <div
       className="flex flex-col md:flex-row items-center gap-10 overflow-hidden"
-      style={{ background: '#ffffff', border: '1px solid #dddddd', borderRadius: 14, padding: 24 }}
+      style={{
+        background: 'var(--color-surface-container-lowest)',
+        border: '1px solid var(--color-outline)',
+        borderRadius: 14,
+        padding: 24,
+      }}
     >
       <div className="w-full md:w-1/2 space-y-5">
         {status === 'authenticated' ? (
@@ -30,15 +35,21 @@ const LoginPanel = (): React.JSX.Element => {
                   width={48}
                   height={48}
                   className="rounded-full"
-                  style={{ border: '1px solid #e0e0e0' }}
+                  style={{ border: '1px solid var(--color-outline-variant)' }}
                   unoptimized
                 />
               )}
               <div>
-                <p style={{ fontSize: 16, fontWeight: 600, color: '#222222' }}>
+                <p style={{ fontSize: 16, fontWeight: 600, color: 'var(--color-on-surface)' }}>
                   {session.user?.name}
                 </p>
-                <p style={{ fontSize: 14, color: '#7a7a7a', letterSpacing: '-0.224px' }}>
+                <p
+                  style={{
+                    fontSize: 14,
+                    color: 'var(--color-on-surface-variant)',
+                    letterSpacing: '-0.224px',
+                  }}
+                >
                   {session.user?.email}
                 </p>
               </div>
@@ -46,7 +57,7 @@ const LoginPanel = (): React.JSX.Element => {
             <p
               style={{
                 fontSize: 17,
-                color: '#7a7a7a',
+                color: 'var(--color-on-surface-variant)',
                 lineHeight: 1.47,
                 letterSpacing: '-0.374px',
               }}
@@ -65,10 +76,23 @@ const LoginPanel = (): React.JSX.Element => {
         ) : (
           /* ── Signed-out state ── */
           <>
-            <h2 style={{ fontSize: 28, fontWeight: 700, color: '#222222', lineHeight: 1.43 }}>
+            <h2
+              style={{
+                fontSize: 28,
+                fontWeight: 700,
+                color: 'var(--color-on-surface)',
+                lineHeight: 1.43,
+              }}
+            >
               Register or Sign In
             </h2>
-            <p style={{ fontSize: 16, color: '#6a6a6a', lineHeight: 1.5 }}>
+            <p
+              style={{
+                fontSize: 16,
+                color: 'var(--color-on-surface-variant)',
+                lineHeight: 1.5,
+              }}
+            >
               Sign in with your Quran.com account to save your progress and compete on the
               leaderboard! It&rsquo;s quick, easy, and free. Just click the button below to get
               started.
@@ -81,7 +105,13 @@ const LoginPanel = (): React.JSX.Element => {
             >
               Continue with Quran.com
             </button>
-            <p style={{ fontSize: 16, color: '#6a6a6a', lineHeight: 1.5 }}>
+            <p
+              style={{
+                fontSize: 16,
+                color: 'var(--color-on-surface-variant)',
+                lineHeight: 1.5,
+              }}
+            >
               Or{' '}
               <Link
                 href="/quiz"
@@ -91,7 +121,7 @@ const LoginPanel = (): React.JSX.Element => {
                   padding: '2px 4px',
                   fontSize: 16,
                   fontWeight: 500,
-                  border: '1px solid #dddddd',
+                  border: '1px solid var(--color-outline)',
                   cursor: 'pointer',
                 }}
               >
@@ -120,7 +150,12 @@ const LoginPanel = (): React.JSX.Element => {
         />
         <p
           className="absolute bottom-4 left-4 right-4"
-          style={{ color: '#ffffff', fontSize: 14, fontStyle: 'italic', letterSpacing: '-0.224px' }}
+          style={{
+            color: 'var(--color-on-primary)',
+            fontSize: 14,
+            fontStyle: 'italic',
+            letterSpacing: '-0.224px',
+          }}
         >
           &ldquo;Knowledge is a light that Allah casts into the heart.&rdquo;
         </p>

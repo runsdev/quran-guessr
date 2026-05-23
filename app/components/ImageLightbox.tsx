@@ -65,7 +65,7 @@ export default function ImageLightbox({ src, alt, onClose }: Props) {
           borderRadius: '50%',
           background: 'rgba(255,255,255,0.15)',
           border: '1px solid rgba(255,255,255,0.3)',
-          color: '#ffffff',
+          color: 'var(--color-on-primary)',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',

@@ -31,8 +31,8 @@ export default function QuizCardItem({ quiz, innerRef, priority = false }: Props
       ref={innerRef}
       className="max-w-5xl mx-auto"
       style={{
-        background: '#ffffff',
-        border: '1px solid #dddddd',
+        background: 'var(--color-surface-container-lowest)',
+        border: '1px solid var(--color-outline)',
         borderRadius: 14,
         padding: '36px 40px',
         display: 'flex',
@@ -53,7 +53,7 @@ export default function QuizCardItem({ quiz, innerRef, priority = false }: Props
           style={{
             fontSize: 52,
             fontWeight: 800,
-            color: '#ebebeb',
+            color: 'var(--color-outline-variant)',
             lineHeight: 1,
             letterSpacing: '-0.04em',
             fontVariantNumeric: 'tabular-nums',
@@ -79,13 +79,27 @@ export default function QuizCardItem({ quiz, innerRef, priority = false }: Props
             {quiz.badge}
           </span>
           <h3
-            style={{ fontSize: 26, fontWeight: 700, color: '#222222', lineHeight: 1.25, margin: 0 }}
+            style={{
+              fontSize: 26,
+              fontWeight: 700,
+              color: 'var(--color-on-surface)',
+              lineHeight: 1.25,
+              margin: 0,
+            }}
           >
             {quiz.title}
           </h3>
         </div>
 
-        <p style={{ fontSize: 16, color: '#6a6a6a', lineHeight: 1.65, flex: 1, margin: 0 }}>
+        <p
+          style={{
+            fontSize: 16,
+            color: 'var(--color-on-surface-variant)',
+            lineHeight: 1.65,
+            flex: 1,
+            margin: 0,
+          }}
+        >
           {quiz.desc}
         </p>
 

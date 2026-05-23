@@ -52,6 +52,61 @@
   --color-on-error: #ffffff;
   --color-error-container: #ffeee8;
   --color-on-error-container: #c13515;
+
+  /* ── Scrim / Overlay ── */
+  --color-scrim: rgba(0, 0, 0, 0.5);
+  --color-bottom-nav-bg: rgba(255, 255, 255, 0.85);
+  --color-bottom-nav-border: rgba(0, 0, 0, 0.08);
+}
+
+/* ── Dark-mode tokens ── */
+.dark {
+  --color-background: #121212;
+  --color-on-background: #e3e3e3;
+
+  --color-surface: #1e1e1e;
+  --color-surface-dim: #1a1a1a;
+  --color-surface-bright: #2a2a2a;
+  --color-surface-container-lowest: #0e0e0e;
+  --color-surface-container-low: #1e1e1e;
+  --color-surface-container: #252525;
+  --color-surface-container-high: #2e2e2e;
+  --color-surface-container-highest: #383838;
+  --color-surface-variant: #1e1e1e;
+  --color-surface-tint: #ff6b85;
+
+  --color-on-surface: #e3e3e3;
+  --color-on-surface-variant: #a0a0a0;
+  --color-inverse-surface: #e3e3e3;
+  --color-inverse-on-surface: #1e1e1e;
+
+  --color-outline: #3a3a3a;
+  --color-outline-variant: #2e2e2e;
+
+  --color-primary: #ff6b85;
+  --color-on-primary: #ffffff;
+  --color-primary-container: #5c1028;
+  --color-on-primary-container: #ff8fa3;
+  --color-inverse-primary: #ff385c;
+
+  --color-secondary: #e3e3e3;
+  --color-on-secondary: #1e1e1e;
+  --color-secondary-container: #2a2a2a;
+  --color-on-secondary-container: #e3e3e3;
+
+  --color-tertiary: #a0a0a0;
+  --color-on-tertiary: #1e1e1e;
+  --color-tertiary-container: #2a2a2a;
+  --color-on-tertiary-container: #c8c8c8;
+
+  --color-error: #ff6b6b;
+  --color-on-error: #1e1e1e;
+  --color-error-container: #3d1515;
+  --color-on-error-container: #ff8a8a;
+
+  --color-scrim: rgba(0, 0, 0, 0.7);
+  --color-bottom-nav-bg: rgba(18, 18, 18, 0.85);
+  --color-bottom-nav-border: rgba(255, 255, 255, 0.08);
 }
 
 @theme inline {
@@ -106,6 +161,11 @@
   --color-error-container: var(--color-error-container);
   --color-on-error-container: var(--color-on-error-container);
 
+  /* Scrim / Overlay */
+  --color-scrim: var(--color-scrim);
+  --color-bottom-nav-bg: var(--color-bottom-nav-bg);
+  --color-bottom-nav-border: var(--color-bottom-nav-border);
+
   /* Background */
   --color-background: var(--color-background);
   --color-on-background: var(--color-on-background);
@@ -148,8 +208,8 @@
 
 /* ── Game card — white utility card ── */
 .game-card {
-  background: #ffffff;
-  border: 1px solid #dddddd;
+  background: var(--color-surface-container-lowest);
+  border: 1px solid var(--color-outline);
   border-radius: 14px;
   transition:
     box-shadow 0.2s ease,
@@ -172,23 +232,23 @@ button:hover .image-zoom-icon {
 
 /* ── Glass panel — now a clean white card (no blur for Airbnb) ── */
 .glass-panel {
-  background: #ffffff;
-  border: 1px solid #dddddd;
+  background: var(--color-surface-container-lowest);
+  border: 1px solid var(--color-outline);
   border-radius: 14px;
 }
 
 /* ── Deprecated Apple tile utilities (kept for safety) ── */
 .tile-light {
-  background-color: #ffffff;
-  color: #222222;
+  background-color: var(--color-surface-container-lowest);
+  color: var(--color-on-surface);
 }
 .tile-dark {
-  background-color: #f7f7f7;
-  color: #222222;
+  background-color: var(--color-surface-container-low);
+  color: var(--color-on-surface);
 } /* inverted to light */
 .tile-parchment {
-  background-color: #f7f7f7;
-  color: #222222;
+  background-color: var(--color-surface-container-low);
+  color: var(--color-on-surface);
 }
 
 body {

@@ -8,7 +8,9 @@ import LoginPanel from './LoginPanel';
 const BentoGrid = (): React.JSX.Element => (
   <>
     {/* ── Login / sign-in panel ── */}
-    <section style={{ backgroundColor: '#f7f7f7', padding: '64px 24px' }}>
+    <section
+      style={{ backgroundColor: 'var(--color-surface-container-low)', padding: '64px 24px' }}
+    >
       <div className="max-w-5xl mx-auto">
         <LoginPanel />
       </div>

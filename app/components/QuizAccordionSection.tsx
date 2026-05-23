@@ -80,14 +80,17 @@ export default function QuizAccordionSection() {
   }, []);
 
   return (
-    <section id="quiz-modes" style={{ backgroundColor: '#f7f7f7', paddingTop: 64 }}>
+    <section
+      id="quiz-modes"
+      style={{ backgroundColor: 'var(--color-surface-container-low)', paddingTop: 64 }}
+    >
       {/* ── Section header ── */}
       <div className="max-w-5xl mx-auto" style={{ padding: '0 24px 48px' }}>
         <p
           style={{
             fontSize: 13,
             fontWeight: 700,
-            color: '#ff385c',
+            color: 'var(--color-primary)',
             letterSpacing: '0.1em',
             textTransform: 'uppercase',
             marginBottom: 10,
@@ -99,7 +102,7 @@ export default function QuizAccordionSection() {
           style={{
             fontSize: 28,
             fontWeight: 700,
-            color: '#222222',
+            color: 'var(--color-on-surface)',
             lineHeight: 1.3,
             maxWidth: 480,
           }}
@@ -109,7 +112,7 @@ export default function QuizAccordionSection() {
         <p
           style={{
             fontSize: 16,
-            color: '#6a6a6a',
+            color: 'var(--color-on-surface-variant)',
             lineHeight: 1.6,
             maxWidth: 480,
             marginTop: 8,
@@ -131,7 +134,7 @@ export default function QuizAccordionSection() {
               position: 'sticky',
               top: NAV_HEIGHT,
               zIndex: i + 1,
-              backgroundColor: '#f7f7f7',
+              backgroundColor: 'var(--color-surface-container-low)',
               padding: '0 24px',
             }}
           >
@@ -147,7 +150,7 @@ export default function QuizAccordionSection() {
       </div>
 
       {/* ── Bottom spacer so last card scrolls fully into view ── */}
-      <div style={{ height: 64, backgroundColor: '#f7f7f7' }} />
+      <div style={{ height: 64, backgroundColor: 'var(--color-surface-container-low)' }} />
     </section>
   );
 }

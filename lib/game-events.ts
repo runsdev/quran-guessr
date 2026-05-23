@@ -16,6 +16,7 @@ export async function recordGameEvent(opts: {
   correct: boolean;
   ranked?: boolean;
   practice?: boolean;
+  score?: number;
 }): Promise<void> {
   await prisma.gameEvent.create({
     data: {
@@ -24,6 +25,7 @@ export async function recordGameEvent(opts: {
       correct: opts.correct,
       ranked: opts.ranked ?? false,
       practice: opts.practice ?? false,
+      score: opts.score ?? 0,
     },
   });
 }

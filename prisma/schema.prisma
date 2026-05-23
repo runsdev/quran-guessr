@@ -146,6 +146,7 @@ model GameEvent {
   gameMode  String   // "missing-word-count" | "locate-verse" | "next-verse"
   practice  Boolean  @default(false)
   correct   Boolean
+  score     Int      @default(0) // for locate-verse, max 5000
   ranked    Boolean  @default(false) // true only for ELO-affecting MWC games
   createdAt DateTime @default(now())
 

@@ -20,7 +20,10 @@ const FEATURES = [
 
 export default function PurposeSection(): React.JSX.Element {
   return (
-    <section id="purpose" style={{ backgroundColor: '#ffffff', padding: '80px 24px' }}>
+    <section
+      id="purpose"
+      style={{ backgroundColor: 'var(--color-background)', padding: '80px 24px' }}
+    >
       <div className="max-w-5xl mx-auto">
         {/* ── Header ── */}
         <div style={{ maxWidth: 560, marginBottom: 56 }}>
@@ -28,7 +31,7 @@ export default function PurposeSection(): React.JSX.Element {
             style={{
               fontSize: 13,
               fontWeight: 700,
-              color: '#ff385c',
+              color: 'var(--color-primary)',
               letterSpacing: '0.1em',
               textTransform: 'uppercase',
               marginBottom: 10,
@@ -40,14 +43,14 @@ export default function PurposeSection(): React.JSX.Element {
             style={{
               fontSize: 28,
               fontWeight: 700,
-              color: '#222222',
+              color: 'var(--color-on-surface)',
               lineHeight: 1.3,
               marginBottom: 12,
             }}
           >
             Learn the Quran through play
           </h2>
-          <p style={{ fontSize: 16, color: '#6a6a6a', lineHeight: 1.65 }}>
+          <p style={{ fontSize: 16, color: 'var(--color-on-surface-variant)', lineHeight: 1.65 }}>
             QuranGuessr turns passive recitation review into active, gamified practice. Whether you
             are a student, teacher, or lifelong learner — there is a mode for your level.
           </p>
@@ -59,7 +62,7 @@ export default function PurposeSection(): React.JSX.Element {
             <div
               key={f.title}
               style={{
-                background: '#f7f7f7',
+                background: 'var(--color-surface-container-low)',
                 borderRadius: 14,
                 padding: '28px 28px 32px',
                 display: 'flex',
@@ -69,7 +72,7 @@ export default function PurposeSection(): React.JSX.Element {
             >
               <span
                 className="material-symbols-outlined"
-                style={{ fontSize: 32, color: '#ff385c' }}
+                style={{ fontSize: 32, color: 'var(--color-primary)' }}
               >
                 {f.icon}
               </span>
@@ -77,14 +80,23 @@ export default function PurposeSection(): React.JSX.Element {
                 style={{
                   fontSize: 17,
                   fontWeight: 700,
-                  color: '#222222',
+                  color: 'var(--color-on-surface)',
                   lineHeight: 1.35,
                   margin: 0,
                 }}
               >
                 {f.title}
               </h3>
-              <p style={{ fontSize: 15, color: '#6a6a6a', lineHeight: 1.6, margin: 0 }}>{f.desc}</p>
+              <p
+                style={{
+                  fontSize: 15,
+                  color: 'var(--color-on-surface-variant)',
+                  lineHeight: 1.6,
+                  margin: 0,
+                }}
+              >
+                {f.desc}
+              </p>
             </div>
           ))}
         </div>

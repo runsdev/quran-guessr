@@ -1,4 +1,4 @@
-import { GoogleTagManager } from '@next/third-parties/google';
+import { GoogleTagManager, GoogleAnalytics } from '@next/third-parties/google';
 import { GeistMono } from 'geist/font/mono';
 import type { Metadata } from 'next';
 import { Inter, Scheherazade_New } from 'next/font/google';
@@ -6,6 +6,7 @@ import { Toaster } from 'sonner';
 
 import MaterialSymbolsLoader from './components/MaterialSymbolsLoader';
 import SessionProvider from './components/providers/SessionProvider';
+import ThemeProvider from './components/providers/ThemeProvider';
 
 import { auth } from '@/auth';
 
@@ -41,6 +42,7 @@ export default async function RootLayout({
     <html
       lang="en"
       className={`${GeistMono.variable} ${inter.variable} ${scheherazadeNew.variable} h-full antialiased`}
+      suppressHydrationWarning
     >
       <head>
         <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -48,11 +50,13 @@ export default async function RootLayout({
         <link rel="preconnect" href="https://verses.quran.foundation" crossOrigin="anonymous" />
       </head>
       <GoogleTagManager gtmId="GTM-5B2K62HZ" />
-      <GoogleTagManager gtmId="G-GNR9C7CWZ3" />
+      <GoogleAnalytics gaId="G-GNR9C7CWZ3" />
       <body className="min-h-full flex flex-col">
-        <SessionProvider session={session}>{children}</SessionProvider>
-        <MaterialSymbolsLoader />
-        <Toaster position="bottom-center" richColors closeButton />
+        <ThemeProvider>
+          <SessionProvider session={session}>{children}</SessionProvider>
+          <MaterialSymbolsLoader />
+          <Toaster position="bottom-center" richColors closeButton />
+        </ThemeProvider>
       </body>
     </html>
   );

@@ -33,7 +33,7 @@ export default function ChallengeCategories({ rankedLimitReached, openModal }: P
           style={{
             fontSize: 13,
             fontWeight: 700,
-            color: '#ff385c',
+            color: 'var(--color-primary)',
             letterSpacing: '0.1em',
             textTransform: 'uppercase',
             marginBottom: 6,
@@ -41,10 +41,12 @@ export default function ChallengeCategories({ rankedLimitReached, openModal }: P
         >
           More Modes
         </p>
-        <h3 className="text-2xl font-bold mb-1" style={{ color: '#222222' }}>
+        <h3 className="text-2xl font-bold mb-1" style={{ color: 'var(--color-on-surface)' }}>
           Challenge Categories
         </h3>
-        <p style={{ color: '#6a6a6a' }}>Targeted mini-games to hone specific skills.</p>
+        <p style={{ color: 'var(--color-on-surface-variant)' }}>
+          Targeted mini-games to hone specific skills.
+        </p>
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
@@ -52,20 +54,26 @@ export default function ChallengeCategories({ rankedLimitReached, openModal }: P
         <button
           onClick={() => openModal('/quiz/next-verse')}
           className="game-card card-shadow p-6 rounded-2xl text-left w-full transition-all hover:-translate-y-0.5"
-          style={{ background: '#ffffff', border: '1px solid #dddddd' }}
+          style={{
+            background: 'var(--color-surface-container-lowest)',
+            border: '1px solid var(--color-outline)',
+          }}
         >
           <div
             className="w-12 h-12 rounded-xl flex items-center justify-center mb-4"
-            style={{ background: '#ffd1da' }}
+            style={{ background: 'var(--color-primary-container)' }}
           >
-            <span className="material-symbols-outlined" style={{ color: '#ff385c' }}>
+            <span className="material-symbols-outlined" style={{ color: 'var(--color-primary)' }}>
               format_quote
             </span>
           </div>
-          <h5 className="font-bold mb-2" style={{ color: '#222222' }}>
+          <h5 className="font-bold mb-2" style={{ color: 'var(--color-on-surface)' }}>
             Next Verse
           </h5>
-          <p className="text-sm leading-relaxed" style={{ color: '#6a6a6a' }}>
+          <p
+            className="text-sm leading-relaxed"
+            style={{ color: 'var(--color-on-surface-variant)' }}
+          >
             Guess the next verse in sequence.
           </p>
         </button>
@@ -74,41 +82,81 @@ export default function ChallengeCategories({ rankedLimitReached, openModal }: P
         <button
           onClick={() => openModal('/quiz/locate-verse')}
           className="game-card card-shadow p-6 rounded-2xl text-left w-full transition-all hover:-translate-y-0.5"
-          style={{ background: '#ffffff', border: '1px solid #dddddd' }}
+          style={{
+            background: 'var(--color-surface-container-lowest)',
+            border: '1px solid var(--color-outline)',
+          }}
         >
           <div
             className="w-12 h-12 rounded-xl flex items-center justify-center mb-4"
-            style={{ background: '#ffd1da' }}
+            style={{ background: 'var(--color-primary-container)' }}
           >
-            <span className="material-symbols-outlined" style={{ color: '#ff385c' }}>
+            <span className="material-symbols-outlined" style={{ color: 'var(--color-primary)' }}>
               my_location
             </span>
           </div>
-          <h5 className="font-bold mb-2" style={{ color: '#222222' }}>
+          <h5 className="font-bold mb-2" style={{ color: 'var(--color-on-surface)' }}>
             Verse Location
           </h5>
-          <p className="text-sm leading-relaxed" style={{ color: '#6a6a6a' }}>
+          <p
+            className="text-sm leading-relaxed"
+            style={{ color: 'var(--color-on-surface-variant)' }}
+          >
             Identify the page and row of an Ayah. Used in daily challenges.
+          </p>
+        </button>
+
+        {/* Missing Word Count */}
+        <button
+          onClick={() => openModal('/quiz/missing-word-count')}
+          className="game-card card-shadow p-6 rounded-2xl text-left w-full transition-all hover:-translate-y-0.5"
+          style={{
+            background: 'var(--color-surface-container-lowest)',
+            border: '1px solid var(--color-outline)',
+          }}
+        >
+          <div
+            className="w-12 h-12 rounded-xl flex items-center justify-center mb-4"
+            style={{ background: 'var(--color-primary-container)' }}
+          >
+            <span className="material-symbols-outlined" style={{ color: 'var(--color-primary)' }}>
+              pin
+            </span>
+          </div>
+          <h5 className="font-bold mb-2" style={{ color: 'var(--color-on-surface)' }}>
+            Missing Word Count
+          </h5>
+          <p
+            className="text-sm leading-relaxed"
+            style={{ color: 'var(--color-on-surface-variant)' }}
+          >
+            Count the missing words in a verse.
           </p>
         </button>
 
         {/* Meaning Match */}
         <div
           className="game-card card-shadow p-6 rounded-2xl text-left w-full flex flex-col gap-3"
-          style={{ background: '#ffffff', border: '1px solid #dddddd' }}
+          style={{
+            background: 'var(--color-surface-container-lowest)',
+            border: '1px solid var(--color-outline)',
+          }}
         >
           <div
             className="w-12 h-12 rounded-xl flex items-center justify-center"
-            style={{ background: '#ffd1da' }}
+            style={{ background: 'var(--color-primary-container)' }}
           >
-            <span className="material-symbols-outlined" style={{ color: '#ff385c' }}>
+            <span className="material-symbols-outlined" style={{ color: 'var(--color-primary)' }}>
               translate
             </span>
           </div>
-          <h5 className="font-bold" style={{ color: '#222222' }}>
+          <h5 className="font-bold" style={{ color: 'var(--color-on-surface)' }}>
             Meaning Match
           </h5>
-          <p className="text-sm leading-relaxed" style={{ color: '#6a6a6a' }}>
+          <p
+            className="text-sm leading-relaxed"
+            style={{ color: 'var(--color-on-surface-variant)' }}
+          >
             Identify the correct translation.
           </p>
           <TranslationSelector value={translationId} onChange={handleTranslationChange} />
@@ -116,7 +164,10 @@ export default function ChallengeCategories({ rankedLimitReached, openModal }: P
             onClick={() => openModal('/quiz/translation')}
             disabled={translationId === null}
             className="mt-1 w-full rounded-lg py-2 text-sm font-semibold transition-all disabled:opacity-40 disabled:cursor-not-allowed"
-            style={{ background: '#ff385c', color: '#ffffff' }}
+            style={{
+              background: 'var(--color-primary)',
+              color: 'var(--color-on-primary)',
+            }}
           >
             {translationId === null ? 'Select a translation first' : 'Play'}
           </button>
