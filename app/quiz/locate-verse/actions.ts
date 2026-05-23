@@ -152,7 +152,12 @@ export async function submitAnswer(
     roundScore,
   };
 
-  void recordGameEvent({ userId, gameMode: GAME_MODE, correct: guessedPage === correctPage });
+  void recordGameEvent({
+    userId,
+    gameMode: GAME_MODE,
+    score: roundScore,
+    correct: roundScore == 5000,
+  });
   await saveQuizSubmitResult(sessionToken, submitResult, roundScore);
 
   return submitResult;

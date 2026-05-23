@@ -1,4 +1,4 @@
-import { GoogleTagManager } from '@next/third-parties/google';
+import { GoogleTagManager, GoogleAnalytics } from '@next/third-parties/google';
 import { GeistMono } from 'geist/font/mono';
 import type { Metadata } from 'next';
 import { Inter, Scheherazade_New } from 'next/font/google';
@@ -50,7 +50,7 @@ export default async function RootLayout({
         <link rel="preconnect" href="https://verses.quran.foundation" crossOrigin="anonymous" />
       </head>
       <GoogleTagManager gtmId="GTM-5B2K62HZ" />
-      <GoogleTagManager gtmId="G-GNR9C7CWZ3" />
+      <GoogleAnalytics gaId="G-GNR9C7CWZ3" />
       <body className="min-h-full flex flex-col">
         <ThemeProvider>
           <SessionProvider session={session}>{children}</SessionProvider>

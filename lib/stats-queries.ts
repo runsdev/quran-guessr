@@ -14,6 +14,7 @@ export interface ModeStats {
   practiceCorrect: number;
   casual: number;
   casualCorrect: number;
+  score: number; // aggregate score for modes that have it (currently only locate-verse)
 }
 
 export interface DayBucket {
@@ -91,6 +92,7 @@ export const getCachedStats = unstable_cache(
           practiceCorrect: 0,
           casual: 0,
           casualCorrect: 0,
+          score: 0,
         });
       }
       const m = modeMap.get(key)!;
@@ -135,6 +137,7 @@ export const getCachedStats = unstable_cache(
           practiceCorrect: 0,
           casual: 0,
           casualCorrect: 0,
+          score: 0,
         },
     );
 

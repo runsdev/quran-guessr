@@ -33,7 +33,7 @@ export default function DashboardHeader({
             marginBottom: 8,
           }}
         >
-          Your Dashboard
+          Bismillah,
         </p>
         <h1
           className="text-3xl md:text-4xl font-bold mb-2"
@@ -41,9 +41,7 @@ export default function DashboardHeader({
         >
           Welcome back, {userName}
         </h1>
-        <p style={{ color: 'var(--color-on-surface-variant)', fontSize: 16 }}>
-          Ready to test your knowledge today?
-        </p>
+        <p style={{ color: 'var(--color-on-surface-variant)', fontSize: 16 }}>How are you today?</p>
       </div>
 
       {/* ── Right: stat chips ── */}

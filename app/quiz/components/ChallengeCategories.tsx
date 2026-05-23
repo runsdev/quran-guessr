@@ -106,6 +106,34 @@ export default function ChallengeCategories({ rankedLimitReached, openModal }: P
           </p>
         </button>
 
+        {/* Missing Word Count */}
+        <button
+          onClick={() => openModal('/quiz/missing-word-count')}
+          className="game-card card-shadow p-6 rounded-2xl text-left w-full transition-all hover:-translate-y-0.5"
+          style={{
+            background: 'var(--color-surface-container-lowest)',
+            border: '1px solid var(--color-outline)',
+          }}
+        >
+          <div
+            className="w-12 h-12 rounded-xl flex items-center justify-center mb-4"
+            style={{ background: 'var(--color-primary-container)' }}
+          >
+            <span className="material-symbols-outlined" style={{ color: 'var(--color-primary)' }}>
+              pin
+            </span>
+          </div>
+          <h5 className="font-bold mb-2" style={{ color: 'var(--color-on-surface)' }}>
+            Missing Word Count
+          </h5>
+          <p
+            className="text-sm leading-relaxed"
+            style={{ color: 'var(--color-on-surface-variant)' }}
+          >
+            Count the missing words in a verse.
+          </p>
+        </button>
+
         {/* Meaning Match */}
         <div
           className="game-card card-shadow p-6 rounded-2xl text-left w-full flex flex-col gap-3"

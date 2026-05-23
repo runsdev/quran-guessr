@@ -42,11 +42,11 @@ export default function StatsActivityChart({ last30Days, maxDayTotal }: Props) {
                 />
               ) : (
                 <div
-                  className="w-full rounded-sm overflow-hidden flex flex-col-reverse bg-primary/70 hover:bg-primary transition-colors"
+                  className="w-full rounded-sm overflow-hidden flex flex-col-reverse bg-primary/90 hover:bg-primary transition-colors"
                   style={{ height: `${Math.max((heightPct / maxTotal) * maxHeight, 4)}px` }}
                 >
                   <div
-                    className="w-full bg-green-500/70 hover:bg-green-500 transition-colors shrink-0"
+                    className="w-full rounded-sm bg-green-400/70 hover:bg-green-500 transition-colors shrink-0"
                     style={{ height: `${accuracyPct}%` }}
                   />
                 </div>
