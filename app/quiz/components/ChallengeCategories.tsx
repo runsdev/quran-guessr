@@ -71,16 +71,17 @@ export default function ChallengeCategories({ rankedLimitReached, openModal }: P
           </p>
         </button>
 
-        {/* Meaning Match — coming soon */}
-        <div
-          className="p-6 rounded-2xl cursor-not-allowed opacity-50"
-          style={{ background: '#f7f7f7', border: '1px solid #dddddd' }}
+        {/* Meaning Match */}
+        <button
+          onClick={() => openModal('/quiz/translation')}
+          className="game-card card-shadow p-6 rounded-2xl text-left w-full transition-all hover:-translate-y-0.5"
+          style={{ background: '#ffffff', border: '1px solid #dddddd' }}
         >
           <div
             className="w-12 h-12 rounded-xl flex items-center justify-center mb-4"
-            style={{ background: '#ebebeb' }}
+            style={{ background: '#ffd1da' }}
           >
-            <span className="material-symbols-outlined" style={{ color: '#6a6a6a' }}>
+            <span className="material-symbols-outlined" style={{ color: '#ff385c' }}>
               translate
             </span>
           </div>
@@ -90,13 +91,7 @@ export default function ChallengeCategories({ rankedLimitReached, openModal }: P
           <p className="text-sm leading-relaxed" style={{ color: '#6a6a6a' }}>
             Identify the correct translation.
           </p>
-          <span
-            className="inline-block mt-3 text-xs font-bold uppercase tracking-widest px-2 py-0.5 rounded-full"
-            style={{ color: '#6a6a6a', border: '1px solid #dddddd' }}
-          >
-            Coming Soon
-          </span>
-        </div>
+        </button>
       </div>
     </section>
   );
