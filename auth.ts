@@ -23,7 +23,8 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
       authorization: {
         url: `${qfAuthBase}/oauth2/auth`,
         params: {
-          scope: 'openid offline_access user streak reading_session activity_day',
+          scope:
+            'activity_day bookmark collection comment content goal note offline_access openid post preference profile reading_session room streak sync tag user',
           // eslint-disable-next-line @typescript-eslint/naming-convention
           response_type: 'code',
           prompt: 'login',

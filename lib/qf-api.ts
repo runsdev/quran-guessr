@@ -1,83 +1,122 @@
 /* eslint-disable @typescript-eslint/naming-convention */
-import type { UserSession } from '@quranjs/api';
-import { createServerClient } from '@quranjs/api/server';
 import { unstable_cache } from 'next/cache';
 
 import { prisma } from './prisma';
 
 const IS_PRODUCTION = process.env.QF_ENVIRONMENT === 'production';
 
+const QF_OAUTH2_BASE = IS_PRODUCTION
+  ? 'https://oauth2.quran.foundation'
+  : 'https://prelive-oauth2.quran.foundation';
+
 const QF_USER_API_BASE = IS_PRODUCTION
   ? 'https://apis.quran.foundation/auth'
   : 'https://apis-prelive.quran.foundation/auth';
 
-/** Prelive service URLs — used when QF_ENVIRONMENT is not "production". */
-const PRELIVE_SERVICES = {
-  oauth2BaseUrl: 'https://prelive-oauth2.quran.foundation',
-  contentBaseUrl: 'https://apis-prelive.quran.foundation/content',
-  searchBaseUrl: 'https://apis-prelive.quran.foundation/search',
-  authBaseUrl: 'https://apis-prelive.quran.foundation/auth',
-} as const;
+/** Buffer in seconds — refresh the token this far before actual expiry. */
+const REFRESH_BUFFER_SECONDS = 60;
 
 /**
- * Build a @quranjs/api/server client scoped to a signed-in user session.
- *
- * The SDK handles token refresh automatically.  When it refreshes, the
- * `storage.setSession` callback persists the new tokens back to the database
- * so the next request can reuse them without another round-trip.
- *
- * CLIENT_SECRET stays here — server module, never bundled into the client.
+ * Refresh an OAuth2 access token using the `refresh_token` grant.
  */
-async function buildUserClient(
-  userId: string,
-): Promise<ReturnType<typeof createServerClient> | null> {
+async function refreshTokens(refreshToken: string): Promise<{
+  access_token: string;
+  refresh_token: string;
+  expires_in: number;
+  scope: string;
+  token_type: string;
+} | null> {
+  const clientId = process.env.QF_CLIENT_ID!;
+  const clientSecret = process.env.QF_CLIENT_SECRET!;
+
+  // HTTP Basic Auth as required by the QF OAuth2 server (client_secret_basic)
+  const basicAuth = Buffer.from(`${clientId}:${clientSecret}`).toString('base64');
+
+  try {
+    const res = await fetch(`${QF_OAUTH2_BASE}/oauth2/token`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded',
+        Authorization: `Basic ${basicAuth}`,
+      },
+      body: new URLSearchParams({
+        grant_type: 'refresh_token',
+        refresh_token: refreshToken,
+      }).toString(),
+      cache: 'no-store',
+    });
+
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({}));
+      console.error('[qf-api] Token refresh failed:', res.status, err);
+      return null;
+    }
+
+    return (await res.json()) as {
+      access_token: string;
+      refresh_token: string;
+      expires_in: number;
+      scope: string;
+      token_type: string;
+    };
+  } catch (e) {
+    console.error('[qf-api] Token refresh network error:', e);
+    return null;
+  }
+}
+
+/**
+ * Return a valid access token for the given local userId.
+ *
+ * 1. Looks up the Account record by the app's local `userId` FK.
+ * 2. If the stored access_token hasn't expired yet, returns it immediately.
+ * 3. If it has expired, uses the `refresh_token` + HTTP Basic Auth to get
+ *    a fresh token pair from the QF OAuth2 server.
+ * 4. Persists the refreshed tokens back to the database so subsequent
+ *    requests don't need another round-trip.
+ */
+export async function getAccessToken(userId: string): Promise<string | null> {
   const account = await prisma.account.findFirst({
     where: { userId, provider: 'quran-foundation' },
     select: { access_token: true, refresh_token: true, expires_at: true },
   });
+
   if (!account?.access_token) {
     return null;
   }
 
-  const userSession: UserSession = {
-    accessToken: account.access_token,
-    refreshToken: account.refresh_token ?? undefined,
-    expiresAt: account.expires_at ?? undefined,
-  };
+  // Check if the token is still valid (with buffer)
+  const nowSeconds = Math.floor(Date.now() / 1000);
+  const isExpired =
+    !account.expires_at || nowSeconds >= account.expires_at - REFRESH_BUFFER_SECONDS;
 
-  return createServerClient({
-    clientId: process.env.QF_CLIENT_ID!,
-    clientSecret: process.env.QF_CLIENT_SECRET!,
-    userSession,
-    ...(!IS_PRODUCTION && { services: PRELIVE_SERVICES }),
-    storage: {
-      setSession: async (session: UserSession | null) => {
-        if (session?.accessToken) {
-          await prisma.account.updateMany({
-            where: { userId, provider: 'quran-foundation' },
-            data: {
-              access_token: session.accessToken,
-              refresh_token: session.refreshToken ?? account.refresh_token,
-              expires_at: session.expiresAt ?? null,
-            },
-          });
-        }
-      },
-    },
-  });
-}
+  if (!isExpired) {
+    return account.access_token;
+  }
 
-/**
- * Return a valid access token for userId, letting the SDK refresh it if
- * needed and persist the new tokens via the storage callback above.
- */
-async function getAccessToken(userId: string): Promise<string | null> {
-  const client = await buildUserClient(userId);
-  if (!client) {
+  // Token expired — attempt refresh
+  if (!account.refresh_token) {
+    console.warn('[qf-api] Token expired and no refresh_token available for user', userId);
     return null;
   }
-  const session = await client.getUserSession();
-  return session?.accessToken ?? null;
+
+  const refreshed = await refreshTokens(account.refresh_token);
+  if (!refreshed) {
+    return null;
+  }
+
+  // Persist the new tokens back to the database
+  const newExpiresAt = Math.floor(Date.now() / 1000) + refreshed.expires_in;
+  await prisma.account.updateMany({
+    where: { userId, provider: 'quran-foundation' },
+    data: {
+      access_token: refreshed.access_token,
+      refresh_token: refreshed.refresh_token,
+      expires_at: newExpiresAt,
+    },
+  });
+
+  return refreshed.access_token;
 }
 
 /**
@@ -99,7 +138,6 @@ export async function fetchQfStreak(userId: string): Promise<number> {
       },
       next: { revalidate: 0 },
     });
-    console.log('QF streak response', res);
     if (!res.ok) {
       return 0;
     }
