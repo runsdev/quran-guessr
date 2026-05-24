@@ -185,7 +185,6 @@ export async function qdcFetchTranslation(
     `${QDC_BASE}/verses/by_key/${verseKey}?translations=${translationId}&translation_fields=text`,
   );
   // const res = await fetch(`${QDC_BASE}/translations/${translationId}/by_ayah/${verseKey}`);
-  console.log(res);
   if (!res.ok) {
     return null;
   }
