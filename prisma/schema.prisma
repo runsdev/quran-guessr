@@ -12,7 +12,7 @@ datasource db {
 model User {
   id            String    @id @default(auto()) @map("_id") @db.ObjectId
   name          String?
-  email         String?   @unique
+  email         String?   
   emailVerified DateTime?
   image         String?
   elo                  Float     @default(1000)
