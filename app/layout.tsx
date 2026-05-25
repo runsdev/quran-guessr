@@ -90,9 +90,13 @@ export default async function RootLayout({
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
         <link rel="preconnect" href="https://verses.quran.foundation" crossOrigin="anonymous" />
+        <meta
+          name="google-site-verification"
+          content="ugY-qC7oXMg5tU6qAy3jb3F70tAmhio1uWMoy2rpICQ"
+        />
+        <GoogleTagManager gtmId="GTM-5B2K62HZ" />
+        <GoogleAnalytics gaId="G-GNR9C7CWZ3" />
       </head>
-      <GoogleTagManager gtmId="GTM-5B2K62HZ" />
-      <GoogleAnalytics gaId="G-GNR9C7CWZ3" />
       <body className="min-h-full flex flex-col">
         <ThemeProvider>
           <SessionProvider session={session}>{children}</SessionProvider>
