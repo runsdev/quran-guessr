@@ -20,6 +20,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
       issuer: qfAuthBase,
       clientId: process.env.QF_CLIENT_ID!,
       clientSecret: process.env.QF_CLIENT_SECRET!,
+      allowDangerousEmailAccountLinking: true,
       authorization: {
         url: `${qfAuthBase}/oauth2/auth`,
         params: {
