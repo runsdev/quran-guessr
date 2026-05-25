@@ -12,11 +12,13 @@ import { auth } from '@/auth';
 
 import './globals.css';
 
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://quranguessr.com';
+
 const inter = Inter({
   subsets: ['latin'],
   variable: '--font-inter',
   weight: ['400', '600', '700'],
-  display: 'optional',
+  display: 'swap',
 });
 
 const scheherazadeNew = Scheherazade_New({
@@ -27,8 +29,48 @@ const scheherazadeNew = Scheherazade_New({
 });
 
 export const metadata: Metadata = {
-  title: 'Quran Guessr',
-  description: 'Test your knowledge of the Holy Quran',
+  metadataBase: new URL(SITE_URL),
+  title: {
+    default: 'Quran Guessr — Test Your Knowledge of the Holy Quran',
+    template: '%s | Quran Guessr',
+  },
+  description:
+    'Interactive Quran quizzes on verse location, missing words, and sequence — for every level. Challenge yourself and climb the leaderboard.',
+  keywords: [
+    'Quran',
+    'quiz',
+    'Islamic',
+    'Quran game',
+    'verse location',
+    'missing word',
+    'Quran trivia',
+    'learn Quran',
+    'Quran challenge',
+  ],
+  authors: [{ name: 'Quran Guessr' }],
+  openGraph: {
+    type: 'website',
+    locale: 'en_US',
+    url: SITE_URL,
+    siteName: 'Quran Guessr',
+    title: 'Quran Guessr — Test Your Knowledge of the Holy Quran',
+    description:
+      'Interactive Quran quizzes on verse location, missing words, and sequence — for every level.',
+    images: [{ url: '/quran-hero.jpg', width: 1200, height: 630, alt: 'Quran Guessr' }],
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Quran Guessr — Test Your Knowledge of the Holy Quran',
+    description:
+      'Interactive Quran quizzes on verse location, missing words, and sequence — for every level.',
+    images: ['/quran-hero.jpg'],
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: { index: true, follow: true, 'max-snippet': -1, 'max-image-preview': 'large' },
+  },
+  alternates: { canonical: SITE_URL },
 };
 
 export default async function RootLayout({
