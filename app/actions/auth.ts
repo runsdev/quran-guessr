@@ -36,13 +36,13 @@ export async function oidcLogout() {
   // Clear the local NextAuth session without triggering its own redirect.
   await signOut({ redirect: false });
 
-  // const postLogoutUri = process.env.AUTH_URL ?? 'http://localhost:3000';
+  const postLogoutUri = process.env.AUTH_URL ?? 'http://localhost:3000';
 
   if (account?.id_token) {
     const logoutUrl = new URL(`${qfAuthBase}/oauth2/sessions/logout`);
-    // logoutUrl.searchParams.set('id_token_hint', account.id_token);
-    // logoutUrl.searchParams.set('post_logout_redirect_uri', postLogoutUri);
-    // logoutUrl.searchParams.set('state', crypto.randomUUID());
+    logoutUrl.searchParams.set('id_token_hint', account.id_token);
+    logoutUrl.searchParams.set('post_logout_redirect_uri', postLogoutUri);
+    logoutUrl.searchParams.set('state', crypto.randomUUID());
 
     redirect(logoutUrl.toString());
   }
