@@ -14,7 +14,7 @@ export default function QuizProgressHeader({
 
   return (
     <>
-      <div className="w-full flex flex-col gap-2">
+      <div className="w-full flex flex-col gap-2 pt-5">
         <div className="flex justify-between items-center">
           <div className="flex items-center gap-3">
             {onEndSession && (
@@ -27,7 +27,7 @@ export default function QuizProgressHeader({
                 <span className="material-symbols-outlined text-[18px]">close</span>
               </button>
             )}
-            <div className="flex flex-col gap-0.5">
+            <div className="flex flex-col gap-0.5 ">
               <span className="text-xs font-medium text-on-surface-variant uppercase tracking-wider">
                 Verse Translation
               </span>

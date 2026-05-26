@@ -59,7 +59,7 @@ export default function QuizClient() {
           </div>
         ) : (
           <>
-            <div className="w-full flex justify-between items-center">
+            <div className="w-full flex justify-between items-center pt-5">
               <div className="flex items-center gap-3">
                 <button
                   onClick={async () => {
