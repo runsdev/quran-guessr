@@ -8,7 +8,7 @@ export default function QuizHeader({
   onEndSession?: () => void;
 }) {
   return (
-    <div className="w-full flex justify-between items-center">
+    <div className="w-full flex justify-between items-center pt-5">
       <div className="flex items-center gap-3">
         {onEndSession && (
           <button

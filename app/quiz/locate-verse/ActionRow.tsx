@@ -85,14 +85,25 @@ export default function ActionRow({
       <div role="status" aria-live="polite" aria-atomic="true" className="flex-1">
         {submitted ? feedbackEl : null}
       </div>
-      <div className="shrink-0">
+      <div className="shrink-0 flex items-center gap-2">
         {submitted ? (
-          <button onClick={onNext} className={BTN}>
-            Next Question
-            <span className="material-symbols-outlined" style={{ fontSize: 18 }}>
-              arrow_forward
-            </span>
-          </button>
+          <>
+            <a
+              href="/quiz"
+              className="text-sm font-medium px-4 py-3 rounded-lg border border-outline-variant text-on-surface-variant hover:bg-surface-container-high transition-colors flex items-center gap-2"
+            >
+              <span className="material-symbols-outlined" style={{ fontSize: 18 }}>
+                home
+              </span>
+              Hub
+            </a>
+            <button onClick={onNext} className={BTN}>
+              Next Question
+              <span className="material-symbols-outlined" style={{ fontSize: 18 }}>
+                arrow_forward
+              </span>
+            </button>
+          </>
         ) : (
           <button
             onClick={onSubmit}

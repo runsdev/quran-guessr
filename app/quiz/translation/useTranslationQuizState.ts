@@ -1,6 +1,6 @@
 'use client';
 
-import { useTransition, useState, useEffect } from 'react';
+import { useTransition, useState, useEffect, useRef } from 'react';
 
 import { initSession, fetchNextQuestion, submitAnswer } from './actions';
 import { fetchPracticeQuestion, submitPracticeAnswer } from './practice-actions';
@@ -37,7 +37,15 @@ export function useTranslationQuizState() {
   const [score, setScore] = useState(0);
   const [timeLeft, setTimeLeft] = useState(QUESTION_TIME_LIMIT);
 
+  const initKeyRef = useRef<string | null>(null);
+
   useEffect(() => {
+    const initKey = `${isPractice}:${translationId}`;
+    if (initKeyRef.current === initKey) {
+      return;
+    }
+    initKeyRef.current = initKey;
+
     if (isPractice) {
       fetchPracticeQuestion(translationId)
         .then((q) => {
