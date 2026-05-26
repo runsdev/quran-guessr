@@ -1,6 +1,8 @@
 import { GoogleTagManager, GoogleAnalytics } from '@next/third-parties/google';
 import { GeistMono } from 'geist/font/mono';
 import type { Metadata } from 'next';
+import { NextIntlClientProvider } from 'next-intl';
+import { getLocale, getMessages } from 'next-intl/server';
 import { Inter, Scheherazade_New } from 'next/font/google';
 import { Toaster } from 'sonner';
 
@@ -79,10 +81,12 @@ export default async function RootLayout({
   children: React.ReactNode;
 }>) {
   const session = await auth();
+  const locale = await getLocale();
+  const messages = await getMessages();
 
   return (
     <html
-      lang="en"
+      lang={locale}
       className={`${GeistMono.variable} ${inter.variable} ${scheherazadeNew.variable} h-full antialiased`}
       suppressHydrationWarning
     >
@@ -99,7 +103,9 @@ export default async function RootLayout({
       </head>
       <body className="min-h-full flex flex-col">
         <ThemeProvider>
-          <SessionProvider session={session}>{children}</SessionProvider>
+          <NextIntlClientProvider messages={messages}>
+            <SessionProvider session={session}>{children}</SessionProvider>
+          </NextIntlClientProvider>
           <MaterialSymbolsLoader />
           <Toaster position="bottom-center" richColors closeButton />
         </ThemeProvider>
