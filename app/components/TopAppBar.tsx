@@ -17,7 +17,7 @@ interface TopAppBarProps {
 }
 
 /**
- * Airbnb-style global nav — 80px white bar, 1px hairline bottom border.
+ * 80px white bar, 1px hairline bottom border.
  * Wordmark (Rausch) left · product tabs center · account link right.
  */
 export default function TopAppBar({ activeHref }: TopAppBarProps): React.JSX.Element {
@@ -38,9 +38,7 @@ export default function TopAppBar({ activeHref }: TopAppBarProps): React.JSX.Ele
       }
 
       try {
-        // FIXED: Call the Server Action instead of the direct DB API
         const userProfile = await getUserProfileAction(userId);
-        console.log('Fetched user profile:', userProfile);
         setUser(userProfile);
       } catch (error) {
         console.error('Failed to load user profile', error);

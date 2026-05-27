@@ -63,7 +63,7 @@ export default async function AboutSection(): Promise<React.JSX.Element> {
         >
           {/* Avatar column */}
           <div
-            className="w-full md:w-1/3 lg:w-[280px] shrink-0 flex items-center justify-center min-h-[240px]"
+            className="w-full md:w-1/3 lg:w-70 shrink-0 flex items-center justify-center min-h-60"
             style={{
               background: 'var(--color-outline-variant)',
             }}
