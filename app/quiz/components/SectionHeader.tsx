@@ -1,8 +1,17 @@
+import React from 'react';
+
+import { getTranslations } from 'next-intl/server';
+
 import { PrimaryGameModesProps } from './types';
 
 type HeaderProps = Pick<PrimaryGameModesProps, 'openJuzPanel' | 'activeJuzCount'>;
 
-export default function SectionHeader({ openJuzPanel, activeJuzCount }: HeaderProps) {
+export default async function SectionHeader({
+  openJuzPanel,
+  activeJuzCount,
+}: HeaderProps): Promise<React.JSX.Element> {
+  const t = await getTranslations('section');
+
   return (
     <div className="flex items-end justify-between">
       <div>
@@ -16,14 +25,12 @@ export default function SectionHeader({ openJuzPanel, activeJuzCount }: HeaderPr
             marginBottom: 6,
           }}
         >
-          Game Modes
+          {t('gameModes')}
         </p>
         <h3 className="text-2xl font-bold mb-1" style={{ color: 'var(--color-on-surface)' }}>
-          Select Game Mode
+          {t('selectGameMode')}
         </h3>
-        <p style={{ color: 'var(--color-on-surface-variant)' }}>
-          Choose the mode that suits your learning style.
-        </p>
+        <p style={{ color: 'var(--color-on-surface-variant)' }}>{t('chooseMode')}</p>
       </div>
       <button
         onClick={openJuzPanel}
@@ -34,13 +41,13 @@ export default function SectionHeader({ openJuzPanel, activeJuzCount }: HeaderPr
           color: 'var(--color-on-surface-variant)',
           fontSize: 12,
         }}
-        aria-label="Configure juz filter"
+        aria-label={t('juzFilter')}
       >
         <span className="material-symbols-outlined" style={{ fontSize: 16 }}>
           filter_list
         </span>
         <span>
-          Juz Filter
+          {t('juzFilter')}
           {activeJuzCount < 30 && (
             <span
               className="ml-1 text-xs font-bold rounded-full px-1.5 py-0.5"

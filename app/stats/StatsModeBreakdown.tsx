@@ -1,3 +1,5 @@
+import { getTranslations } from 'next-intl/server';
+
 import { fmt, pct } from './stats-helpers';
 
 import type { ModeStats } from '@/lib/stats-queries';
@@ -7,24 +9,36 @@ interface Props {
   modeStats: ModeStats[];
 }
 
-export default function StatsModeBreakdown({ modeStats }: Props) {
+export default async function StatsModeBreakdown({ modeStats }: Props) {
+  const t = await getTranslations('statsPage');
+  const tCommon = await getTranslations('common');
+  const tGameModes = await getTranslations('gameModes');
+
   return (
     <div className="bg-surface-container-low border border-primary/10 rounded-3xl p-5 space-y-1">
       <h2 className="text-base font-semibold text-on-surface mb-4 flex items-center gap-2">
         <span className="material-symbols-outlined text-primary text-[18px]">
           stacked_bar_chart
         </span>
-        Per-Mode Breakdown
+        {t('perModeBreakdown')}
       </h2>
 
       {modeStats.map((m) => {
-        const meta = MODE_META[m.gameMode] ?? {
-          label: m.gameMode,
+        const modeMeta = MODE_META[m.gameMode];
+        const meta = modeMeta ?? {
           icon: 'sports_esports',
           iconCls: 'text-on-surface-variant',
           bgCls: 'bg-surface-container',
-          desc: '',
         };
+        const copy = modeMeta
+          ? {
+              label: tGameModes(modeMeta.labelKey),
+              desc: tGameModes(modeMeta.descKey),
+            }
+          : {
+              label: m.gameMode,
+              desc: '',
+            };
         return (
           <div key={m.gameMode} className="py-4 border-b border-outline-variant/30 last:border-0">
             <div className="flex items-center justify-between mb-3">
@@ -37,14 +51,16 @@ export default function StatsModeBreakdown({ modeStats }: Props) {
                   </span>
                 </div>
                 <div>
-                  <p className="text-sm font-semibold text-on-surface">{meta.label}</p>
-                  <p className="text-xs text-on-surface-variant">{meta.desc}</p>
+                  <p className="text-sm font-semibold text-on-surface">{copy.label}</p>
+                  <p className="text-xs text-on-surface-variant">{copy.desc}</p>
                 </div>
               </div>
               <div className="text-right">
-                <p className="text-sm font-bold text-on-surface">{fmt(m.total)} plays</p>
+                <p className="text-sm font-bold text-on-surface">
+                  {t('plays', { count: fmt(m.total) })}
+                </p>
                 <p className="text-xs text-on-surface-variant">
-                  {pct(m.correct, m.total)} accuracy
+                  {pct(m.correct, m.total)} {tCommon('accuracy')}
                 </p>
               </div>
             </div>
@@ -56,7 +72,7 @@ export default function StatsModeBreakdown({ modeStats }: Props) {
                     emoji_events
                   </span>
                   <span className="text-xs text-on-surface">
-                    <span className="font-semibold">{fmt(m.ranked)}</span> ranked
+                    <span className="font-semibold">{fmt(m.ranked)}</span> {tCommon('ranked')}
                   </span>
                   <span className="text-xs text-on-surface-variant">
                     · {pct(m.rankedCorrect, m.ranked)}
@@ -69,7 +85,7 @@ export default function StatsModeBreakdown({ modeStats }: Props) {
                     person_play
                   </span>
                   <span className="text-xs text-on-surface">
-                    <span className="font-semibold">{fmt(m.casual)}</span> casual
+                    <span className="font-semibold">{fmt(m.casual)}</span> {tCommon('casual')}
                   </span>
                   <span className="text-xs text-on-surface-variant">
                     · {pct(m.casualCorrect, m.casual)}
@@ -82,7 +98,7 @@ export default function StatsModeBreakdown({ modeStats }: Props) {
                     school
                   </span>
                   <span className="text-xs text-on-surface">
-                    <span className="font-semibold">{fmt(m.practice)}</span> practice
+                    <span className="font-semibold">{fmt(m.practice)}</span> {tCommon('practice')}
                   </span>
                   <span className="text-xs text-on-surface-variant">
                     · {pct(m.practiceCorrect, m.practice)}
@@ -90,7 +106,7 @@ export default function StatsModeBreakdown({ modeStats }: Props) {
                 </div>
               )}
               {m.total === 0 && (
-                <span className="text-xs text-on-surface-variant italic">No games yet</span>
+                <span className="text-xs text-on-surface-variant italic">{t('noGamesYet')}</span>
               )}
             </div>
           </div>

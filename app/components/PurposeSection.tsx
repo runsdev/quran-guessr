@@ -1,24 +1,28 @@
 import React from 'react';
 
-const FEATURES = [
-  {
-    icon: 'auto_stories',
-    title: 'Deepen Quranic Knowledge',
-    desc: 'Regular quiz practice reinforces verse location, word recall, and sequential memory across all 114 Surahs.',
-  },
-  {
-    icon: 'emoji_events',
-    title: 'Compete Globally',
-    desc: 'An ELO-based ranking system means every ranked game matters. Climb the leaderboard against players worldwide.',
-  },
-  {
-    icon: 'calendar_today',
-    title: 'Daily Discipline',
-    desc: 'A shared daily challenge keeps you accountable. Compare your streak and accuracy with friends and the community.',
-  },
-];
+import { getTranslations } from 'next-intl/server';
 
-export default function PurposeSection(): React.JSX.Element {
+export default async function PurposeSection(): Promise<React.JSX.Element> {
+  const t = await getTranslations('purpose');
+
+  const FEATURES = [
+    {
+      icon: 'auto_stories',
+      title: t('featureDeepen'),
+      desc: t('featureDeepenDesc'),
+    },
+    {
+      icon: 'emoji_events',
+      title: t('featureCompete'),
+      desc: t('featureCompeteDesc'),
+    },
+    {
+      icon: 'calendar_today',
+      title: t('featureDaily'),
+      desc: t('featureDailyDesc'),
+    },
+  ];
+
   return (
     <section
       id="purpose"
@@ -37,7 +41,7 @@ export default function PurposeSection(): React.JSX.Element {
               marginBottom: 10,
             }}
           >
-            Why QuranGuessr?
+            {t('label')}
           </p>
           <h2
             style={{
@@ -48,11 +52,10 @@ export default function PurposeSection(): React.JSX.Element {
               marginBottom: 12,
             }}
           >
-            Learn the Quran through play
+            {t('title')}
           </h2>
           <p style={{ fontSize: 16, color: 'var(--color-on-surface-variant)', lineHeight: 1.65 }}>
-            QuranGuessr turns passive recitation review into active, gamified practice. Whether you
-            are a student, teacher, or lifelong learner — there is a mode for your level.
+            {t('desc')}
           </p>
         </div>
 

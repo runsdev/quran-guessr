@@ -2,52 +2,56 @@
 
 import { useEffect, useRef } from 'react';
 
-import QuizCardItem from './QuizCardItem';
+import { useTranslations } from 'next-intl';
 
-const QUIZ_MODES = [
-  {
-    index: '01',
-    badge: 'Daily Challenge',
-    badgeColors: { bg: '#fff3cd', text: '#856404' },
-    title: 'Locate the Verse',
-    desc: 'A Quran verse appears on screen. Identify the correct page and row number. A fresh puzzle drops every day — the same verse for all players worldwide.',
-    image: '/img/locate-verse.png',
-    href: '/quiz/locate-verse',
-  },
-  {
-    index: '02',
-    badge: 'Ranked',
-    badgeColors: { bg: '#ffd1da', text: '#c00030' },
-    title: 'Missing Word Count',
-    desc: 'A verse is shown with one or more segment(s) hidden. Guess the number of missing words. Every correct or incorrect answer shifts your ELO rating on the global ladder.',
-    image: '/img/missing-word-count.png',
-    href: '/quiz/missing-word-count',
-  },
-  {
-    index: '03',
-    badge: 'Casual',
-    badgeColors: { bg: '#d1e7dd', text: '#0a4a28' },
-    title: 'Next Verse',
-    desc: 'Given a verse, pick the one that comes right after it. Perfect for practising sequential recitation and strengthening your Quranic memory.',
-    image: '/img/next-verse.png',
-    href: '/quiz/next-verse',
-  },
-  {
-    index: '04',
-    badge: 'Casual',
-    badgeColors: { bg: '#cfe2ff', text: '#084298' },
-    title: 'Translation Quiz',
-    desc: 'Test your knowledge of Quran translations. Given a verse, identify the correct meaning from four options.',
-    image: '/img/translation-quiz.png',
-    href: '/quiz',
-  },
-];
+import QuizCardItem from './QuizCardItem';
 
 const NAV_HEIGHT = 80;
 
 export default function QuizAccordionSection() {
+  const t = useTranslations('quizModes');
+  const tCommon = useTranslations('common');
   const outerRefs = useRef<(HTMLDivElement | null)[]>([]);
   const innerRefs = useRef<(HTMLDivElement | null)[]>([]);
+
+  const QUIZ_MODES = [
+    {
+      index: '01',
+      badge: t('dailyChallenge'),
+      badgeColors: { bg: '#fff3cd', text: '#856404' },
+      title: t('locateTheVerse'),
+      desc: t('locateDesc'),
+      image: '/img/locate-verse.png',
+      href: '/quiz/locate-verse',
+    },
+    {
+      index: '02',
+      badge: tCommon('ranked'),
+      badgeColors: { bg: '#ffd1da', text: '#c00030' },
+      title: t('missingWordCount'),
+      desc: t('missingWordDesc'),
+      image: '/img/missing-word-count.png',
+      href: '/quiz/missing-word-count',
+    },
+    {
+      index: '03',
+      badge: tCommon('casual'),
+      badgeColors: { bg: '#d1e7dd', text: '#0a4a28' },
+      title: t('nextVerse'),
+      desc: t('nextVerseDesc'),
+      image: '/img/next-verse.png',
+      href: '/quiz/next-verse',
+    },
+    {
+      index: '04',
+      badge: tCommon('casual'),
+      badgeColors: { bg: '#cfe2ff', text: '#084298' },
+      title: t('translationQuiz'),
+      desc: t('translationDesc'),
+      image: '/img/translation-quiz.png',
+      href: '/quiz',
+    },
+  ];
 
   useEffect(() => {
     const onScroll = () => {
@@ -96,7 +100,7 @@ export default function QuizAccordionSection() {
             marginBottom: 10,
           }}
         >
-          Quiz Modes
+          {t('label')}
         </p>
         <h2
           style={{
@@ -107,7 +111,7 @@ export default function QuizAccordionSection() {
             maxWidth: 480,
           }}
         >
-          Pick your challenge
+          {t('title')}
         </h2>
         <p
           style={{
@@ -118,7 +122,7 @@ export default function QuizAccordionSection() {
             marginTop: 8,
           }}
         >
-          Three distinct game modes — from daily community puzzles to competitive ranked play.
+          {t('subtitle')}
         </p>
       </div>
 

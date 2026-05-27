@@ -1,3 +1,7 @@
+import React from 'react';
+
+import { getTranslations } from 'next-intl/server';
+
 interface ActionRowProps {
   isCorrect: boolean;
   submitted: boolean;
@@ -15,7 +19,7 @@ interface ActionRowProps {
 const BTN =
   'bg-primary-container text-on-primary-container text-sm font-medium px-6 py-3 rounded-lg hover:bg-primary hover:text-on-primary transition-colors active:scale-95 flex items-center gap-2';
 
-export default function ActionRow({
+export default async function ActionRow({
   isCorrect,
   submitted,
   selected,
@@ -27,7 +31,10 @@ export default function ActionRow({
   timedOut,
   onSubmit,
   onNext,
-}: ActionRowProps) {
+}: ActionRowProps): Promise<React.JSX.Element> {
+  const t = await getTranslations('mwc');
+  const tCommon = await getTranslations('common');
+
   return (
     <div className="w-full flex items-center justify-between min-h-12">
       <div role="status" aria-live="polite" aria-atomic="true" className="flex-1">
@@ -35,10 +42,10 @@ export default function ActionRow({
           <div className="flex flex-col gap-1">
             <p className={`text-sm font-medium ${isCorrect ? 'text-green-700' : 'text-red-700'}`}>
               {isCorrect
-                ? 'Correct!'
+                ? tCommon('correct')
                 : timedOut
-                  ? `Time's up! The answer was ${missingCount} missing word${missingCount !== 1 ? 's' : ''}.`
-                  : `The answer was ${missingCount} missing word${missingCount !== 1 ? 's' : ''}.`}
+                  ? t('timesUp', { count: missingCount })
+                  : t('answerWas', { count: missingCount })}
             </p>
             {userEloDelta !== null && newUserElo !== null ? (
               <p className="text-xs text-on-surface-variant">
@@ -50,9 +57,7 @@ export default function ActionRow({
                 → <span className="font-semibold text-on-background">{Math.round(newUserElo)}</span>
               </p>
             ) : ranked === false && userEloDelta === null ? (
-              <p className="text-xs text-on-surface-variant opacity-60">
-                Unranked — daily limit reached
-              </p>
+              <p className="text-xs text-on-surface-variant opacity-60">{t('unranked')}</p>
             ) : null}
           </div>
         ) : null}
@@ -67,14 +72,14 @@ export default function ActionRow({
               <span className="material-symbols-outlined" style={{ fontSize: 18 }}>
                 home
               </span>
-              Hub
+              {tCommon('hub')}
             </a>
             <button
               onClick={onNext}
               disabled={loading}
               className={`${BTN} disabled:opacity-40 disabled:cursor-not-allowed`}
             >
-              Next Question
+              {tCommon('nextQuestion')}
               <span className="material-symbols-outlined" style={{ fontSize: 18 }}>
                 arrow_forward
               </span>
@@ -86,7 +91,7 @@ export default function ActionRow({
             disabled={selected === null || loading}
             className={`${BTN} disabled:opacity-40 disabled:cursor-not-allowed`}
           >
-            Submit
+            {t('submitAnswer')}
             <span className="material-symbols-outlined" style={{ fontSize: 18 }}>
               arrow_forward
             </span>

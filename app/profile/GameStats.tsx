@@ -1,3 +1,5 @@
+import { getTranslations } from 'next-intl/server';
+
 import { pct } from './utils';
 
 interface GameStatsProps {
@@ -15,7 +17,10 @@ interface GameStatsProps {
   };
 }
 
-export default function GameStats({ streak, eloFormatted, user }: GameStatsProps) {
+export default async function GameStats({ streak, eloFormatted, user }: GameStatsProps) {
+  const t = await getTranslations('profilePage');
+  const tCommon = await getTranslations('common');
+
   return (
     <>
       {/* Top stats */}
@@ -25,7 +30,7 @@ export default function GameStats({ streak, eloFormatted, user }: GameStatsProps
             <span className="material-symbols-outlined text-primary">trending_up</span>
           </div>
           <h4 className="text-3xl font-bold text-on-surface">{eloFormatted}</h4>
-          <p className="text-sm text-on-surface-variant mt-1">ELO Rating</p>
+          <p className="text-sm text-on-surface-variant mt-1">{t('eloRating')}</p>
         </div>
 
         <div className="bg-surface-container-low border border-primary/10 p-5 rounded-3xl">
@@ -33,7 +38,7 @@ export default function GameStats({ streak, eloFormatted, user }: GameStatsProps
             <span className="material-symbols-outlined text-amber-400">local_fire_department</span>
           </div>
           <h4 className="text-3xl font-bold text-on-surface">{streak}</h4>
-          <p className="text-sm text-on-surface-variant mt-1">Day Streak</p>
+          <p className="text-sm text-on-surface-variant mt-1">{t('dayStreak')}</p>
         </div>
 
         <div className="bg-surface-container-low border border-primary/10 p-5 rounded-3xl">
@@ -43,7 +48,7 @@ export default function GameStats({ streak, eloFormatted, user }: GameStatsProps
           <h4 className="text-3xl font-bold text-on-surface">
             {user.gamesPlayed.toLocaleString()}
           </h4>
-          <p className="text-sm text-on-surface-variant mt-1">Ranked Games (MWC)</p>
+          <p className="text-sm text-on-surface-variant mt-1">{t('rankedGames')}</p>
         </div>
 
         <div className="bg-surface-container-low border border-primary/10 p-5 rounded-3xl">
@@ -53,7 +58,7 @@ export default function GameStats({ streak, eloFormatted, user }: GameStatsProps
           <h4 className="text-3xl font-bold text-on-surface">
             {pct(user.mwcCorrect, user.gamesPlayed)}
           </h4>
-          <p className="text-sm text-on-surface-variant mt-1">Ranked Accuracy</p>
+          <p className="text-sm text-on-surface-variant mt-1">{t('rankedAccuracy')}</p>
         </div>
       </div>
 
@@ -61,7 +66,7 @@ export default function GameStats({ streak, eloFormatted, user }: GameStatsProps
       <div className="bg-surface-container-low border border-primary/10 rounded-3xl p-5 space-y-4">
         <h2 className="text-base font-semibold text-on-surface flex items-center gap-2">
           <span className="material-symbols-outlined text-primary text-[18px]">bar_chart</span>
-          Game Mode Stats
+          {t('gameModeStats')}
         </h2>
 
         {/* Missing Word Count */}
@@ -73,16 +78,16 @@ export default function GameStats({ streak, eloFormatted, user }: GameStatsProps
               </span>
             </div>
             <div>
-              <p className="text-sm font-medium text-on-surface">Missing Word Count</p>
-              <p className="text-xs text-on-surface-variant">Ranked · Affects ELO</p>
+              <p className="text-sm font-medium text-on-surface">{t('mwcTitle')}</p>
+              <p className="text-xs text-on-surface-variant">{t('mwcDesc')}</p>
             </div>
           </div>
           <div className="text-right">
             <p className="text-sm font-bold text-on-surface">
-              {user.gamesPlayed.toLocaleString()} games
+              {user.gamesPlayed.toLocaleString()} {tCommon('games')}
             </p>
             <p className="text-xs text-on-surface-variant">
-              {pct(user.mwcCorrect, user.gamesPlayed)} accuracy
+              {pct(user.mwcCorrect, user.gamesPlayed)} {tCommon('accuracy')}
             </p>
           </div>
         </div>
@@ -96,16 +101,16 @@ export default function GameStats({ streak, eloFormatted, user }: GameStatsProps
               </span>
             </div>
             <div>
-              <p className="text-sm font-medium text-on-surface">Verse Location</p>
-              <p className="text-xs text-on-surface-variant">Casual · Page accuracy</p>
+              <p className="text-sm font-medium text-on-surface">{t('verseLocation')}</p>
+              <p className="text-xs text-on-surface-variant">{t('verseLocationDesc')}</p>
             </div>
           </div>
           <div className="text-right">
             <p className="text-sm font-bold text-on-surface">
-              {user.lvGames.toLocaleString()} games
+              {user.lvGames.toLocaleString()} {tCommon('games')}
             </p>
             <p className="text-xs text-on-surface-variant">
-              {pct(user.lvCorrect, user.lvGames)} accuracy
+              {pct(user.lvCorrect, user.lvGames)} {tCommon('accuracy')}
             </p>
           </div>
         </div>
@@ -119,16 +124,16 @@ export default function GameStats({ streak, eloFormatted, user }: GameStatsProps
               </span>
             </div>
             <div>
-              <p className="text-sm font-medium text-on-surface">Verse Quest</p>
-              <p className="text-xs text-on-surface-variant">Casual · Next verse</p>
+              <p className="text-sm font-medium text-on-surface">{t('verseQuest')}</p>
+              <p className="text-xs text-on-surface-variant">{t('verseQuestDesc')}</p>
             </div>
           </div>
           <div className="text-right">
             <p className="text-sm font-bold text-on-surface">
-              {user.nvGames.toLocaleString()} games
+              {user.nvGames.toLocaleString()} {tCommon('games')}
             </p>
             <p className="text-xs text-on-surface-variant">
-              {pct(user.nvCorrect, user.nvGames)} accuracy
+              {pct(user.nvCorrect, user.nvGames)} {tCommon('accuracy')}
             </p>
           </div>
         </div>
@@ -142,16 +147,16 @@ export default function GameStats({ streak, eloFormatted, user }: GameStatsProps
               </span>
             </div>
             <div>
-              <p className="text-sm font-medium text-on-surface">Translation Quiz</p>
-              <p className="text-xs text-on-surface-variant">Casual · Translation knowledge</p>
+              <p className="text-sm font-medium text-on-surface">{t('translationQuiz')}</p>
+              <p className="text-xs text-on-surface-variant">{t('translationQuizDesc')}</p>
             </div>
           </div>
           <div className="text-right">
             <p className="text-sm font-bold text-on-surface">
-              {user.tqGames?.toLocaleString()} games
+              {user.tqGames?.toLocaleString()} {tCommon('games')}
             </p>
             <p className="text-xs text-on-surface-variant">
-              {pct(user.tqCorrect, user.tqGames)} accuracy
+              {pct(user.tqCorrect, user.tqGames)} {tCommon('accuracy')}
             </p>
           </div>
         </div>

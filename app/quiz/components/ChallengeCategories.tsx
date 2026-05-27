@@ -2,6 +2,8 @@
 
 import { useState } from 'react';
 
+import { useTranslations } from 'next-intl';
+
 import TranslationSelector, {
   loadTranslationId,
   saveTranslationId,
@@ -14,6 +16,8 @@ interface Props {
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 export default function ChallengeCategories({ rankedLimitReached, openModal }: Props) {
+  const t = useTranslations('challenges');
+  const tCommon = useTranslations('common');
   const [translationId, setTranslationId] = useState<number | null>(() => {
     if (typeof window === 'undefined') {
       return null;
@@ -39,14 +43,12 @@ export default function ChallengeCategories({ rankedLimitReached, openModal }: P
             marginBottom: 6,
           }}
         >
-          More Modes
+          {t('moreModesLabel')}
         </p>
         <h3 className="text-2xl font-bold mb-1" style={{ color: 'var(--color-on-surface)' }}>
-          Challenge Categories
+          {t('title')}
         </h3>
-        <p style={{ color: 'var(--color-on-surface-variant)' }}>
-          Targeted mini-games to hone specific skills.
-        </p>
+        <p style={{ color: 'var(--color-on-surface-variant)' }}>{t('desc')}</p>
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
@@ -68,13 +70,13 @@ export default function ChallengeCategories({ rankedLimitReached, openModal }: P
             </span>
           </div>
           <h5 className="font-bold mb-2" style={{ color: 'var(--color-on-surface)' }}>
-            Next Verse
+            {t('nextVerse')}
           </h5>
           <p
             className="text-sm leading-relaxed"
             style={{ color: 'var(--color-on-surface-variant)' }}
           >
-            Guess the next verse in sequence.
+            {t('nextVerseDesc')}
           </p>
         </button>
 
@@ -96,13 +98,13 @@ export default function ChallengeCategories({ rankedLimitReached, openModal }: P
             </span>
           </div>
           <h5 className="font-bold mb-2" style={{ color: 'var(--color-on-surface)' }}>
-            Verse Location
+            {t('verseLocation')}
           </h5>
           <p
             className="text-sm leading-relaxed"
             style={{ color: 'var(--color-on-surface-variant)' }}
           >
-            Identify the page and row of an Ayah. Used in daily challenges.
+            {t('verseLocationDesc')}
           </p>
         </button>
 
@@ -124,13 +126,13 @@ export default function ChallengeCategories({ rankedLimitReached, openModal }: P
             </span>
           </div>
           <h5 className="font-bold mb-2" style={{ color: 'var(--color-on-surface)' }}>
-            Missing Word Count
+            {t('missingWordCount')}
           </h5>
           <p
             className="text-sm leading-relaxed"
             style={{ color: 'var(--color-on-surface-variant)' }}
           >
-            Count the missing words in a verse.
+            {t('missingWordDesc')}
           </p>
         </button>
 
@@ -151,13 +153,13 @@ export default function ChallengeCategories({ rankedLimitReached, openModal }: P
             </span>
           </div>
           <h5 className="font-bold" style={{ color: 'var(--color-on-surface)' }}>
-            Meaning Match
+            {t('meaningMatch')}
           </h5>
           <p
             className="text-sm leading-relaxed"
             style={{ color: 'var(--color-on-surface-variant)' }}
           >
-            Identify the correct translation.
+            {t('meaningMatchDesc')}
           </p>
           <TranslationSelector value={translationId} onChange={handleTranslationChange} />
           <button
@@ -169,7 +171,7 @@ export default function ChallengeCategories({ rankedLimitReached, openModal }: P
               color: 'var(--color-on-primary)',
             }}
           >
-            {translationId === null ? 'Select a translation first' : 'Play'}
+            {translationId === null ? t('selectTranslation') : tCommon('play')}
           </button>
         </div>
       </div>

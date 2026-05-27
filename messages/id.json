@@ -27,7 +27,9 @@
     "practice": "Latihan",
     "previous": "Halaman sebelumnya",
     "next": "Halaman berikutnya",
-    "showing": "Menampilkan {from}–{to} dari {total} {noun}"
+    "showing": "Menampilkan {from}–{to} dari {total} {noun}",
+    "pointsAbbr": "poin",
+    "mastery": "Penguasaan: {percent}%"
   },
   "nav": {
     "quranGuessr": "QuranGuessr",
@@ -186,7 +188,9 @@
     "title": "Terjemahan Ayat",
     "whichTranslation": "Mana terjemahan yang benar?",
     "selectMatching": "Pilih terjemahan yang cocok untuk Ayat ini.",
-    "searchPlaceholder": "Cari bahasa atau penerjemah…"
+    "searchPlaceholder": "Cari bahasa atau penerjemah…",
+    "selectTranslation": "Pilih terjemahan…",
+    "noResults": "Tidak ada hasil."
   },
   "auth": {
     "signInTitle": "QuranGuessr",

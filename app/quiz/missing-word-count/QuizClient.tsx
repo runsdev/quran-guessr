@@ -1,6 +1,7 @@
 'use client';
 
 import { AnimatePresence, motion } from 'framer-motion';
+import { useTranslations } from 'next-intl';
 import { toast } from 'sonner';
 
 import ActionRow from './ActionRow';
@@ -38,6 +39,8 @@ export default function QuizClient() {
     handleEndSession,
   } = useMissingWordCountState();
   const loadedPages = useQcfFontLoader(pageNumbers);
+  const t = useTranslations('mwc');
+  const tCommon = useTranslations('common');
 
   if (isInitializing) {
     return <MissingWordCountSkeleton />;
@@ -45,16 +48,16 @@ export default function QuizClient() {
 
   return (
     <>
-      <TopAppBar activeTab="Quiz" />
+      <TopAppBar activeTab={tCommon('quiz')} />
       <main className="flex-1 flex flex-col px-5 max-w-3xl mx-auto w-full gap-6 justify-center min-h-screen pt-20 pb-24 md:pb-8">
         {initError ? (
           <div role="alert" className="flex flex-col items-center gap-3 py-8">
-            <span className="text-sm text-error">Failed to start quiz session.</span>
+            <span className="text-sm text-error">{tCommon('failedToStart')}</span>
             <button
               onClick={() => window.location.reload()}
               className="text-sm text-primary underline underline-offset-2"
             >
-              Retry
+              {tCommon('retry')}
             </button>
           </div>
         ) : (
@@ -63,21 +66,21 @@ export default function QuizClient() {
               <div className="flex items-center gap-3">
                 <button
                   onClick={async () => {
-                    toast.info('Session ended');
+                    toast.info(tCommon('sessionEnded'));
                     await handleEndSession();
                   }}
                   className="w-8 h-8 rounded-full flex items-center justify-center text-on-surface-variant hover:text-error hover:bg-error/10 transition-colors"
-                  aria-label="End session"
-                  title="End session and return to quiz hub"
+                  aria-label={tCommon('endSession')}
+                  title={tCommon('endSessionTitle')}
                 >
                   <span className="material-symbols-outlined text-[18px]">close</span>
                 </button>
                 <div className="flex flex-col gap-1">
                   <span className="text-xs font-medium text-on-surface-variant uppercase tracking-wider">
-                    Missing Word Count
+                    {t('title')}
                   </span>
                   <span className="text-base font-medium text-on-background">
-                    Question {questionNumber}
+                    {tCommon('question', { number: questionNumber })}
                   </span>
                 </div>
               </div>
@@ -86,7 +89,7 @@ export default function QuizClient() {
                   bar_chart
                 </span>
                 <span className="text-sm font-semibold text-secondary">
-                  {displayPageElo !== null ? `Page ELO ${displayPageElo}` : '—'}
+                  {displayPageElo !== null ? t('pageElo', { elo: displayPageElo }) : '—'}
                 </span>
               </div>
             </div>
@@ -123,9 +126,7 @@ export default function QuizClient() {
                 {question ? (
                   <>
                     <div className="w-full text-center">
-                      <h2 className="text-2xl font-semibold text-on-background">
-                        How many words are missing from this verse?
-                      </h2>
+                      <h2 className="text-2xl font-semibold text-on-background">{t('howMany')}</h2>
                     </div>
 
                     <AnswerGrid

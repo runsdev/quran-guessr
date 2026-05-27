@@ -1,65 +1,65 @@
-// profile display
+// profile display — labelKey / descKey are looked up via the "gameModes" namespace
 export const MODE_DISPLAY: Record<
   string,
-  { label: string; icon: string; iconCls: string; dotCls: string }
+  { labelKey: string; icon: string; iconCls: string; dotCls: string }
 > = {
   'missing-word-count': {
-    label: 'Word Count',
+    labelKey: 'wordCount',
     icon: 'find_replace',
     iconCls: 'text-primary',
     dotCls: 'bg-primary/10',
   },
   'locate-verse': {
-    label: 'Locate Verse',
+    labelKey: 'locateVerse',
     icon: 'my_location',
     iconCls: 'text-tertiary',
     dotCls: 'bg-tertiary/10',
   },
   'next-verse': {
-    label: 'Next Verse',
+    labelKey: 'nextVerse',
     icon: 'format_quote',
     iconCls: 'text-secondary',
     dotCls: 'bg-secondary/10',
   },
   'translation-quiz': {
-    label: 'Translation Quiz',
+    labelKey: 'translationQuiz',
     icon: 'translate',
     iconCls: 'text-green-700',
     dotCls: 'bg-green-100',
   },
 };
 
-// stats helpers
+// stats helpers — labelKey / descKey are looked up via the "gameModes" namespace
 export const MODE_META: Record<
   string,
-  { label: string; icon: string; iconCls: string; bgCls: string; desc: string }
+  { labelKey: string; icon: string; iconCls: string; bgCls: string; descKey: string }
 > = {
   'missing-word-count': {
-    label: 'Missing Word Count',
+    labelKey: 'mwcLabel',
     icon: 'find_replace',
     iconCls: 'text-primary',
     bgCls: 'bg-primary/10',
-    desc: 'Ranked · ELO-affecting',
+    descKey: 'mwcDesc',
   },
   'locate-verse': {
-    label: 'Locate Verse',
+    labelKey: 'lvLabel',
     icon: 'my_location',
     iconCls: 'text-tertiary',
     bgCls: 'bg-tertiary/10',
-    desc: 'Casual · Page accuracy',
+    descKey: 'lvDesc',
   },
   'next-verse': {
-    label: 'Next Verse',
+    labelKey: 'nvLabel',
     icon: 'format_quote',
     iconCls: 'text-secondary',
     bgCls: 'bg-secondary/10',
-    desc: 'Casual · Verse continuation',
+    descKey: 'nvDesc',
   },
   'translation-quiz': {
-    label: 'Translation Quiz',
+    labelKey: 'tqLabel',
     icon: 'translate',
     iconCls: 'text-green-700',
     bgCls: 'bg-green-100',
-    desc: 'Casual · Translation knowledge',
+    descKey: 'tqDesc',
   },
 };

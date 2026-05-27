@@ -1,6 +1,8 @@
 'use client';
 
-import { useRef, useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
+
+import { useTranslations } from 'next-intl';
 
 import { TRANSLATION_OPTIONS } from '@/lib/qdc-translations';
 
@@ -43,6 +45,7 @@ export default function TranslationSelector({ value, onChange, disabled }: Props
   const [query, setQuery] = useState('');
   const ref = useRef<HTMLDivElement>(null);
   const searchRef = useRef<HTMLInputElement>(null);
+  const t = useTranslations('translationQuiz');
 
   useEffect(() => {
     function handleOutside(e: MouseEvent) {
@@ -60,13 +63,13 @@ export default function TranslationSelector({ value, onChange, disabled }: Props
     }
   }, [open]);
 
-  const selected = TRANSLATION_OPTIONS.find((t) => t.id === value);
+  const selected = TRANSLATION_OPTIONS.find((tOption) => tOption.id === value);
 
   const filtered = query.trim()
     ? TRANSLATION_OPTIONS.filter(
-        (t) =>
-          t.label.toLowerCase().includes(query.toLowerCase()) ||
-          t.language.toLowerCase().includes(query.toLowerCase()),
+        (tOption) =>
+          tOption.label.toLowerCase().includes(query.toLowerCase()) ||
+          tOption.language.toLowerCase().includes(query.toLowerCase()),
       )
     : TRANSLATION_OPTIONS;
 
@@ -86,7 +89,7 @@ export default function TranslationSelector({ value, onChange, disabled }: Props
         }}
         className="bg-surface-container border border-outline-variant rounded-lg px-3 py-1.5 text-sm text-on-surface disabled:opacity-50 focus:outline-none focus:border-primary flex items-center gap-1 text-left"
       >
-        <span>{selected ? truncate(selected.label, 20) : 'Select a translation…'}</span>
+        <span>{selected ? truncate(selected.label, 20) : t('selectTranslation')}</span>
         <span
           className="material-symbols-outlined text-on-surface-variant shrink-0"
           style={{ fontSize: 16 }}
@@ -108,7 +111,7 @@ export default function TranslationSelector({ value, onChange, disabled }: Props
               type="text"
               value={query}
               onChange={(e) => setQuery(e.target.value)}
-              placeholder="Search language or translator…"
+              placeholder={t('searchPlaceholder')}
               className="flex-1 bg-transparent text-sm text-on-surface placeholder:text-on-surface-variant focus:outline-none"
             />
             {query && (
@@ -125,7 +128,7 @@ export default function TranslationSelector({ value, onChange, disabled }: Props
           </div>
           <div className="overflow-y-auto max-h-60">
             {filtered.length === 0 ? (
-              <p className="px-3 py-2 text-sm text-on-surface-variant">No results.</p>
+              <p className="px-3 py-2 text-sm text-on-surface-variant">{t('noResults')}</p>
             ) : (
               filtered.map((opt) => (
                 <button

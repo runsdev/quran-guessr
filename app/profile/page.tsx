@@ -1,5 +1,6 @@
 import Image from 'next/image';
 import { redirect } from 'next/navigation';
+import { getTranslations } from 'next-intl/server';
 
 import GameStats from './GameStats';
 import LeaderboardConsentToggle from './LeaderboardConsentToggle';
@@ -16,6 +17,9 @@ import { MODE_DISPLAY } from '@/types/game-mode';
 export const dynamic = 'force-dynamic';
 
 export default async function ProfilePage() {
+  const t = await getTranslations('profilePage');
+  const tCommon = await getTranslations('common');
+  const tGameModes = await getTranslations('gameModes');
   const session = await auth();
   const userId = (session?.user as { id?: string } | undefined)?.id;
 
@@ -91,12 +95,14 @@ export default async function ProfilePage() {
                 <div className="flex items-start justify-between gap-2">
                   <div className="min-w-0">
                     <h1 className="text-2xl font-bold text-on-surface truncate">
-                      {user.name ?? 'Anonymous'}
+                      {user.name ?? t('anonymous')}
                     </h1>
                     {user.email && (
                       <p className="text-sm text-on-surface-variant truncate">{user.email}</p>
                     )}
-                    <p className="text-xs text-on-surface-variant mt-1">Joined {joinDate}</p>
+                    <p className="text-xs text-on-surface-variant mt-1">
+                      {t('joined', { date: joinDate })}
+                    </p>
                   </div>
                   <LogoutButton />
                 </div>
@@ -115,16 +121,17 @@ export default async function ProfilePage() {
                 <span className="material-symbols-outlined text-primary text-[18px]">
                   calendar_month
                 </span>
-                Recent Activity
+                {t('recentActivity')}
               </h2>
               <div className="space-y-0.5">
                 {recentEvents.map((event) => {
-                  const meta = MODE_DISPLAY[event.gameMode] ?? {
-                    label: event.gameMode,
+                  const modeMeta = MODE_DISPLAY[event.gameMode];
+                  const meta = modeMeta ?? {
                     icon: 'sports_esports',
                     iconCls: 'text-on-surface-variant',
                     dotCls: 'bg-surface-container',
                   };
+                  const label = modeMeta ? tGameModes(modeMeta.labelKey) : event.gameMode;
                   return (
                     <div
                       key={event.id}
@@ -139,21 +146,21 @@ export default async function ProfilePage() {
                           </span>
                         </div>
                         <div>
-                          <p className="text-sm font-medium text-on-surface">{meta.label}</p>
+                          <p className="text-sm font-medium text-on-surface">{label}</p>
                           <div className="flex items-center gap-1.5 mt-0.5">
                             {event.ranked && (
                               <span className="text-[10px] font-semibold bg-primary/10 text-primary px-1.5 py-0.5 rounded-full">
-                                Ranked
+                                {tCommon('ranked')}
                               </span>
                             )}
                             {event.practice && (
                               <span className="text-[10px] font-semibold bg-surface-container text-on-surface-variant px-1.5 py-0.5 rounded-full">
-                                Practice
+                                {tCommon('practice')}
                               </span>
                             )}
                             {!event.ranked && !event.practice && (
                               <span className="text-[10px] font-semibold bg-surface-container text-on-surface-variant px-1.5 py-0.5 rounded-full">
-                                Casual
+                                {tCommon('casual')}
                               </span>
                             )}
                           </div>

@@ -27,7 +27,9 @@
     "practice": "Practice",
     "previous": "Previous page",
     "next": "Next page",
-    "showing": "Showing {from}–{to} of {total} {noun}"
+    "showing": "Showing {from}–{to} of {total} {noun}",
+    "pointsAbbr": "pts",
+    "mastery": "Mastery: {percent}%"
   },
   "nav": {
     "quranGuessr": "QuranGuessr",
@@ -186,7 +188,9 @@
     "title": "Verse Translation",
     "whichTranslation": "Which is the correct translation?",
     "selectMatching": "Select the matching translation for this Ayah.",
-    "searchPlaceholder": "Search language or translator…"
+    "searchPlaceholder": "Search language or translator…",
+    "selectTranslation": "Select a translation…",
+    "noResults": "No results."
   },
   "auth": {
     "signInTitle": "QuranGuessr",

@@ -1,9 +1,9 @@
 import { GoogleTagManager, GoogleAnalytics } from '@next/third-parties/google';
 import { GeistMono } from 'geist/font/mono';
 import type { Metadata } from 'next';
+import { Inter, Scheherazade_New } from 'next/font/google';
 import { NextIntlClientProvider } from 'next-intl';
 import { getLocale, getMessages } from 'next-intl/server';
-import { Inter, Scheherazade_New } from 'next/font/google';
 import { Toaster } from 'sonner';
 
 import MaterialSymbolsLoader from './components/MaterialSymbolsLoader';

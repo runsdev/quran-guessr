@@ -4,19 +4,21 @@ import React from 'react';
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-
-const navItems = [
-  { icon: 'quiz', label: 'Quiz', href: '/quiz' },
-  { icon: 'leaderboard', label: 'Rankings', href: '/leaderboard' },
-  { icon: 'bar_chart', label: 'Stats', href: '/stats' },
-  { icon: 'person', label: 'Profile', href: '/profile' },
-];
+import { useTranslations } from 'next-intl';
 
 /**
  * Mobile-only fixed bottom navigation bar — Apple-style frosted bar.
  */
 const BottomNav = (): React.JSX.Element => {
   const pathname = usePathname();
+  const t = useTranslations('common');
+
+  const navItems = [
+    { icon: 'quiz', label: t('quiz'), href: '/quiz' },
+    { icon: 'leaderboard', label: t('rankings'), href: '/leaderboard' },
+    { icon: 'bar_chart', label: t('stats'), href: '/stats' },
+    { icon: 'person', label: t('profile'), href: '/profile' },
+  ];
 
   return (
     <nav
@@ -35,7 +37,7 @@ const BottomNav = (): React.JSX.Element => {
         const isActive = pathname.startsWith(href);
         return (
           <Link
-            key={label}
+            key={href}
             href={href}
             aria-label={label}
             aria-current={isActive ? 'page' : undefined}

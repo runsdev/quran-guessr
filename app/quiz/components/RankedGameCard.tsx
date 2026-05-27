@@ -1,14 +1,23 @@
+import React from 'react';
+
+import { getTranslations } from 'next-intl/server';
+
 import { PrimaryGameModesProps } from './types';
 
 type RankedProps = Omit<PrimaryGameModesProps, 'openJuzPanel' | 'activeJuzCount'>;
 
-export default function RankedGameCard({
+export default async function RankedGameCard({
   elo,
   dailyRankedCount,
   dailyRankedLimit,
   rankedLimitReached,
   openModal,
-}: RankedProps) {
+}: RankedProps): Promise<React.JSX.Element> {
+  const t = await getTranslations('rankedCard');
+  const tCommon = await getTranslations('common');
+  const eloValue = elo.toLocaleString();
+  const [eloBefore = '', eloAfter = ''] = t('eloLabel', { elo: eloValue }).split(eloValue);
+
   return (
     <button
       onClick={() => openModal('/quiz/missing-word-count')}
@@ -42,25 +51,24 @@ export default function RankedGameCard({
               color: 'var(--color-primary)',
             }}
           >
-            Competitive
+            {t('competitive')}
           </span>
           {rankedLimitReached && (
             <span
               className="px-3 py-1.5 rounded-full text-xs font-bold uppercase tracking-widest"
               style={{ background: '#fde8e0', color: 'var(--color-error)' }}
-              title={`Daily limit of ${dailyRankedLimit} ranked games reached. Resets at midnight UTC.`}
+              title={t('limitTooltip', { limit: dailyRankedLimit })}
             >
-              Limit Reached
+              {t('limitReached')}
             </span>
           )}
         </div>
       </div>
       <h4 className="text-2xl font-bold mb-3" style={{ color: 'var(--color-on-surface)' }}>
-        Missing Word Count
+        {t('title')}
       </h4>
       <p className="mb-8 leading-relaxed" style={{ color: 'var(--color-on-surface-variant)' }}>
-        Climb the global leaderboard. Guess the missing word count — every answer affects your ELO
-        rating.
+        {t('desc')}
       </p>
       <div
         className="mt-auto flex items-center justify-between rounded-xl p-4 w-full"
@@ -77,15 +85,14 @@ export default function RankedGameCard({
             workspace_premium
           </span>
           <span className="text-sm font-medium" style={{ color: 'var(--color-on-surface)' }}>
-            <span title="Your ELO rating — starts at 1000. Correct answers increase it, wrong answers decrease it.">
-              ELO:{' '}
-              <span style={{ color: 'var(--color-primary)', fontWeight: 700 }}>
-                {elo.toLocaleString()}
-              </span>
+            <span title={t('eloTooltip')}>
+              {eloBefore}
+              <span style={{ color: 'var(--color-primary)', fontWeight: 700 }}>{eloValue}</span>
+              {eloAfter}
             </span>
             {' · '}
             <span
-              title={`${dailyRankedCount} of ${dailyRankedLimit} ranked games played today. Resets at midnight UTC.`}
+              title={t('todayTooltip', { count: dailyRankedCount, limit: dailyRankedLimit })}
               style={{
                 color: rankedLimitReached
                   ? 'var(--color-error)'
@@ -93,7 +100,7 @@ export default function RankedGameCard({
                 fontWeight: rankedLimitReached ? 700 : 400,
               }}
             >
-              {dailyRankedCount}/{dailyRankedLimit} today
+              {t('todayCount', { count: dailyRankedCount, limit: dailyRankedLimit })}
             </span>
           </span>
         </div>
@@ -104,7 +111,7 @@ export default function RankedGameCard({
             color: 'var(--color-on-primary)',
           }}
         >
-          {rankedLimitReached ? 'Limit Reached' : 'Start'}
+          {rankedLimitReached ? t('limitReached') : tCommon('start')}
         </span>
       </div>
     </button>

@@ -2,11 +2,14 @@
 
 import { useState, useTransition } from 'react';
 
+import { useTranslations } from 'next-intl';
+
 import { updateLeaderboardConsent } from '@/app/actions/auth';
 
 export default function LeaderboardConsentToggle({ initialValue }: { initialValue: boolean }) {
   const [isPending, startTransition] = useTransition();
   const [value, setValue] = useState(initialValue);
+  const t = useTranslations('leaderboardPrivacy');
 
   function handleToggle() {
     const next = !value;
@@ -24,13 +27,9 @@ export default function LeaderboardConsentToggle({ initialValue }: { initialValu
     <div className="bg-surface-container-low border border-primary/10 rounded-3xl p-5">
       <h2 className="text-base font-semibold text-on-surface mb-1 flex items-center gap-2">
         <span className="material-symbols-outlined text-primary text-[18px]">leaderboard</span>
-        Leaderboard Privacy
+        {t('title')}
       </h2>
-      <p className="text-sm text-on-surface-variant mb-4">
-        {value
-          ? 'Your name and avatar are visible on the leaderboard.'
-          : 'You appear as \u201cAbdullah\u201d on the leaderboard. Enable to show your real name.'}
-      </p>
+      <p className="text-sm text-on-surface-variant mb-4">{value ? t('visible') : t('hidden')}</p>
       <button
         onClick={handleToggle}
         disabled={isPending}
@@ -39,7 +38,7 @@ export default function LeaderboardConsentToggle({ initialValue }: { initialValu
         }`}
         role="switch"
         aria-checked={value}
-        aria-label="Show on leaderboard"
+        aria-label={t('ariaLabel')}
       >
         <span
           className={`inline-block h-5 w-5 rounded-full bg-on-primary shadow transition-transform ${

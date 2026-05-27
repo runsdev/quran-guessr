@@ -1,6 +1,7 @@
 'use client';
 
 import { AnimatePresence, motion } from 'framer-motion';
+import { useTranslations } from 'next-intl';
 import { toast } from 'sonner';
 
 import { TranslationQuizSkeleton } from './loading';
@@ -34,6 +35,8 @@ export default function QuizClient() {
     handleRetry,
     handleEndSession,
   } = useTranslationQuizState();
+  const t = useTranslations('translationQuiz');
+  const tCommon = useTranslations('common');
 
   const pageNumbers =
     question?.verseWords.filter((w) => w.page_number !== undefined).map((w) => w.page_number!) ??
@@ -46,16 +49,16 @@ export default function QuizClient() {
 
   return (
     <>
-      <TopAppBar activeTab="Quiz" />
+      <TopAppBar activeTab={tCommon('quiz')} />
       <main className="flex-1 flex flex-col px-5 max-w-3xl mx-auto w-full gap-6 justify-center min-h-screen pt-20 pb-24 md:pb-8">
         {initError ? (
           <div role="alert" className="flex flex-col items-center gap-3 py-8">
-            <span className="text-sm text-error">Failed to start quiz session.</span>
+            <span className="text-sm text-error">{tCommon('failedToStart')}</span>
             <button
               onClick={() => window.location.reload()}
               className="text-sm text-primary underline underline-offset-2"
             >
-              Retry
+              {tCommon('retry')}
             </button>
           </div>
         ) : (
@@ -65,7 +68,7 @@ export default function QuizClient() {
               score={score}
               timeLeft={timeLeft}
               onEndSession={async () => {
-                toast.info('Session ended');
+                toast.info(tCommon('sessionEnded'));
                 await handleEndSession();
               }}
             />
@@ -90,11 +93,9 @@ export default function QuizClient() {
 
                 <div className="w-full flex flex-col items-center gap-2">
                   <h2 className="text-2xl font-semibold text-on-background">
-                    Which is the correct translation?
+                    {t('whichTranslation')}
                   </h2>
-                  <p className="text-sm text-on-surface-variant">
-                    Select the matching translation for this Ayah.
-                  </p>
+                  <p className="text-sm text-on-surface-variant">{t('selectMatching')}</p>
                 </div>
 
                 {question && (
@@ -117,12 +118,12 @@ export default function QuizClient() {
 
                 {!question && !isPending && fetchError && (
                   <div role="alert" className="flex flex-col items-center gap-3 py-8">
-                    <span className="text-sm text-error">Failed to load question.</span>
+                    <span className="text-sm text-error">{tCommon('failedToLoad')}</span>
                     <button
                       onClick={handleRetry}
                       className="text-sm text-primary underline underline-offset-2"
                     >
-                      Try again
+                      {tCommon('tryAgain')}
                     </button>
                   </div>
                 )}
