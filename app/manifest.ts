@@ -3,8 +3,8 @@ import type { MetadataRoute } from 'next';
 
 export default function manifest(): MetadataRoute.Manifest {
   return {
-    name: 'Quran Guessr — Test Your Knowledge of the Holy Quran',
-    short_name: 'Quran Guessr',
+    name: 'QuranGuessr — Test Your Knowledge of the Holy Quran',
+    short_name: 'QuranGuessr',
     description:
       'Interactive Quran quizzes on verse location, missing words, and sequence — for every level.',
     start_url: '/',

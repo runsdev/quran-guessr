@@ -33,8 +33,8 @@ const scheherazadeNew = Scheherazade_New({
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
   title: {
-    default: 'Quran Guessr — Test Your Knowledge of the Holy Quran',
-    template: '%s | Quran Guessr',
+    default: 'QuranGuessr — Test Your Knowledge of the Holy Quran',
+    template: '%s | QuranGuessr',
   },
   description:
     'Interactive Quran quizzes on verse location, missing words, and sequence — for every level. Challenge yourself and climb the leaderboard.',
@@ -49,20 +49,20 @@ export const metadata: Metadata = {
     'learn Quran',
     'Quran challenge',
   ],
-  authors: [{ name: 'Quran Guessr' }],
+  authors: [{ name: 'QuranGuessr' }],
   openGraph: {
     type: 'website',
     locale: 'en_US',
     url: SITE_URL,
-    siteName: 'Quran Guessr',
-    title: 'Quran Guessr — Test Your Knowledge of the Holy Quran',
+    siteName: 'QuranGuessr',
+    title: 'QuranGuessr — Test Your Knowledge of the Holy Quran',
     description:
       'Interactive Quran quizzes on verse location, missing words, and sequence — for every level.',
-    images: [{ url: '/quran-hero.jpg', width: 1200, height: 630, alt: 'Quran Guessr' }],
+    images: [{ url: '/quran-hero.jpg', width: 1200, height: 630, alt: 'QuranGuessr' }],
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Quran Guessr — Test Your Knowledge of the Holy Quran',
+    title: 'QuranGuessr — Test Your Knowledge of the Holy Quran',
     description:
       'Interactive Quran quizzes on verse location, missing words, and sequence — for every level.',
     images: ['/quran-hero.jpg'],
