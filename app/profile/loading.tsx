@@ -34,7 +34,7 @@ function GameModeRowSkeleton() {
 export default function ProfileLoading() {
   return (
     <>
-      <TopAppBar activeTab="Profile" />
+      <TopAppBar />
       <main className="min-h-screen bg-surface text-on-surface pt-20 pb-24 md:pb-8">
         <div className="max-w-2xl mx-auto p-4 md:p-8 space-y-6">
           {/* Profile header */}

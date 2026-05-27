@@ -2,6 +2,8 @@ import type { Metadata } from 'next';
 
 import QuizClient from './QuizClient';
 
+import TopAppBar from '@/app/components/TopAppBar';
+
 export const metadata: Metadata = {
   title: 'Locate Verse Quiz',
   description:
@@ -9,5 +11,10 @@ export const metadata: Metadata = {
 };
 
 export default function LocateVerseQuiz() {
-  return <QuizClient />;
+  return (
+    <>
+      <TopAppBar activeHref="/quiz" />
+      <QuizClient />
+    </>
+  );
 }

@@ -2,7 +2,8 @@ export type { VerseWord } from '@/app/quiz/types';
 
 export type Segment =
   | { type: 'words'; words: import('@/app/quiz/types').VerseWord[] }
-  | { type: 'blank' };
+  | { type: 'blank' }
+  | { type: 'verse-end'; verseKey: string };
 
 /** Sent to the client — both the answer and the verse reference are hidden. */
 export interface Question {

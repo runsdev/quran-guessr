@@ -1,5 +1,6 @@
 import Image from 'next/image';
 import { redirect } from 'next/navigation';
+import { getTranslations } from 'next-intl/server';
 
 import GameStats from './GameStats';
 import LeaderboardConsentToggle from './LeaderboardConsentToggle';
@@ -10,12 +11,15 @@ import BottomNav from '@/app/components/BottomNav';
 import TopAppBar from '@/app/components/TopAppBar';
 import { auth } from '@/auth';
 import { prisma } from '@/lib/prisma';
-import { fetchQfStreak } from '@/lib/qf-api';
+import { fetchQfStreak, fetchQfUserProfile } from '@/lib/qf-api';
 import { MODE_DISPLAY } from '@/types/game-mode';
 
 export const dynamic = 'force-dynamic';
 
 export default async function ProfilePage() {
+  const t = await getTranslations('profilePage');
+  const tCommon = await getTranslations('common');
+  const tGameModes = await getTranslations('gameModes');
   const session = await auth();
   const userId = (session?.user as { id?: string } | undefined)?.id;
 
@@ -48,14 +52,17 @@ export default async function ProfilePage() {
     redirect('/auth/signin');
   }
 
-  const [streak, recentEvents] = await Promise.all([
+  // Fetch QF Profile alongside the existing queries (true flag fetches QDC data)
+  const [streak, recentEvents, qfProfile] = await Promise.all([
     fetchQfStreak(userId),
     prisma.gameEvent.findMany({
       where: { userId },
       orderBy: { createdAt: 'desc' },
       take: 15,
     }),
+    fetchQfUserProfile(userId, true),
   ]);
+
   const eloFormatted = Math.round(user.elo).toLocaleString();
   const joinDate = user.createdAt.toLocaleDateString('en-US', {
     year: 'numeric',
@@ -63,19 +70,30 @@ export default async function ProfilePage() {
     day: 'numeric',
   });
 
+  // Determine the display image (QF photoUrl > QF avatar > DB image > null)
+  const imageUrl =
+    qfProfile?.photoUrl ||
+    (qfProfile?.avatarUrls ? (Object.values(qfProfile.avatarUrls)[0] as string) : undefined) ||
+    user.image;
+
+  // Determine the display name (QF full name > QF username > DB name > anonymous)
+  const userName = qfProfile?.firstName
+    ? `${qfProfile.firstName} ${qfProfile.lastName ?? ''}`.trim()
+    : (qfProfile?.username ?? user.name ?? t('anonymous'));
+
   return (
     <>
-      <TopAppBar activeTab="Profile" />
+      <TopAppBar />
       <main className="min-h-screen bg-surface text-on-surface pt-20 pb-24 md:pb-8">
         <div className="max-w-2xl mx-auto p-4 md:p-8 space-y-6">
           {/* Profile header */}
           <div className="bg-surface-container-low border border-primary/10 rounded-3xl p-6">
             <div className="flex items-start gap-5">
               <div className="w-20 h-20 rounded-full overflow-hidden border-2 border-primary/30 shrink-0">
-                {user.image ? (
+                {imageUrl ? (
                   <Image
-                    src={user.image}
-                    alt={user.name ?? 'User avatar'}
+                    src={imageUrl}
+                    alt={userName}
                     width={80}
                     height={80}
                     className="w-full h-full object-cover"
@@ -90,13 +108,13 @@ export default async function ProfilePage() {
               <div className="min-w-0 flex-1">
                 <div className="flex items-start justify-between gap-2">
                   <div className="min-w-0">
-                    <h1 className="text-2xl font-bold text-on-surface truncate">
-                      {user.name ?? 'Anonymous'}
-                    </h1>
+                    <h1 className="text-2xl font-bold text-on-surface truncate">{userName}</h1>
                     {user.email && (
                       <p className="text-sm text-on-surface-variant truncate">{user.email}</p>
                     )}
-                    <p className="text-xs text-on-surface-variant mt-1">Joined {joinDate}</p>
+                    <p className="text-xs text-on-surface-variant mt-1">
+                      {t('joined', { date: joinDate })}
+                    </p>
                   </div>
                   <LogoutButton />
                 </div>
@@ -115,16 +133,17 @@ export default async function ProfilePage() {
                 <span className="material-symbols-outlined text-primary text-[18px]">
                   calendar_month
                 </span>
-                Recent Activity
+                {t('recentActivity')}
               </h2>
               <div className="space-y-0.5">
                 {recentEvents.map((event) => {
-                  const meta = MODE_DISPLAY[event.gameMode] ?? {
-                    label: event.gameMode,
+                  const modeMeta = MODE_DISPLAY[event.gameMode];
+                  const meta = modeMeta ?? {
                     icon: 'sports_esports',
                     iconCls: 'text-on-surface-variant',
                     dotCls: 'bg-surface-container',
                   };
+                  const label = modeMeta ? tGameModes(modeMeta.labelKey) : event.gameMode;
                   return (
                     <div
                       key={event.id}
@@ -139,21 +158,21 @@ export default async function ProfilePage() {
                           </span>
                         </div>
                         <div>
-                          <p className="text-sm font-medium text-on-surface">{meta.label}</p>
+                          <p className="text-sm font-medium text-on-surface">{label}</p>
                           <div className="flex items-center gap-1.5 mt-0.5">
                             {event.ranked && (
                               <span className="text-[10px] font-semibold bg-primary/10 text-primary px-1.5 py-0.5 rounded-full">
-                                Ranked
+                                {tCommon('ranked')}
                               </span>
                             )}
                             {event.practice && (
                               <span className="text-[10px] font-semibold bg-surface-container text-on-surface-variant px-1.5 py-0.5 rounded-full">
-                                Practice
+                                {tCommon('practice')}
                               </span>
                             )}
                             {!event.ranked && !event.practice && (
                               <span className="text-[10px] font-semibold bg-surface-container text-on-surface-variant px-1.5 py-0.5 rounded-full">
-                                Casual
+                                {tCommon('casual')}
                               </span>
                             )}
                           </div>

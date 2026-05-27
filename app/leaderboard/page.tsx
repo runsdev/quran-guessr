@@ -103,7 +103,7 @@ export default async function LeaderboardPage() {
 
   return (
     <>
-      <TopAppBar activeTab="Rankings" />
+      <TopAppBar activeHref="/leaderboard" />
       <LeaderboardClient
         playerEntries={playerEntries}
         pageEntries={pageEntries}

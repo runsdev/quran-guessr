@@ -1,8 +1,9 @@
 /* eslint-disable @typescript-eslint/naming-convention */
 'use client';
 
-import { useState, useCallback } from 'react';
+import { useCallback, useState } from 'react';
 
+import { useTranslations } from 'next-intl';
 import { toast } from 'sonner';
 
 export const JUZ_FILTER_KEY = 'quizJuzFilter';
@@ -32,12 +33,14 @@ const PILL = 'px-3 py-1.5 rounded-full text-xs font-semibold border transition-a
 const ON = 'bg-primary text-on-primary border-primary';
 const OFF = 'bg-transparent text-on-surface-variant border-outline-variant hover:border-primary/50';
 const RANGES = [
-  { label: 'Juz 1-10', from: 1, to: 10 },
-  { label: 'Juz 11-20', from: 11, to: 20 },
-  { label: 'Juz 21-30', from: 21, to: 30 },
+  { from: 1, to: 10 },
+  { from: 11, to: 20 },
+  { from: 21, to: 30 },
 ];
 
 function JuzFilterPanel({ onClose }: { onClose: () => void }) {
+  const t = useTranslations('juzFilter');
+  const tCommon = useTranslations('common');
   const [selected, setSelected] = useState<Set<number>>(() => new Set(loadJuzFilter()));
 
   const toggle = useCallback((juz: number) => {
@@ -57,17 +60,18 @@ function JuzFilterPanel({ onClose }: { onClose: () => void }) {
     setSelected(new Set(Array.from({ length: to - from + 1 }, (_, i) => i + from)));
   const handleSave = () => {
     saveJuzFilter([...selected].sort((a, b) => a - b));
-    toast.success('Juz filter saved');
+    toast.success(t('saved'));
     onClose();
   };
 
   const allSelected = selected.size === 0;
+  const activeCount = allSelected ? 30 : selected.size;
   return (
     <div
       className="fixed inset-0 z-50 flex items-end md:items-center justify-center"
       role="dialog"
       aria-modal="true"
-      aria-label="Juz filter settings"
+      aria-label={t('title')}
     >
       <div
         className="absolute inset-0 bg-black/60 backdrop-blur-sm min-h-screen"
@@ -77,36 +81,36 @@ function JuzFilterPanel({ onClose }: { onClose: () => void }) {
       <div className="relative z-10 md:max-w-[30%] w-full max-w-[90%] bg-surface-container rounded-3xl md:rounded-3xl border border-outline-variant shadow-2xl p-6 flex flex-col gap-5 overflow-hidden">
         <div className="flex items-center justify-between shrink-0">
           <div>
-            <h2 className="text-lg font-bold text-on-surface">Juz Filter</h2>
+            <h2 className="text-lg font-bold text-on-surface">{t('title')}</h2>
             <p className="text-xs text-on-surface-variant mt-0.5">
-              Questions will only come from the selected juz.{' '}
+              {t('desc')}{' '}
               <span className="text-primary font-medium">
-                {allSelected ? 30 : selected.size} active
+                {t('active', { count: activeCount })}
               </span>
             </p>
           </div>
           <button
             onClick={onClose}
             className="w-8 h-8 rounded-full flex items-center justify-center text-on-surface-variant hover:bg-surface-container-high transition-colors"
-            aria-label="Close"
+            aria-label={tCommon('cancel')}
           >
             <span className="material-symbols-outlined text-xl">close</span>
           </button>
         </div>
         <div className="flex flex-wrap gap-2 shrink-0">
           <button onClick={selectAll} className={`${PILL} ${allSelected ? ON : OFF}`}>
-            All Juz
+            {t('allJuz')}
           </button>
-          {RANGES.map(({ label, from, to }) => {
+          {RANGES.map(({ from, to }) => {
             const rs = new Set(Array.from({ length: to - from + 1 }, (_, i) => i + from));
             const isOn = selected.size === rs.size && [...rs].every((j) => selected.has(j));
             return (
               <button
-                key={label}
+                key={`${from}-${to}`}
                 onClick={() => selectRange(from, to)}
                 className={`${PILL} ${isOn ? ON : OFF}`}
               >
-                {label}
+                {t('juzRange', { from, to })}
               </button>
             );
           })}
@@ -129,13 +133,13 @@ function JuzFilterPanel({ onClose }: { onClose: () => void }) {
             onClick={onClose}
             className="flex-1 py-2.5 rounded-xl border border-outline-variant text-on-surface-variant text-sm font-medium hover:bg-surface-container-high active:scale-95 transition-all"
           >
-            Cancel
+            {tCommon('cancel')}
           </button>
           <button
             onClick={handleSave}
             className="flex-1 py-2.5 rounded-xl bg-primary text-on-primary text-sm font-semibold hover:bg-on-primary-container active:scale-95 transition-all"
           >
-            Apply Filter
+            {t('applyFilter')}
           </button>
         </div>
       </div>

@@ -56,7 +56,7 @@ function SmallCardSkeleton() {
 export default function QuizLoading() {
   return (
     <div className="min-h-screen text-on-surface">
-      <TopAppBar activeTab="Quiz" />
+      <TopAppBar activeHref="/quiz" />
 
       {/* Band 1: white — dashboard header */}
       <section

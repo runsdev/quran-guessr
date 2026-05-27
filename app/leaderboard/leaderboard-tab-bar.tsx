@@ -1,39 +1,42 @@
 'use client';
 
+import { useTranslations } from 'next-intl';
+
 import type { LeaderboardTab } from './leaderboard-types';
 
-export const TAB_META: Record<
-  LeaderboardTab,
-  { title: string; desc: string; placeholder: string; empty: string; noun: string }
-> = {
-  player: {
-    title: 'Player Rankings',
-    desc: 'Players ranked by their ELO rating earned through the Missing Word Count quiz.',
-    placeholder: 'Search players…',
-    empty: 'No entries found.',
-    noun: 'players',
-  },
-  page: {
-    title: 'Page Difficulty Rankings',
-    desc: 'Quran pages ranked by difficulty — higher ELO means players answer incorrectly more often.',
-    placeholder: 'Search page number…',
-    empty: 'No entries found.',
-    noun: 'pages',
-  },
-  daily: {
-    title: 'Daily Challenge Rankings',
-    desc: "Top scores for today's 5-question Locate Verse challenge.",
-    placeholder: 'Search players…',
-    empty: "No one has completed today's challenge yet.",
-    noun: 'completions',
-  },
-};
+interface TabMeta {
+  title: string;
+  desc: string;
+  placeholder: string;
+  empty: string;
+  noun: string;
+}
 
-const TABS: { id: LeaderboardTab; label: string; icon: string }[] = [
-  { id: 'player', label: 'Player ELO', icon: 'person' },
-  { id: 'page', label: 'Page ELO', icon: 'menu_book' },
-  { id: 'daily', label: 'Daily', icon: 'today' },
-];
+export function getTabMeta(t: ReturnType<typeof useTranslations>): Record<LeaderboardTab, TabMeta> {
+  return {
+    player: {
+      title: t('playerRankings'),
+      desc: t('playerDesc'),
+      placeholder: t('searchPlayers'),
+      empty: t('noEntries'),
+      noun: t('players'),
+    },
+    page: {
+      title: t('pageDifficulty'),
+      desc: t('pageDesc'),
+      placeholder: t('searchPage'),
+      empty: t('noEntries'),
+      noun: t('pages'),
+    },
+    daily: {
+      title: t('dailyRankings'),
+      desc: t('dailyDesc'),
+      placeholder: t('searchPlayers'),
+      empty: t('noDailyEntries'),
+      noun: t('completions'),
+    },
+  };
+}
 
 interface Props {
   tab: LeaderboardTab;
@@ -50,6 +53,13 @@ export function LeaderboardTabBar({
   onSearchChange,
   placeholder,
 }: Props) {
+  const t = useTranslations('leaderboard');
+  const tabs: { id: LeaderboardTab; label: string; icon: string }[] = [
+    { id: 'player', label: t('playerElo'), icon: 'person' },
+    { id: 'page', label: t('pageLevelElo'), icon: 'menu_book' },
+    { id: 'daily', label: t('dailyChallenge'), icon: 'today' },
+  ];
+
   return (
     <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
       <div
@@ -57,7 +67,7 @@ export function LeaderboardTabBar({
         aria-label="Leaderboard categories"
         className="flex gap-1 shrink-0 bg-surface-container border border-outline-variant rounded-xl p-1"
       >
-        {TABS.map(({ id, label, icon }) => (
+        {tabs.map(({ id, label, icon }) => (
           <button
             key={id}
             role="tab"
@@ -78,7 +88,7 @@ export function LeaderboardTabBar({
         </span>
         <input
           type="search"
-          aria-label="Search leaderboard"
+          aria-label={placeholder}
           value={search}
           onChange={(e) => onSearchChange(e.target.value)}
           placeholder={placeholder}

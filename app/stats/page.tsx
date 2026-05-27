@@ -1,3 +1,5 @@
+import { getTranslations } from 'next-intl/server';
+
 import { fmt, pct } from './stats-helpers';
 import StatsActivityChart from './StatsActivityChart';
 import StatsModeBreakdown from './StatsModeBreakdown';
@@ -7,6 +9,7 @@ import TopAppBar from '@/app/components/TopAppBar';
 import { getCachedStats } from '@/lib/stats-queries';
 
 export default async function StatsPage() {
+  const t = await getTranslations('statsPage');
   const stats = await getCachedStats();
 
   const overallAccuracy = pct(stats.totalCorrect, stats.totalGames);
@@ -14,14 +17,12 @@ export default async function StatsPage() {
 
   return (
     <>
-      <TopAppBar activeTab="Stats" />
+      <TopAppBar activeHref="/stats" />
       <main className="min-h-screen bg-surface text-on-surface pt-20 pb-24 md:pb-8">
         <div className="max-w-3xl mx-auto p-4 md:p-8 space-y-6">
           <div>
-            <h1 className="text-2xl font-bold text-on-surface">Community Stats</h1>
-            <p className="text-sm text-on-surface-variant mt-1">
-              Aggregated across all game modes and players. Refreshes every 5 minutes.
-            </p>
+            <h1 className="text-2xl font-bold text-on-surface">{t('title')}</h1>
+            <p className="text-sm text-on-surface-variant mt-1">{t('subtitle')}</p>
           </div>
 
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
@@ -30,7 +31,7 @@ export default async function StatsPage() {
                 <span className="material-symbols-outlined text-primary">sports_esports</span>
               </div>
               <p className="text-3xl font-bold text-on-surface">{fmt(stats.totalGames)}</p>
-              <p className="text-sm text-on-surface-variant mt-1">Games Played</p>
+              <p className="text-sm text-on-surface-variant mt-1">{t('gamesPlayed')}</p>
             </div>
 
             <div className="bg-surface-container-low border border-primary/10 p-5 rounded-3xl">
@@ -38,7 +39,7 @@ export default async function StatsPage() {
                 <span className="material-symbols-outlined text-green-500">target</span>
               </div>
               <p className="text-3xl font-bold text-on-surface">{overallAccuracy}</p>
-              <p className="text-sm text-on-surface-variant mt-1">Overall Accuracy</p>
+              <p className="text-sm text-on-surface-variant mt-1">{t('overallAccuracy')}</p>
             </div>
 
             <div className="bg-surface-container-low border border-primary/10 p-5 rounded-3xl">
@@ -46,7 +47,7 @@ export default async function StatsPage() {
                 <span className="material-symbols-outlined text-secondary">group</span>
               </div>
               <p className="text-3xl font-bold text-on-surface">{fmt(stats.uniquePlayers)}</p>
-              <p className="text-sm text-on-surface-variant mt-1">Active Players</p>
+              <p className="text-sm text-on-surface-variant mt-1">{t('activePlayers')}</p>
             </div>
 
             <div className="bg-surface-container-low border border-primary/10 p-5 rounded-3xl">
@@ -54,7 +55,7 @@ export default async function StatsPage() {
                 <span className="material-symbols-outlined text-amber-400">today</span>
               </div>
               <p className="text-3xl font-bold text-on-surface">{fmt(stats.totalToday)}</p>
-              <p className="text-sm text-on-surface-variant mt-1">Games Today</p>
+              <p className="text-sm text-on-surface-variant mt-1">{t('gamesToday')}</p>
             </div>
           </div>
 
@@ -67,7 +68,7 @@ export default async function StatsPage() {
               <span className="material-symbols-outlined text-primary text-[18px]">
                 supervised_user_circle
               </span>
-              Player Origin
+              {t('playerOrigin')}
             </h2>
 
             <div className="grid grid-cols-2 gap-3">
@@ -77,12 +78,12 @@ export default async function StatsPage() {
                     manage_accounts
                   </span>
                   <span className="text-xs font-semibold text-on-surface-variant uppercase tracking-wide">
-                    Signed In
+                    {t('signedIn')}
                   </span>
                 </div>
                 <p className="text-2xl font-bold text-on-surface">{fmt(stats.totalAuthGames)}</p>
                 <p className="text-xs text-on-surface-variant mt-0.5">
-                  {pct(stats.totalAuthGames, stats.totalGames)} of games
+                  {t('ofGames', { pct: pct(stats.totalAuthGames, stats.totalGames) })}
                 </p>
               </div>
               <div className="bg-surface-container rounded-2xl p-4">
@@ -91,12 +92,12 @@ export default async function StatsPage() {
                     person_off
                   </span>
                   <span className="text-xs font-semibold text-on-surface-variant uppercase tracking-wide">
-                    Anonymous
+                    {t('anonymous')}
                   </span>
                 </div>
                 <p className="text-2xl font-bold text-on-surface">{fmt(stats.totalAnonGames)}</p>
                 <p className="text-xs text-on-surface-variant mt-0.5">
-                  {pct(stats.totalAnonGames, stats.totalGames)} of games
+                  {t('ofGames', { pct: pct(stats.totalAnonGames, stats.totalGames) })}
                 </p>
               </div>
             </div>

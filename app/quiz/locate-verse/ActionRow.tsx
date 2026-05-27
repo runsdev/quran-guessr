@@ -1,3 +1,9 @@
+'use client';
+
+import React from 'react';
+
+import { useTranslations } from 'next-intl';
+
 import type { SubmitResult } from './types';
 
 interface ActionRowProps {
@@ -21,32 +27,41 @@ export default function ActionRow({
   loading,
   onSubmit,
   onNext,
-}: ActionRowProps) {
+}: ActionRowProps): React.JSX.Element {
+  const t = useTranslations('locateVerse');
+  const tCommon = useTranslations('common');
+
   let feedbackEl: React.ReactNode = null;
   if (submitted && submitResult) {
     const { pageCorrect, lineCorrect, correctPage, correctLine, roundScore } = submitResult;
-    const pts = `+${roundScore.toLocaleString()} pts`;
+    const pts = `+${roundScore.toLocaleString()} ${tCommon('pointsAbbr')}`;
     if (pageCorrect && lineCorrect) {
       feedbackEl = (
         <div className="flex flex-col gap-0.5">
-          <p className="text-sm font-medium text-green-400">✓ Perfect! {pts}</p>
+          <p className="text-sm font-medium text-green-400">
+            {t('perfect')} {pts}
+          </p>
           <p className="text-xs text-on-surface-variant">
-            Page {correctPage}, Row {correctLine}
+            {t('pageRow', { page: correctPage, line: correctLine })}
           </p>
         </div>
       );
     } else if (pageCorrect) {
       feedbackEl = (
         <div className="flex flex-col gap-0.5">
-          <p className="text-sm font-medium text-amber-400">~ Right page! {pts}</p>
-          <p className="text-xs text-on-surface-variant">Row was {correctLine}</p>
+          <p className="text-sm font-medium text-amber-400">
+            {t('rightPage')} {pts}
+          </p>
+          <p className="text-xs text-on-surface-variant">{t('rowWas', { line: correctLine })}</p>
         </div>
       );
     } else if (lineCorrect) {
       feedbackEl = (
         <div className="flex flex-col gap-0.5">
-          <p className="text-sm font-medium text-amber-400">~ Right row! {pts}</p>
-          <p className="text-xs text-on-surface-variant">Page was {correctPage}</p>
+          <p className="text-sm font-medium text-amber-400">
+            {t('rightRow')} {pts}
+          </p>
+          <p className="text-xs text-on-surface-variant">{t('pageWas', { page: correctPage })}</p>
         </div>
       );
     } else {
@@ -55,16 +70,16 @@ export default function ActionRow({
       let missLabel: string;
       let missColor: string;
       if (pageDist <= 3 && lineDist <= 2) {
-        missLabel = '~ So close!';
+        missLabel = t('soClose');
         missColor = 'text-amber-400';
       } else if (pageDist <= 10) {
-        missLabel = '~ Close.';
+        missLabel = t('close');
         missColor = 'text-amber-400';
       } else if (pageDist <= 30) {
-        missLabel = '↗ Not far.';
+        missLabel = t('notFar');
         missColor = 'text-orange-400';
       } else {
-        missLabel = '✗ Miss.';
+        missLabel = t('miss');
         missColor = 'text-rose-400';
       }
       feedbackEl = (
@@ -73,7 +88,7 @@ export default function ActionRow({
             {missLabel} {pts}
           </p>
           <p className="text-xs text-on-surface-variant">
-            Page {correctPage}, Row {correctLine}
+            {t('pageRow', { page: correctPage, line: correctLine })}
           </p>
         </div>
       );
@@ -95,10 +110,10 @@ export default function ActionRow({
               <span className="material-symbols-outlined" style={{ fontSize: 18 }}>
                 home
               </span>
-              Hub
+              {tCommon('hub')}
             </a>
             <button onClick={onNext} className={BTN}>
-              Next Question
+              {tCommon('nextQuestion')}
               <span className="material-symbols-outlined" style={{ fontSize: 18 }}>
                 arrow_forward
               </span>
@@ -110,7 +125,7 @@ export default function ActionRow({
             disabled={selectedPage === null || selectedLine === null || loading}
             className={`${BTN} disabled:opacity-40 disabled:cursor-not-allowed`}
           >
-            Submit Answer
+            {t('submitAnswer')}
             <span className="material-symbols-outlined" style={{ fontSize: 18 }}>
               check
             </span>

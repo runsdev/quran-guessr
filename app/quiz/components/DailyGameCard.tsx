@@ -1,8 +1,17 @@
+'use client';
+
+import React from 'react';
+
+import { useTranslations } from 'next-intl';
+
 import { PrimaryGameModesProps } from './types';
 
 type DailyProps = Pick<PrimaryGameModesProps, 'openModal'>;
 
-export default function DailyGameCard({ openModal }: DailyProps) {
+export default function DailyGameCard({ openModal }: DailyProps): React.JSX.Element {
+  const t = useTranslations('dailyCard');
+  const tCommon = useTranslations('common');
+
   return (
     <button
       onClick={() => openModal('/quiz/locate-verse/daily')}
@@ -35,15 +44,14 @@ export default function DailyGameCard({ openModal }: DailyProps) {
             color: 'var(--color-on-surface-variant)',
           }}
         >
-          Daily Casual
+          {t('dailyCasual')}
         </span>
       </div>
       <h4 className="text-2xl font-bold mb-3" style={{ color: 'var(--color-on-surface)' }}>
-        Locate the Verse
+        {t('title')}
       </h4>
       <p className="mb-8 leading-relaxed" style={{ color: 'var(--color-on-surface-variant)' }}>
-        5 verses · same for everyone · new challenge each day · identify the page and row of an
-        Ayah.
+        {t('desc')}
       </p>
       <div
         className="mt-auto flex items-center justify-between rounded-xl p-4 w-full"
@@ -60,9 +68,9 @@ export default function DailyGameCard({ openModal }: DailyProps) {
             shuffle
           </span>
           <span className="text-sm font-medium" style={{ color: 'var(--color-on-surface)' }}>
-            Mode:{' '}
+            {t('mode')}{' '}
             <span style={{ color: 'var(--color-on-surface-variant)', fontWeight: 700 }}>
-              Daily Free Play
+              {t('dailyFreePlay')}
             </span>
           </span>
         </div>
@@ -74,7 +82,7 @@ export default function DailyGameCard({ openModal }: DailyProps) {
             background: 'var(--color-surface-container-lowest)',
           }}
         >
-          Start
+          {tCommon('play')}
         </span>
       </div>
     </button>

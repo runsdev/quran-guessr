@@ -1,3 +1,9 @@
+'use client';
+
+import React from 'react';
+
+import { useTranslations } from 'next-intl';
+
 interface ActionRowProps {
   isCorrect: boolean;
   submitted: boolean;
@@ -17,13 +23,16 @@ export default function ActionRow({
   loading,
   onSubmit,
   onNext,
-}: ActionRowProps) {
+}: ActionRowProps): React.JSX.Element {
+  const t = useTranslations('nextVerseQuiz');
+  const tCommon = useTranslations('common');
+
   return (
     <div className="w-full flex items-center justify-between min-h-12">
       <div role="status" aria-live="polite" aria-atomic="true" className="flex-1">
         {submitted && (
           <p className={`text-sm font-medium ${isCorrect ? 'text-green-400' : 'text-rose-400'}`}>
-            {isCorrect ? 'Correct!' : 'Not quite — see the highlighted answer.'}
+            {isCorrect ? tCommon('correct') : t('notQuite')}
           </p>
         )}
       </div>
@@ -37,10 +46,10 @@ export default function ActionRow({
               <span className="material-symbols-outlined" style={{ fontSize: 18 }}>
                 home
               </span>
-              Hub
+              {tCommon('hub')}
             </a>
             <button onClick={onNext} className={BTN}>
-              Next Question
+              {tCommon('nextQuestion')}
               <span className="material-symbols-outlined" style={{ fontSize: 18 }}>
                 arrow_forward
               </span>
@@ -52,7 +61,7 @@ export default function ActionRow({
             disabled={selected === null || loading}
             className={`${BTN} disabled:opacity-40 disabled:cursor-not-allowed`}
           >
-            Submit
+            {tCommon('submit')}
             <span className="material-symbols-outlined" style={{ fontSize: 18 }}>
               arrow_forward
             </span>

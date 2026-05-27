@@ -1,12 +1,14 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
+
+import { useTranslations } from 'next-intl';
 
 import { DailyChallengeTable } from './leaderboard-daily-table';
 import { InfoPanel } from './leaderboard-info-panel';
 import { PageEloTable } from './leaderboard-page-table';
 import LeaderboardStatsCards from './leaderboard-stats-cards';
-import { LeaderboardTabBar, TAB_META } from './leaderboard-tab-bar';
+import { getTabMeta, LeaderboardTabBar } from './leaderboard-tab-bar';
 import { LeaderboardTable } from './leaderboard-table';
 import type {
   DailyChallengeEntry,
@@ -35,6 +37,8 @@ export default function LeaderboardClient({
   currentUserId,
   stats,
 }: Props) {
+  const t = useTranslations('leaderboard');
+  const tCommon = useTranslations('common');
   const [tab, setTab] = useState<LeaderboardTab>('player');
   const [search, setSearch] = useState('');
   const [debouncedSearch, setDebouncedSearch] = useState('');
@@ -94,7 +98,7 @@ export default function LeaderboardClient({
   const pagedPlayers = filteredPlayers.slice(page * PAGE_SIZE, (page + 1) * PAGE_SIZE);
   const pagedPages = filteredPages.slice(page * PAGE_SIZE, (page + 1) * PAGE_SIZE);
   const pagedDaily = filteredDaily.slice(page * PAGE_SIZE, (page + 1) * PAGE_SIZE);
-  const meta = TAB_META[tab];
+  const meta = getTabMeta(t)[tab];
 
   const handleTabChange = (newTab: LeaderboardTab) => {
     setTab(newTab);
@@ -144,15 +148,19 @@ export default function LeaderboardClient({
             )}
             <div className="p-6 bg-surface-container-lowest/40 border-t border-primary/10 flex items-center justify-between">
               <span className="text-sm text-on-surface-variant">
-                Showing {filtered.length === 0 ? 0 : page * PAGE_SIZE + 1}–
-                {Math.min((page + 1) * PAGE_SIZE, filtered.length)} of {filtered.length} {meta.noun}
+                {tCommon('showing', {
+                  from: filtered.length === 0 ? 0 : page * PAGE_SIZE + 1,
+                  to: Math.min((page + 1) * PAGE_SIZE, filtered.length),
+                  total: filtered.length,
+                  noun: meta.noun,
+                })}
               </span>
               <div className="flex gap-4">
                 <button
                   onClick={() => setPage((p) => Math.max(0, p - 1))}
                   disabled={page === 0}
                   className="text-on-surface-variant hover:text-primary active:scale-90 transition-all disabled:opacity-30 disabled:pointer-events-none"
-                  aria-label="Previous page"
+                  aria-label={tCommon('previous')}
                 >
                   <span className="material-symbols-outlined">arrow_back_ios</span>
                 </button>
@@ -160,7 +168,7 @@ export default function LeaderboardClient({
                   onClick={() => setPage((p) => Math.min(totalPages - 1, p + 1))}
                   disabled={page === totalPages - 1 || totalPages === 0}
                   className="text-primary hover:text-on-primary-container active:scale-90 transition-all disabled:opacity-30 disabled:pointer-events-none"
-                  aria-label="Next page"
+                  aria-label={tCommon('next')}
                 >
                   <span className="material-symbols-outlined">arrow_forward_ios</span>
                 </button>

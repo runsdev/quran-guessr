@@ -1,3 +1,9 @@
+'use client';
+
+import React from 'react';
+
+import { useTranslations } from 'next-intl';
+
 export default function QuizHeader({
   questionNumber,
   totalScore,
@@ -6,7 +12,10 @@ export default function QuizHeader({
   questionNumber: number;
   totalScore: number;
   onEndSession?: () => void;
-}) {
+}): React.JSX.Element {
+  const t = useTranslations('locateVerse');
+  const tCommon = useTranslations('common');
+
   return (
     <div className="w-full flex justify-between items-center pt-5">
       <div className="flex items-center gap-3">
@@ -14,18 +23,18 @@ export default function QuizHeader({
           <button
             onClick={onEndSession}
             className="w-8 h-8 rounded-full flex items-center justify-center text-on-surface-variant hover:text-error hover:bg-error/10 transition-colors"
-            aria-label="End session"
-            title="End session and return to quiz hub"
+            aria-label={tCommon('endSession')}
+            title={tCommon('endSessionTitle')}
           >
             <span className="material-symbols-outlined text-[18px]">close</span>
           </button>
         )}
         <div className="flex flex-col gap-1">
           <span className="text-xs font-medium text-on-surface-variant uppercase tracking-wider">
-            Verse Location
+            {t('title')}
           </span>
           <span className="text-base font-medium text-on-background">
-            Question {questionNumber}
+            {tCommon('question', { number: questionNumber })}
           </span>
         </div>
       </div>
@@ -34,7 +43,7 @@ export default function QuizHeader({
           stars
         </span>
         <span className="text-sm font-semibold text-primary">
-          {totalScore.toLocaleString()} pts
+          {totalScore.toLocaleString()} {tCommon('pointsAbbr')}
         </span>
       </div>
     </div>

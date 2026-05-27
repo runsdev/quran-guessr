@@ -6,7 +6,7 @@ import TopAppBar from '@/app/components/TopAppBar';
 import { auth } from '@/auth';
 import { getOrCreateDailyChallenge } from '@/lib/daily-challenge';
 import { prisma } from '@/lib/prisma';
-import { getCachedQfStreak } from '@/lib/qf-api';
+import { fetchQfStreak } from '@/lib/qf-api';
 
 export const dynamic = 'force-dynamic';
 
@@ -53,7 +53,7 @@ export default async function QuizHubPage() {
     const [user, rankedCount, qfStreak, sessions, dailyResult] = await Promise.all([
       prisma.user.findUnique({ where: { id: userId }, select: { elo: true, name: true } }),
       getDailyRankedCount(userId),
-      getCachedQfStreak(userId),
+      fetchQfStreak(userId),
       prisma.quizSession.findMany({
         where: { userId, status: 'active', expiresAt: { gt: new Date() } },
         select: {
@@ -96,7 +96,7 @@ export default async function QuizHubPage() {
 
   return (
     <div className="min-h-screen text-on-surface">
-      <TopAppBar activeTab="Quiz" />
+      <TopAppBar activeHref="/quiz" />
 
       {/* ── Band 1: white — welcome header ── */}
       <section

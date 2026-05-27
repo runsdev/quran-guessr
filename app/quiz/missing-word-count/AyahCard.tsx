@@ -57,18 +57,31 @@ export default function AyahCard({
   loadedPages,
   onRetry,
 }: AyahCardProps) {
-  // Build ordered full-verse word list when we have hidden words after submission
-  const fullVerseWords: { word: VerseWord; wasHidden: boolean }[] | null =
+  // Build display data for the submitted view by splitting segments at verse-end
+  const submittedDisplay: {
+    primaryWords: { word: VerseWord; wasHidden: boolean }[];
+    infoWords: VerseWord[];
+  } | null =
     submitted && hiddenWords && question
       ? (() => {
-          const visible: { word: VerseWord; wasHidden: boolean }[] = question.segments
-            .filter((seg): seg is { type: 'words'; words: VerseWord[] } => seg.type === 'words')
-            .flatMap((seg) => seg.words.map((w) => ({ word: w, wasHidden: false })));
-          const hidden: { word: VerseWord; wasHidden: boolean }[] = hiddenWords.map((w) => ({
-            word: w,
-            wasHidden: true,
-          }));
-          return [...visible, ...hidden].sort((a, b) => a.word.position - b.word.position);
+          const veIdx = question.segments.findIndex((s) => s.type === 'verse-end');
+          const primarySegs = veIdx >= 0 ? question.segments.slice(0, veIdx) : question.segments;
+          const afterSegs = veIdx >= 0 ? question.segments.slice(veIdx + 1) : [];
+
+          const primaryVisible = primarySegs
+            .filter((s): s is { type: 'words'; words: VerseWord[] } => s.type === 'words')
+            .flatMap((s) => s.words.map((w) => ({ word: w, wasHidden: false as const })));
+
+          const infoWords = afterSegs
+            .filter((s): s is { type: 'words'; words: VerseWord[] } => s.type === 'words')
+            .flatMap((s) => s.words);
+
+          const primaryWords = [
+            ...primaryVisible,
+            ...hiddenWords.map((w) => ({ word: w, wasHidden: true as const })),
+          ].sort((a, b) => a.word.id - b.word.id);
+
+          return { primaryWords, infoWords };
         })()
       : null;
 
@@ -94,26 +107,44 @@ export default function AyahCard({
 
       {!loading && !error && question && !submitted && (
         <p lang="ar" dir="rtl" className="quran-text text-on-surface relative z-10 text-center">
-          {question.segments
-            .filter((seg): seg is { type: 'words'; words: VerseWord[] } => seg.type === 'words')
-            .map((seg, segIdx) =>
-              seg.words.map((word, wordIdx) => (
+          {question.segments.map((seg, segIdx) => {
+            if (seg.type === 'words') {
+              return seg.words.map((word, wordIdx) => (
                 <WordSpan key={`${segIdx}-${wordIdx}`} word={word} loadedPages={loadedPages} />
-              )),
-            )}
+              ));
+            }
+            if (seg.type === 'verse-end') {
+              return (
+                <span
+                  key={`ve-${segIdx}`}
+                  className="mx-1 text-on-surface-variant/40 select-none"
+                  aria-hidden="true"
+                >
+                  ۝
+                </span>
+              );
+            }
+            return null;
+          })}
         </p>
       )}
 
-      {!loading && !error && submitted && fullVerseWords && (
+      {!loading && !error && submitted && submittedDisplay && (
         <div className="flex flex-col items-center gap-3 w-full relative z-10">
           <p lang="ar" dir="rtl" className="quran-text text-on-surface text-center">
-            {fullVerseWords.map((entry, idx) => (
+            {submittedDisplay.primaryWords.map((entry, idx) => (
               <WordSpan
                 key={idx}
                 word={entry.word}
                 loadedPages={loadedPages}
                 highlight={entry.wasHidden ? (isCorrect ? 'correct' : 'incorrect') : null}
               />
+            ))}
+            <span className="mx-1 text-on-surface-variant/40 select-none" aria-hidden="true">
+              ۝
+            </span>
+            {submittedDisplay.infoWords.map((word, idx) => (
+              <WordSpan key={`info-${idx}`} word={word} loadedPages={loadedPages} />
             ))}
           </p>
           {verseKey && (

@@ -9,14 +9,14 @@ export default function JsonLd() {
   const jsonLd = {
     '@context': 'https://schema.org',
     '@type': 'WebApplication',
-    name: 'Quran Guessr',
+    name: 'QuranGuessr',
     url: SITE_URL,
     description:
       'Interactive Quran quizzes on verse location, missing words, and sequence — for every level.',
     applicationCategory: 'EducationalApplication',
     operatingSystem: 'Any',
     offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' },
-    inLanguage: ['en', 'ar'],
+    inLanguage: ['en', 'ar', 'id'],
   };
 
   return (

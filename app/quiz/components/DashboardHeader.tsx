@@ -1,3 +1,7 @@
+import React from 'react';
+
+import { getTranslations } from 'next-intl/server';
+
 /* eslint-disable @typescript-eslint/no-unused-vars */
 interface Props {
   userName: string;
@@ -9,13 +13,14 @@ interface Props {
 
 const STREAK_GOAL = 1;
 
-export default function DashboardHeader({
+export default async function DashboardHeader({
   userName,
   elo,
   streak,
   dailyRankedCount,
   dailyRankedLimit,
-}: Props) {
+}: Props): Promise<React.JSX.Element> {
+  const t = await getTranslations('dashboard');
   const circumference = 2 * Math.PI * 20;
   const streakOffset = circumference - circumference * Math.min(streak / STREAK_GOAL, 1);
 
@@ -33,15 +38,15 @@ export default function DashboardHeader({
             marginBottom: 8,
           }}
         >
-          Bismillah,
+          {t('bismillah')}
         </p>
         <h1
           className="text-3xl md:text-4xl font-bold mb-2"
           style={{ color: 'var(--color-on-surface)' }}
         >
-          Welcome back, {userName}
+          {t('welcomeBack', { name: userName })}
         </h1>
-        <p style={{ color: 'var(--color-on-surface-variant)', fontSize: 16 }}>How are you today?</p>
+        <p style={{ color: 'var(--color-on-surface-variant)', fontSize: 16 }}>{t('howAreYou')}</p>
       </div>
 
       {/* ── Right: stat chips ── */}
@@ -73,7 +78,7 @@ export default function DashboardHeader({
               className="text-xs uppercase tracking-wider font-semibold"
               style={{ color: 'var(--color-on-surface-variant)' }}
             >
-              ELO
+              {t('elo')}
             </p>
             <span className="text-xl font-bold" style={{ color: 'var(--color-on-surface)' }}>
               {elo.toLocaleString()}
@@ -118,10 +123,12 @@ export default function DashboardHeader({
               className="text-xs uppercase tracking-wider font-semibold"
               style={{ color: 'var(--color-on-surface-variant)' }}
             >
-              Streak
+              {t('streak')}
             </p>
             <p className="text-sm font-medium" style={{ color: 'var(--color-on-surface)' }}>
-              {streak >= STREAK_GOAL ? 'Goal reached!' : `${STREAK_GOAL - streak} to goal`}
+              {streak >= STREAK_GOAL
+                ? t('goalReached')
+                : t('toGoal', { count: STREAK_GOAL - streak })}
             </p>
           </div>
         </div>

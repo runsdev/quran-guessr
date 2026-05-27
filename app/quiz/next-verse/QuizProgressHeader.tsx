@@ -1,3 +1,9 @@
+'use client';
+
+import React from 'react';
+
+import { useTranslations } from 'next-intl';
+
 export default function QuizProgressHeader({
   questionNumber,
   score,
@@ -8,7 +14,9 @@ export default function QuizProgressHeader({
   score?: number;
   timeLeft?: number;
   onEndSession?: () => void;
-}) {
+}): React.JSX.Element {
+  const t = useTranslations('nextVerseQuiz');
+  const tCommon = useTranslations('common');
   const totalAnswered = questionNumber - 1;
   const masteryPct = totalAnswered > 0 && score !== undefined ? (score / totalAnswered) * 100 : 0;
 
@@ -21,18 +29,18 @@ export default function QuizProgressHeader({
               <button
                 onClick={onEndSession}
                 className="w-8 h-8 rounded-full flex items-center justify-center text-on-surface-variant hover:text-error hover:bg-error/10 transition-colors"
-                aria-label="End session"
-                title="End session and return to quiz hub"
+                aria-label={tCommon('endSession')}
+                title={tCommon('endSessionTitle')}
               >
                 <span className="material-symbols-outlined text-[18px]">close</span>
               </button>
             )}
             <div className="flex flex-col gap-0.5">
               <span className="text-xs font-medium text-on-surface-variant uppercase tracking-wider">
-                Next Verse
+                {t('title')}
               </span>
               <span className="text-base font-medium text-on-background">
-                Question {questionNumber}
+                {tCommon('question', { number: questionNumber })}
               </span>
             </div>
           </div>
@@ -72,7 +80,7 @@ export default function QuizProgressHeader({
             aria-valuenow={Math.round(masteryPct)}
             aria-valuemin={0}
             aria-valuemax={100}
-            aria-label={`Mastery: ${Math.round(masteryPct)}%`}
+            aria-label={tCommon('mastery', { percent: Math.round(masteryPct) })}
           >
             <div
               className="h-full rounded-full bg-primary transition-all duration-500"

@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 
+import { useTranslations } from 'next-intl';
 import { createPortal } from 'react-dom';
 
 interface Props {
@@ -11,6 +12,8 @@ interface Props {
 }
 
 export default function IntegrityModal({ open, onClose, onConfirm }: Props) {
+  const t = useTranslations('integrity');
+  const tCommon = useTranslations('common');
   const [pledged, setPledged] = useState(false);
 
   if (!open) {
@@ -44,16 +47,14 @@ export default function IntegrityModal({ open, onClose, onConfirm }: Props) {
           </div>
 
           <h2 className="text-[22px] font-semibold text-on-surface text-center mb-2 tracking-[-0.01em]">
-            Play with Integrity
+            {t('title')}
           </h2>
           <p className="text-on-surface-variant text-center text-sm font-medium mb-6 tracking-widest">
-            بِسْمِ اللَّهِ الرَّحْمَنِ الرَّحِيمِ
+            {t('bismillah')}
           </p>
 
           <p className="text-on-surface-variant text-center text-[15px] leading-relaxed mb-8">
-            This is a test of what lives in your heart. Answer from memory only — do not open the
-            Quran, consult a translation, or use any external aid. Let your score reflect your true
-            connection with the Book of Allah.
+            {t('desc')}
           </p>
 
           {/* Pledge checkbox */}
@@ -83,8 +84,7 @@ export default function IntegrityModal({ open, onClose, onConfirm }: Props) {
               </div>
             </div>
             <span className="text-sm text-on-surface-variant group-hover:text-on-surface transition-colors leading-relaxed">
-              I commit to answering from memory only, without peeking at the Quran or any other
-              resource.
+              {t('pledge')}
             </span>
           </label>
 
@@ -94,14 +94,14 @@ export default function IntegrityModal({ open, onClose, onConfirm }: Props) {
               onClick={onClose}
               className="flex-1 h-12 rounded-lg border border-outline text-on-surface hover:border-on-surface-variant hover:bg-surface-container active:scale-95 transition-all duration-200 font-medium text-sm bg-background"
             >
-              Cancel
+              {tCommon('cancel')}
             </button>
             <button
               onClick={onConfirm}
               disabled={!pledged}
               className="flex-1 h-12 rounded-lg font-medium text-sm transition-all duration-200 bg-primary text-on-primary disabled:bg-primary-container disabled:text-on-surface-variant disabled:cursor-not-allowed disabled:pointer-events-none hover:bg-on-primary-container active:scale-95"
             >
-              Begin Game
+              {t('beginGame')}
             </button>
           </div>
         </div>

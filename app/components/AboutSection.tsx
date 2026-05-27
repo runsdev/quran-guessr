@@ -1,13 +1,25 @@
 import React from 'react';
 
-const LINKS = [
-  { label: 'GitHub', icon: 'code', href: 'https://github.com/runsdev/quran-guessr/issues' },
-  { label: 'Quran.com', icon: 'menu_book', href: 'https://quran.com' },
-  { label: 'Quran Foundation API', icon: 'api', href: 'https://api-docs.quran.foundation/' },
-  { label: 'Support me', icon: 'volunteer_activism', href: 'https://ko-fi.com/runsha/tip' },
-];
+import { getTranslations } from 'next-intl/server';
 
-export default function AboutSection(): React.JSX.Element {
+export default async function AboutSection(): Promise<React.JSX.Element> {
+  const t = await getTranslations('about');
+
+  const LINKS = [
+    { label: t('github'), icon: 'code', href: 'https://github.com/runsdev/quran-guessr/issues' },
+    { label: t('quranCom'), icon: 'menu_book', href: 'https://quran.com' },
+    {
+      label: t('quranApi'),
+      icon: 'api',
+      href: 'https://api-docs.quran.foundation/',
+    },
+    {
+      label: t('supportMe'),
+      icon: 'volunteer_activism',
+      href: 'https://ko-fi.com/runsha/tip',
+    },
+  ];
+
   return (
     <section
       id="about"
@@ -25,7 +37,7 @@ export default function AboutSection(): React.JSX.Element {
             marginBottom: 10,
           }}
         >
-          About
+          {t('label')}
         </p>
         <h2
           style={{
@@ -36,7 +48,7 @@ export default function AboutSection(): React.JSX.Element {
             marginBottom: 48,
           }}
         >
-          The person behind the project
+          {t('title')}
         </h2>
 
         {/* ── Card ── */}
@@ -51,17 +63,12 @@ export default function AboutSection(): React.JSX.Element {
         >
           {/* Avatar column */}
           <div
-            className="shrink-0 w-full"
+            className="w-full md:w-1/3 lg:w-70 shrink-0 flex items-center justify-center min-h-60"
             style={{
-              width: '100%',
-              maxWidth: 240,
-              minHeight: 240,
               background: 'var(--color-outline-variant)',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
             }}
           >
+            {/* If you drop an actual <img /> here later, you can add className="w-full h-full object-cover" to it */}
             <span
               className="material-symbols-outlined"
               style={{ fontSize: 72, color: 'var(--color-outline)' }}
@@ -80,7 +87,7 @@ export default function AboutSection(): React.JSX.Element {
                 marginBottom: 4,
               }}
             >
-              runsha
+              {t('authorName')}
             </h3>
             <p
               style={{
@@ -90,7 +97,7 @@ export default function AboutSection(): React.JSX.Element {
                 marginBottom: 16,
               }}
             >
-              FullStack Developer
+              {t('authorRole')}
             </p>
             <p
               style={{
@@ -101,17 +108,14 @@ export default function AboutSection(): React.JSX.Element {
                 textAlign: 'justify',
               }}
             >
-              I built QuranGuessr to make Quranic study and muraja&apos;a more interactive and
-              enjoyable. Inspired by the daily-challenge format of GeoGuessr and the ranking systems
-              in competitive games, I wanted to create something that motivates consistent, focused
-              practice — while staying lightweight and free.
+              {t('authorBio')}
             </p>
 
             {/* Links */}
             <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap' }}>
               {LINKS.map((link) => (
                 <a
-                  key={link.label}
+                  key={link.href}
                   href={link.href}
                   target="_blank"
                   rel="noopener noreferrer"

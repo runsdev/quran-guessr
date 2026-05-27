@@ -1,6 +1,7 @@
 'use client';
 
 import { AnimatePresence, motion } from 'framer-motion';
+import { useTranslations } from 'next-intl';
 import { toast } from 'sonner';
 
 import ActionRow from './ActionRow';
@@ -14,12 +15,12 @@ import { useQuizState } from './useQuizState';
 import VerseCard from './VerseCard';
 
 import BottomNav from '@/app/components/BottomNav';
-import TopAppBar from '@/app/components/TopAppBar';
 import { useQcfFontLoader } from '@/app/quiz/useQcfFontLoader';
 
 export default function QuizClient() {
   const state = useQuizState();
   const loadedPages = useQcfFontLoader(state.pageNumbers);
+  const tCommon = useTranslations('common');
 
   if (state.isInitializing) {
     return <LocateVerseQuizSkeleton />;
@@ -27,16 +28,15 @@ export default function QuizClient() {
 
   return (
     <>
-      <TopAppBar activeTab="Quiz" />
       <main className="flex-1 flex flex-col px-5 max-w-3xl mx-auto w-full gap-6 justify-center min-h-screen pt-20 pb-24 md:pb-8">
         {state.initError ? (
           <div role="alert" className="flex flex-col items-center gap-3 py-8">
-            <span className="text-sm text-error">Failed to start quiz session.</span>
+            <span className="text-sm text-error">{tCommon('failedToStart')}</span>
             <button
               onClick={() => window.location.reload()}
               className="text-sm text-primary underline underline-offset-2"
             >
-              Retry
+              {tCommon('retry')}
             </button>
           </div>
         ) : (
@@ -45,7 +45,7 @@ export default function QuizClient() {
               questionNumber={state.questionNumber}
               totalScore={state.totalScore}
               onEndSession={async () => {
-                toast.info('Session ended');
+                toast.info(tCommon('sessionEnded'));
                 await state.handleEndSession();
               }}
             />

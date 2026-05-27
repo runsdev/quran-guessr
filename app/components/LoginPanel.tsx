@@ -5,6 +5,7 @@ import { useTransition } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { signIn, useSession } from 'next-auth/react';
+import { useTranslations } from 'next-intl';
 
 import { oidcLogout } from '@/app/actions/auth';
 
@@ -12,6 +13,7 @@ import { oidcLogout } from '@/app/actions/auth';
 const LoginPanel = (): React.JSX.Element => {
   const { data: session, status } = useSession();
   const [isPending, startTransition] = useTransition();
+  const t = useTranslations('login');
 
   return (
     <div
@@ -62,7 +64,7 @@ const LoginPanel = (): React.JSX.Element => {
                 letterSpacing: '-0.374px',
               }}
             >
-              Your progress is being synced. Keep playing to climb the leaderboard!
+              {t('progressSynced')}
             </p>
             <button
               className="w-full bg-primary text-on-primary text-base font-medium cursor-pointer hover:bg-on-primary-container active:scale-95 transition-all disabled:opacity-60 disabled:pointer-events-none"
@@ -70,7 +72,7 @@ const LoginPanel = (): React.JSX.Element => {
               onClick={() => startTransition(() => oidcLogout())}
               disabled={isPending}
             >
-              {isPending ? 'Signing out…' : 'Sign Out'}
+              {isPending ? t('signingOut') : t('signOut')}
             </button>
           </>
         ) : (
@@ -84,7 +86,7 @@ const LoginPanel = (): React.JSX.Element => {
                 lineHeight: 1.43,
               }}
             >
-              Register or Sign In
+              {t('registerOrSignIn')}
             </h2>
             <p
               style={{
@@ -93,9 +95,7 @@ const LoginPanel = (): React.JSX.Element => {
                 lineHeight: 1.5,
               }}
             >
-              Sign in with your Quran.com account to save your progress and compete on the
-              leaderboard! It&rsquo;s quick, easy, and free. Just click the button below to get
-              started.
+              {t('signInDesc')}
             </p>
             <button
               className="w-full bg-primary text-on-primary text-base font-medium cursor-pointer hover:bg-on-primary-container active:scale-95 transition-all disabled:opacity-60 disabled:pointer-events-none"
@@ -103,7 +103,7 @@ const LoginPanel = (): React.JSX.Element => {
               onClick={() => signIn('quran-foundation', { callbackUrl: '/' })}
               disabled={status === 'loading'}
             >
-              Continue with Quran.com
+              {t('continueWithQuran')}
             </button>
             <p
               style={{
@@ -112,7 +112,7 @@ const LoginPanel = (): React.JSX.Element => {
                 lineHeight: 1.5,
               }}
             >
-              Or{' '}
+              {t('or')}{' '}
               <Link
                 href="/quiz"
                 className="hover:bg-surface-container active:scale-95 transition-all disabled:opacity-60 disabled:pointer-events-none"
@@ -125,9 +125,9 @@ const LoginPanel = (): React.JSX.Element => {
                   cursor: 'pointer',
                 }}
               >
-                try the quiz
+                {t('tryTheQuiz')}
               </Link>{' '}
-              without signing in.
+              {t('withoutSigningIn')}
             </p>
           </>
         )}
@@ -140,7 +140,7 @@ const LoginPanel = (): React.JSX.Element => {
         <Image
           className="absolute inset-0 w-full h-full object-cover"
           src="/quran-hero.jpg"
-          alt="Open Quran with elegant calligraphy"
+          alt={t('quranAlt')}
           fill
           sizes="(max-width: 768px) 0px, 50vw"
         />
@@ -157,7 +157,7 @@ const LoginPanel = (): React.JSX.Element => {
             letterSpacing: '-0.224px',
           }}
         >
-          &ldquo;Knowledge is a light that Allah casts into the heart.&rdquo;
+          {t('knowledgeQuote')}
         </p>
       </div>
     </div>
