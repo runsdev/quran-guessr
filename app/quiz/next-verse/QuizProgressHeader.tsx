@@ -1,8 +1,10 @@
+'use client';
+
 import React from 'react';
 
-import { getTranslations } from 'next-intl/server';
+import { useTranslations } from 'next-intl';
 
-export default async function QuizProgressHeader({
+export default function QuizProgressHeader({
   questionNumber,
   score,
   timeLeft,
@@ -12,9 +14,9 @@ export default async function QuizProgressHeader({
   score?: number;
   timeLeft?: number;
   onEndSession?: () => void;
-}): Promise<React.JSX.Element> {
-  const t = await getTranslations('nextVerseQuiz');
-  const tCommon = await getTranslations('common');
+}): React.JSX.Element {
+  const t = useTranslations('nextVerseQuiz');
+  const tCommon = useTranslations('common');
   const totalAnswered = questionNumber - 1;
   const masteryPct = totalAnswered > 0 && score !== undefined ? (score / totalAnswered) * 100 : 0;
 

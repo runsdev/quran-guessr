@@ -96,7 +96,7 @@ export default async function QuizHubPage() {
 
   return (
     <div className="min-h-screen text-on-surface">
-      <TopAppBar activeTab="Quiz" />
+      <TopAppBar activeHref="/quiz" />
 
       {/* ── Band 1: white — welcome header ── */}
       <section

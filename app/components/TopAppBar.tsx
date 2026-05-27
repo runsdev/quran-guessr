@@ -1,22 +1,27 @@
+'use client';
+
 import React from 'react';
 
 import Link from 'next/link';
-import { getTranslations } from 'next-intl/server';
+import { useSession } from 'next-auth/react';
+import { useTranslations } from 'next-intl';
 
 import LanguageSwitcher from './LanguageSwitcher';
 import ThemeSwitcher from './ThemeSwitcher';
 
 interface TopAppBarProps {
-  activeTab?: string;
+  activeHref?: string;
 }
 
 /**
  * Airbnb-style global nav — 80px white bar, 1px hairline bottom border.
  * Wordmark (Rausch) left · product tabs center · account link right.
  */
-export default async function TopAppBar({ activeTab }: TopAppBarProps): Promise<React.JSX.Element> {
-  const t = await getTranslations('common');
-  const tNav = await getTranslations('nav');
+export default function TopAppBar({ activeHref }: TopAppBarProps): React.JSX.Element {
+  const t = useTranslations('common');
+  const tNav = useTranslations('nav');
+  const session = useSession();
+  const user = session?.data?.user;
 
   const navItems = [
     { label: t('quiz'), href: '/quiz' },
@@ -55,7 +60,7 @@ export default async function TopAppBar({ activeTab }: TopAppBarProps): Promise<
           <Link
             key={label}
             href={href}
-            aria-current={activeTab === label ? 'page' : undefined}
+            aria-current={activeHref === href ? 'page' : undefined}
             className="flex flex-col items-center pb-1"
             style={{
               color: 'var(--color-on-surface)',
@@ -63,7 +68,7 @@ export default async function TopAppBar({ activeTab }: TopAppBarProps): Promise<
               fontSize: 16,
               fontWeight: 600,
               borderBottom:
-                activeTab === label ? '2px solid var(--color-on-surface)' : '2px solid transparent',
+                activeHref === href ? '2px solid var(--color-on-surface)' : '2px solid transparent',
               transition: 'border-color 0.15s',
             }}
           >
@@ -78,17 +83,37 @@ export default async function TopAppBar({ activeTab }: TopAppBarProps): Promise<
         <ThemeSwitcher />
         <Link
           href="/profile"
+          aria-label={t('profile')}
           style={{
-            color: 'var(--color-on-surface)',
-            textDecoration: 'none',
-            fontSize: 14,
-            fontWeight: 600,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            width: 36,
+            height: 36,
             border: '1px solid var(--color-outline)',
             borderRadius: 9999,
-            padding: '8px 16px',
+            overflow: 'hidden',
+            flexShrink: 0,
           }}
         >
-          {t('account')}
+          {user?.image ? (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img
+              src={user.image}
+              alt={user.name ?? t('profile')}
+              width={36}
+              height={36}
+              referrerPolicy="no-referrer"
+              style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+            />
+          ) : (
+            <span
+              className="material-symbols-outlined"
+              style={{ fontSize: 20, color: 'var(--color-on-surface-variant)' }}
+            >
+              person
+            </span>
+          )}
         </Link>
       </div>
     </header>

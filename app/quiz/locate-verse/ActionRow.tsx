@@ -1,6 +1,8 @@
+'use client';
+
 import React from 'react';
 
-import { getTranslations } from 'next-intl/server';
+import { useTranslations } from 'next-intl';
 
 import type { SubmitResult } from './types';
 
@@ -17,7 +19,7 @@ interface ActionRowProps {
 const BTN =
   'bg-primary-container text-on-primary-container text-sm font-medium px-6 py-3 rounded-lg hover:bg-primary hover:text-on-primary transition-colors active:scale-95 flex items-center gap-2';
 
-export default async function ActionRow({
+export default function ActionRow({
   submitResult,
   submitted,
   selectedPage,
@@ -25,9 +27,9 @@ export default async function ActionRow({
   loading,
   onSubmit,
   onNext,
-}: ActionRowProps): Promise<React.JSX.Element> {
-  const t = await getTranslations('locateVerse');
-  const tCommon = await getTranslations('common');
+}: ActionRowProps): React.JSX.Element {
+  const t = useTranslations('locateVerse');
+  const tCommon = useTranslations('common');
 
   let feedbackEl: React.ReactNode = null;
   if (submitted && submitResult) {

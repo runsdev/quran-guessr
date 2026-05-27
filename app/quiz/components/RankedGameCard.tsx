@@ -1,20 +1,22 @@
+'use client';
+
 import React from 'react';
 
-import { getTranslations } from 'next-intl/server';
+import { useTranslations } from 'next-intl';
 
 import { PrimaryGameModesProps } from './types';
 
 type RankedProps = Omit<PrimaryGameModesProps, 'openJuzPanel' | 'activeJuzCount'>;
 
-export default async function RankedGameCard({
+export default function RankedGameCard({
   elo,
   dailyRankedCount,
   dailyRankedLimit,
   rankedLimitReached,
   openModal,
-}: RankedProps): Promise<React.JSX.Element> {
-  const t = await getTranslations('rankedCard');
-  const tCommon = await getTranslations('common');
+}: RankedProps): React.JSX.Element {
+  const t = useTranslations('rankedCard');
+  const tCommon = useTranslations('common');
   const eloValue = elo.toLocaleString();
   const [eloBefore = '', eloAfter = ''] = t('eloLabel', { elo: eloValue }).split(eloValue);
 

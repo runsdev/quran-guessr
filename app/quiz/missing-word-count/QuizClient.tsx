@@ -12,7 +12,6 @@ import TimerBar from './TimerBar';
 import { useMissingWordCountState } from './useMissingWordCountState';
 
 import BottomNav from '@/app/components/BottomNav';
-import TopAppBar from '@/app/components/TopAppBar';
 import { useQcfFontLoader } from '@/app/quiz/useQcfFontLoader';
 
 export default function QuizClient() {
@@ -48,7 +47,6 @@ export default function QuizClient() {
 
   return (
     <>
-      <TopAppBar activeTab={tCommon('quiz')} />
       <main className="flex-1 flex flex-col px-5 max-w-3xl mx-auto w-full gap-6 justify-center min-h-screen pt-20 pb-24 md:pb-8">
         {initError ? (
           <div role="alert" className="flex flex-col items-center gap-3 py-8">

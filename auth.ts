@@ -9,12 +9,15 @@ const qfAuthBase =
     ? 'https://oauth2.quran.foundation'
     : 'https://prelive-oauth2.quran.foundation';
 
+const qfProviderId =
+  process.env.QF_ENVIRONMENT === 'production' ? 'quran-foundation' : 'quran-foundation-prelive';
+
 export const { handlers, auth, signIn, signOut } = NextAuth({
   adapter: PrismaAdapter(prisma),
 
   providers: [
     {
-      id: 'quran-foundation',
+      id: qfProviderId,
       name: 'Quran.com',
       type: 'oidc',
       issuer: qfAuthBase,
@@ -45,7 +48,8 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         first_name?: string;
         // eslint-disable-next-line @typescript-eslint/naming-convention
         last_name?: string;
-        picture?: string;
+        // eslint-disable-next-line @typescript-eslint/naming-convention
+        photo_url?: string;
       }) {
         return {
           id: profile.sub,
@@ -54,7 +58,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
             profile.name ||
             null,
           email: profile.email ?? null,
-          image: profile.picture ?? null,
+          image: profile.photo_url ?? null,
         };
       },
     },

@@ -1,8 +1,10 @@
+'use client';
+
 import React from 'react';
 
-import { getTranslations } from 'next-intl/server';
+import { useTranslations } from 'next-intl';
 
-export default async function QuizHeader({
+export default function QuizHeader({
   questionNumber,
   totalScore,
   onEndSession,
@@ -10,9 +12,9 @@ export default async function QuizHeader({
   questionNumber: number;
   totalScore: number;
   onEndSession?: () => void;
-}): Promise<React.JSX.Element> {
-  const t = await getTranslations('locateVerse');
-  const tCommon = await getTranslations('common');
+}): React.JSX.Element {
+  const t = useTranslations('locateVerse');
+  const tCommon = useTranslations('common');
 
   return (
     <div className="w-full flex justify-between items-center pt-5">

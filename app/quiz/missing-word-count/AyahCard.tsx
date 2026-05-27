@@ -146,9 +146,6 @@ export default function AyahCard({
             {submittedDisplay.infoWords.map((word, idx) => (
               <WordSpan key={`info-${idx}`} word={word} loadedPages={loadedPages} />
             ))}
-            <span className="mx-1 text-on-surface-variant/40 select-none" aria-hidden="true">
-              ۝
-            </span>
           </p>
           {verseKey && (
             <span className="text-xs text-on-surface-variant/50 font-mono">{verseKey}</span>

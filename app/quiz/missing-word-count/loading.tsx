@@ -5,7 +5,7 @@ import Skeleton from '@/app/components/ui/Skeleton';
 export function MissingWordCountSkeleton() {
   return (
     <>
-      <TopAppBar activeTab="Quiz" />
+      <TopAppBar activeHref="/quiz" />
       <main className="flex-1 flex flex-col px-5 max-w-3xl mx-auto w-full gap-6 justify-center min-h-screen pt-20 pb-24 md:pb-8">
         {/* Header row */}
         <div className="w-full flex justify-between items-center">

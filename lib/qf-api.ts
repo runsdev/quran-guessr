@@ -76,16 +76,19 @@ async function refreshTokens(refreshToken: string): Promise<{
  *    requests don't need another round-trip.
  */
 export async function getAccessToken(userId: string): Promise<string | null> {
+  const currentProviderId =
+    process.env.QF_ENVIRONMENT === 'production' ? 'quran-foundation' : 'quran-foundation-prelive';
+
+  // 1. Only look for the account matching the CURRENT environment
   const account = await prisma.account.findFirst({
-    where: { userId, provider: 'quran-foundation' },
-    select: { access_token: true, refresh_token: true, expires_at: true },
+    where: { userId, provider: currentProviderId },
+    select: { id: true, access_token: true, refresh_token: true, expires_at: true },
   });
 
   if (!account?.access_token) {
     return null;
   }
 
-  // Check if the token is still valid (with buffer)
   const nowSeconds = Math.floor(Date.now() / 1000);
   const isExpired =
     !account.expires_at || nowSeconds >= account.expires_at - REFRESH_BUFFER_SECONDS;
@@ -94,9 +97,7 @@ export async function getAccessToken(userId: string): Promise<string | null> {
     return account.access_token;
   }
 
-  // Token expired — attempt refresh
   if (!account.refresh_token) {
-    console.warn('[qf-api] Token expired and no refresh_token available for user', userId);
     return null;
   }
 
@@ -105,10 +106,11 @@ export async function getAccessToken(userId: string): Promise<string | null> {
     return null;
   }
 
-  // Persist the new tokens back to the database
   const newExpiresAt = Math.floor(Date.now() / 1000) + refreshed.expires_in;
-  await prisma.account.updateMany({
-    where: { userId, provider: 'quran-foundation' },
+
+  // 2. Safely update ONLY the exact account record we are refreshing
+  await prisma.account.update({
+    where: { id: account.id },
     data: {
       access_token: refreshed.access_token,
       refresh_token: refreshed.refresh_token,

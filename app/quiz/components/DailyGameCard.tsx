@@ -1,14 +1,16 @@
+'use client';
+
 import React from 'react';
 
-import { getTranslations } from 'next-intl/server';
+import { useTranslations } from 'next-intl';
 
 import { PrimaryGameModesProps } from './types';
 
 type DailyProps = Pick<PrimaryGameModesProps, 'openModal'>;
 
-export default async function DailyGameCard({ openModal }: DailyProps): Promise<React.JSX.Element> {
-  const t = await getTranslations('dailyCard');
-  const tCommon = await getTranslations('common');
+export default function DailyGameCard({ openModal }: DailyProps): React.JSX.Element {
+  const t = useTranslations('dailyCard');
+  const tCommon = useTranslations('common');
 
   return (
     <button

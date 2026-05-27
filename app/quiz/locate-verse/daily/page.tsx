@@ -116,7 +116,7 @@ export default async function DailyChallengeLocateVersePage() {
   if (existingResult?.completed) {
     return (
       <>
-        <TopAppBar activeTab="Quiz" />
+        <TopAppBar activeHref="/quiz" />
         <DailyResults
           date={today}
           totalScore={existingResult.totalScore}
@@ -133,7 +133,7 @@ export default async function DailyChallengeLocateVersePage() {
 
   return (
     <>
-      <TopAppBar activeTab="Quiz" />
+      <TopAppBar activeHref="/quiz" />
       <DailyQuizClient
         challengeId={challenge.id}
         questions={questions}

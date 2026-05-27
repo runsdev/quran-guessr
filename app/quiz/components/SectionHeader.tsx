@@ -1,16 +1,18 @@
+'use client';
+
 import React from 'react';
 
-import { getTranslations } from 'next-intl/server';
+import { useTranslations } from 'next-intl';
 
 import { PrimaryGameModesProps } from './types';
 
 type HeaderProps = Pick<PrimaryGameModesProps, 'openJuzPanel' | 'activeJuzCount'>;
 
-export default async function SectionHeader({
+export default function SectionHeader({
   openJuzPanel,
   activeJuzCount,
-}: HeaderProps): Promise<React.JSX.Element> {
-  const t = await getTranslations('section');
+}: HeaderProps): React.JSX.Element {
+  const t = useTranslations('section');
 
   return (
     <div className="flex items-end justify-between">

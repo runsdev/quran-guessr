@@ -1,9 +1,11 @@
+'use client';
+
 import React from 'react';
 
-import { getTranslations } from 'next-intl/server';
+import { useTranslations } from 'next-intl';
 
-export default async function QuizPrompt(): Promise<React.JSX.Element> {
-  const t = await getTranslations('locateVerse');
+export default function QuizPrompt(): React.JSX.Element {
+  const t = useTranslations('locateVerse');
 
   return (
     <div className="w-full text-center">
