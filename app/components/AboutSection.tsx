@@ -63,17 +63,12 @@ export default async function AboutSection(): Promise<React.JSX.Element> {
         >
           {/* Avatar column */}
           <div
-            className="shrink-0 w-full"
+            className="w-full md:w-1/3 lg:w-[280px] shrink-0 flex items-center justify-center min-h-[240px]"
             style={{
-              width: '100%',
-              maxWidth: 240,
-              minHeight: 240,
               background: 'var(--color-outline-variant)',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
             }}
           >
+            {/* If you drop an actual <img /> here later, you can add className="w-full h-full object-cover" to it */}
             <span
               className="material-symbols-outlined"
               style={{ fontSize: 72, color: 'var(--color-outline)' }}

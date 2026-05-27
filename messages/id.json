@@ -96,8 +96,8 @@
     "howAreYou": "Apa kabar hari ini?",
     "elo": "ELO",
     "streak": "Streak",
-    "goalReached": "Target tercapai!",
-    "toGoal": "{count} menuju target"
+    "goalReached": "Pertahankan!",
+    "toGoal": "{count} kuis menuju target"
   },
   "section": {
     "gameModes": "Mode Permainan",

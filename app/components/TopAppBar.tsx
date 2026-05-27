@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 
 import Link from 'next/link';
 import { useSession } from 'next-auth/react';
@@ -8,6 +8,9 @@ import { useTranslations } from 'next-intl';
 
 import LanguageSwitcher from './LanguageSwitcher';
 import ThemeSwitcher from './ThemeSwitcher';
+
+import { getUserProfileAction } from '@/app/actions/user';
+import type { QfUserProfile } from '@/lib/qf-api';
 
 interface TopAppBarProps {
   activeHref?: string;
@@ -20,14 +23,45 @@ interface TopAppBarProps {
 export default function TopAppBar({ activeHref }: TopAppBarProps): React.JSX.Element {
   const t = useTranslations('common');
   const tNav = useTranslations('nav');
-  const session = useSession();
-  const user = session?.data?.user;
+  const { data: session } = useSession();
+
+  const userId = (session?.user as { id?: string } | undefined)?.id ?? null;
+
+  // FIXED: Corrected the TypeScript syntax for useState
+  const [user, setUser] = useState<QfUserProfile | null>(null);
+
+  useEffect(() => {
+    async function getUserSession() {
+      if (!userId) {
+        setUser(null);
+        return;
+      }
+
+      try {
+        // FIXED: Call the Server Action instead of the direct DB API
+        const userProfile = await getUserProfileAction(userId);
+        console.log('Fetched user profile:', userProfile);
+        setUser(userProfile);
+      } catch (error) {
+        console.error('Failed to load user profile', error);
+        setUser(null);
+      }
+    }
+
+    getUserSession();
+  }, [userId]);
 
   const navItems = [
     { label: t('quiz'), href: '/quiz' },
     { label: t('rankings'), href: '/leaderboard' },
     { label: t('stats'), href: '/stats' },
   ];
+
+  // Helper values mapping to the QfUserProfile schema
+  const imageUrl = user?.photoUrl || (user?.avatarUrls && Object.values(user.avatarUrls)[0]);
+  const userName = user?.firstName
+    ? `${user.firstName} ${user.lastName ?? ''}`.trim()
+    : (user?.username ?? t('profile'));
 
   return (
     <header
@@ -96,11 +130,11 @@ export default function TopAppBar({ activeHref }: TopAppBarProps): React.JSX.Ele
             flexShrink: 0,
           }}
         >
-          {user?.image ? (
+          {imageUrl ? (
             // eslint-disable-next-line @next/next/no-img-element
             <img
-              src={user.image}
-              alt={user.name ?? t('profile')}
+              src={imageUrl}
+              alt={userName}
               width={36}
               height={36}
               referrerPolicy="no-referrer"

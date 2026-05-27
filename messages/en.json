@@ -27,7 +27,7 @@
     "practice": "Practice",
     "previous": "Previous page",
     "next": "Next page",
-    "showing": "Showing {from}–{to} of {total} {noun}",
+    "showing": "Showing {from}-{to} of {total} {noun}",
     "pointsAbbr": "pts",
     "mastery": "Mastery: {percent}%"
   },
@@ -96,8 +96,8 @@
     "howAreYou": "How are you today?",
     "elo": "ELO",
     "streak": "Streak",
-    "goalReached": "Goal reached!",
-    "toGoal": "{count} to goal"
+    "goalReached": "Keep it up!",
+    "toGoal": "{count} quizzes to goal"
   },
   "section": {
     "gameModes": "Game Modes",

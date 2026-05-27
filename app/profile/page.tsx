@@ -11,7 +11,7 @@ import BottomNav from '@/app/components/BottomNav';
 import TopAppBar from '@/app/components/TopAppBar';
 import { auth } from '@/auth';
 import { prisma } from '@/lib/prisma';
-import { fetchQfStreak } from '@/lib/qf-api';
+import { fetchQfStreak, fetchQfUserProfile } from '@/lib/qf-api';
 import { MODE_DISPLAY } from '@/types/game-mode';
 
 export const dynamic = 'force-dynamic';
@@ -52,20 +52,34 @@ export default async function ProfilePage() {
     redirect('/auth/signin');
   }
 
-  const [streak, recentEvents] = await Promise.all([
+  // Fetch QF Profile alongside the existing queries (true flag fetches QDC data)
+  const [streak, recentEvents, qfProfile] = await Promise.all([
     fetchQfStreak(userId),
     prisma.gameEvent.findMany({
       where: { userId },
       orderBy: { createdAt: 'desc' },
       take: 15,
     }),
+    fetchQfUserProfile(userId, true),
   ]);
+
   const eloFormatted = Math.round(user.elo).toLocaleString();
   const joinDate = user.createdAt.toLocaleDateString('en-US', {
     year: 'numeric',
     month: 'long',
     day: 'numeric',
   });
+
+  // Determine the display image (QF photoUrl > QF avatar > DB image > null)
+  const imageUrl =
+    qfProfile?.photoUrl ||
+    (qfProfile?.avatarUrls ? (Object.values(qfProfile.avatarUrls)[0] as string) : undefined) ||
+    user.image;
+
+  // Determine the display name (QF full name > QF username > DB name > anonymous)
+  const userName = qfProfile?.firstName
+    ? `${qfProfile.firstName} ${qfProfile.lastName ?? ''}`.trim()
+    : (qfProfile?.username ?? user.name ?? t('anonymous'));
 
   return (
     <>
@@ -76,10 +90,10 @@ export default async function ProfilePage() {
           <div className="bg-surface-container-low border border-primary/10 rounded-3xl p-6">
             <div className="flex items-start gap-5">
               <div className="w-20 h-20 rounded-full overflow-hidden border-2 border-primary/30 shrink-0">
-                {user.image ? (
+                {imageUrl ? (
                   <Image
-                    src={user.image}
-                    alt={user.name ?? 'User avatar'}
+                    src={imageUrl}
+                    alt={userName}
                     width={80}
                     height={80}
                     className="w-full h-full object-cover"
@@ -94,9 +108,7 @@ export default async function ProfilePage() {
               <div className="min-w-0 flex-1">
                 <div className="flex items-start justify-between gap-2">
                   <div className="min-w-0">
-                    <h1 className="text-2xl font-bold text-on-surface truncate">
-                      {user.name ?? t('anonymous')}
-                    </h1>
+                    <h1 className="text-2xl font-bold text-on-surface truncate">{userName}</h1>
                     {user.email && (
                       <p className="text-sm text-on-surface-variant truncate">{user.email}</p>
                     )}
