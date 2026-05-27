@@ -2,6 +2,7 @@
 
 import React, { useEffect, useState } from 'react';
 
+import Image from 'next/image';
 import Link from 'next/link';
 import { useSession } from 'next-auth/react';
 import { useTranslations } from 'next-intl';
@@ -18,7 +19,8 @@ interface TopAppBarProps {
 
 /**
  * 80px white bar, 1px hairline bottom border.
- * Wordmark (Rausch) left · product tabs center · account link right.
+ * Wordmark (Logo) left · product tabs center · account link right.
+ * Auto-hides on scroll down, reveals on scroll up.
  */
 export default function TopAppBar({ activeHref }: TopAppBarProps): React.JSX.Element {
   const t = useTranslations('common');
@@ -27,9 +29,10 @@ export default function TopAppBar({ activeHref }: TopAppBarProps): React.JSX.Ele
 
   const userId = (session?.user as { id?: string } | undefined)?.id ?? null;
 
-  // FIXED: Corrected the TypeScript syntax for useState
   const [user, setUser] = useState<QfUserProfile | null>(null);
+  const [isVisible, setIsVisible] = useState(true);
 
+  // Fetch user profile session
   useEffect(() => {
     async function getUserSession() {
       if (!userId) {
@@ -48,6 +51,31 @@ export default function TopAppBar({ activeHref }: TopAppBarProps): React.JSX.Ele
 
     getUserSession();
   }, [userId]);
+
+  // Handle scroll to show/hide header
+  useEffect(() => {
+    let lastScrollY = window.scrollY;
+
+    const handleScroll = () => {
+      const currentScrollY = window.scrollY;
+
+      // Hide if scrolling down and past the header's height (80px)
+      if (currentScrollY > lastScrollY && currentScrollY > 80) {
+        setIsVisible(false);
+      } else {
+        // Show if scrolling up
+        setIsVisible(true);
+      }
+
+      lastScrollY = currentScrollY;
+    };
+
+    window.addEventListener('scroll', handleScroll, { passive: true });
+
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+    };
+  }, []);
 
   const navItems = [
     { label: t('quiz'), href: '/quiz' },
@@ -69,21 +97,27 @@ export default function TopAppBar({ activeHref }: TopAppBarProps): React.JSX.Ele
         backgroundColor: 'var(--color-background)',
         borderBottom: '1px solid var(--color-outline)',
         fontFamily: 'var(--font-inter), Circular, system-ui, sans-serif',
+        transform: isVisible ? 'translateY(0)' : 'translateY(-100%)',
+        transition: 'transform 0.3s ease-in-out',
       }}
     >
-      {/* Wordmark */}
+      {/* Logo */}
       <Link
         href="/"
         aria-label={tNav('goToHomepage')}
-        className="flex items-center"
-        style={{
-          color: 'var(--color-primary)',
-          textDecoration: 'none',
-          fontWeight: 700,
-          fontSize: 22,
-        }}
+        className="flex items-center gap-3"
+        style={{ textDecoration: 'none' }}
       >
-        {tNav('quranGuessr')}
+        <Image
+          src="/icon-512.png"
+          alt={tNav('quranGuessr')}
+          width={40}
+          height={40}
+          priority // Prioritizes loading this image since it's at the top of the page
+          className="object-contain"
+        />
+        {/* Uncomment the line below if you ever want the text to appear next to the logo */}
+        {/* <span style={{ color: 'var(--color-primary)', fontWeight: 700, fontSize: 22 }}>{tNav('quranGuessr')}</span> */}
       </Link>
 
       {/* Desktop center product tabs */}

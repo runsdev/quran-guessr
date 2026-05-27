@@ -9,7 +9,7 @@ import styles from './HomeHero.module.scss';
  */
 const HomeHero = (): React.JSX.Element => (
   <section className={styles.hero}>
-    <h1 className={styles.title}>Quran Guessr</h1>
+    <h1 className={styles.title}>QuranGuessr</h1>
     <p className={styles.subtitle}>Test your knowledge of the Holy Quran</p>
   </section>
 );
