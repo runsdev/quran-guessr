@@ -3,9 +3,10 @@ import type { Verse, Word } from '@quranjs/api';
 import { encryptVerseKey, signAnswer, encryptHiddenWords } from './answerToken';
 import type { Question, Segment } from './types';
 
+import { SURAH_VERSE_COUNTS } from '@/app/quiz/next-verse/surahData';
 import type { VerseWord } from '@/app/quiz/types';
 import { prisma } from '@/lib/prisma';
-import { qdcFetchByJuz, qdcFetchByPage, qdcFetchRandom } from '@/lib/qdc-client';
+import { qdcFetchByJuz, qdcFetchByPage, qdcFetchRandom, qdcFetchByKey } from '@/lib/qdc-client';
 import type { QdcVerse } from '@/lib/qdc-client';
 import { getContentClient } from '@/lib/qf-server-client';
 import { pickRandomJuz } from '@/lib/quran-pages';
@@ -124,6 +125,41 @@ async function fetchVerse(targetPageNumber?: number, juzFilter?: number[]): Prom
   }
 }
 
+async function fetchVerseByKey(verseKey: string): Promise<QuranVerse | null> {
+  if (!IS_PRODUCTION) {
+    const v = await qdcFetchByKey(verseKey);
+    return v ? qdcToQuranVerse(v) : null;
+  }
+  try {
+    const client = getContentClient();
+    const verse = await client.content.v4.verses.byKey(
+      verseKey as Parameters<typeof client.content.v4.verses.byKey>[0],
+      WORD_OPTS,
+    );
+    return toQuranVerse(verse);
+  } catch {
+    const v = await qdcFetchByKey(verseKey);
+    return v ? qdcToQuranVerse(v) : null;
+  }
+}
+
+/** Next verse key within the same surah, or null if at the end of the surah. */
+function nextSurahVerseKey(verseKey: string): string | null {
+  const [surahStr, ayahStr] = verseKey.split(':');
+  const surah = parseInt(surahStr, 10);
+  const ayah = parseInt(ayahStr, 10);
+  if (ayah < SURAH_VERSE_COUNTS[surah]) {
+    return `${surah}:${ayah + 1}`;
+  }
+  return null;
+}
+
+/** Arabic words only, sorted by position within the verse. */
+// eslint-disable-next-line @typescript-eslint/naming-convention
+function arabicWords(v: QuranVerse): Array<VerseWord & { page_number: number }> {
+  return v.words.filter((w) => w.char_type_name === 'word').sort((a, b) => a.position - b.position);
+}
+
 /**
  * @param targetPageNumber - when provided, fetches a verse from that specific
  *   Mushaf page (adaptive difficulty); otherwise selects a fully random verse.
@@ -133,69 +169,83 @@ export async function getRandomQuestion(
   targetPageNumber?: number,
   juzFilter?: number[],
 ): Promise<Question> {
-  // Retry up to 5 times to find a verse with at least 4 words (so at least 1
-  // can be hidden without leaving fewer than 2 visible).
-  for (let attempt = 0; attempt < 5; attempt++) {
-    const verse = await fetchVerse(targetPageNumber, juzFilter);
+  const primaryVerse = await fetchVerse(targetPageNumber, juzFilter);
+  const primaryWords = arabicWords(primaryVerse);
+  const wordCount = primaryWords.length;
 
-    const words = verse.words
-      .filter((w) => w.char_type_name === 'word')
-      .sort((a, b) => a.position - b.position);
-
-    const wordCount = words.length;
-    const maxMissing = Math.min(4, Math.max(0, wordCount - 2));
-
-    // Require at least 1 word to be hidden
-    if (maxMissing < 1) {
-      continue;
-    }
-
-    const missingCount = 1 + Math.floor(Math.random() * maxMissing); // 1..maxMissing
-
-    // eslint-disable-next-line @typescript-eslint/naming-convention
-    const indices: number[] = Array.from({ length: wordCount }, (_, i) => i);
-    for (let i = 0; i < missingCount; i++) {
-      const j = i + Math.floor(Math.random() * (wordCount - i));
-      const tmp = indices[i];
-      indices[i] = indices[j];
-      indices[j] = tmp;
-    }
-    const hiddenSet = new Set(indices.slice(0, missingCount));
-
-    const segments: Segment[] = [];
-    let currentWords: VerseWord[] = [];
-    const hiddenWords: VerseWord[] = [];
-    for (let i = 0; i < words.length; i++) {
-      if (hiddenSet.has(i)) {
-        hiddenWords.push(words[i] as VerseWord);
-        if (currentWords.length > 0) {
-          segments.push({ type: 'words', words: currentWords });
-          currentWords = [];
-        }
-        if (segments.length === 0 || segments[segments.length - 1].type !== 'blank') {
-          segments.push({ type: 'blank' });
-        }
-      } else {
-        currentWords.push(words[i] as VerseWord);
-      }
-    }
-    if (currentWords.length > 0) {
-      segments.push({ type: 'words', words: currentWords });
-    }
-
-    const pageNumber = words[0]?.page_number ?? 1;
-    // Read-only: never write here so we don't overwrite stats recorded by submitAnswer.
-    const pageEloRecord = await prisma.pageElo.findUnique({ where: { pageNumber } });
-
-    return {
-      encryptedVerseKey: encryptVerseKey(verse.verse_key),
-      segments,
-      answerToken: signAnswer(verse.verse_key, missingCount, pageNumber, wordCount),
-      encryptedHiddenWords: encryptHiddenWords(hiddenWords),
-      totalWords: wordCount,
-      pageElo: pageEloRecord ? Math.round(pageEloRecord.elo) : 1000,
-    };
+  // Need at least 1 word to hide; cap missing at 4
+  const maxMissing = Math.min(4, Math.max(0, wordCount - 1));
+  if (maxMissing < 1) {
+    throw new Error('Could not build a question: verse has too few Arabic words');
   }
 
-  throw new Error('Could not find a suitable verse after multiple attempts');
+  const missingCount = 1 + Math.floor(Math.random() * maxMissing);
+  const visibleCount = wordCount - missingCount;
+
+  // If ≤ 2 words remain visible, fetch the next verse as informational context only
+  let infoVerse: QuranVerse | null = null;
+  if (visibleCount <= 2) {
+    const nextKey = nextSurahVerseKey(primaryVerse.verse_key);
+    if (nextKey) {
+      infoVerse = await fetchVerseByKey(nextKey);
+    }
+  }
+
+  // Select hidden word indices via Fisher-Yates partial shuffle
+  const indices = [...Array(wordCount).keys()];
+  for (let i = 0; i < missingCount; i++) {
+    const j = i + Math.floor(Math.random() * (wordCount - i));
+    const tmp = indices[i];
+    indices[i] = indices[j];
+    indices[j] = tmp;
+  }
+  const hiddenSet = new Set(indices.slice(0, missingCount));
+
+  // Build segments for primary verse
+  const segments: Segment[] = [];
+  const hiddenWords: VerseWord[] = [];
+  // eslint-disable-next-line @typescript-eslint/naming-convention
+  let currentWords: Array<VerseWord & { page_number: number }> = [];
+
+  for (let i = 0; i < primaryWords.length; i++) {
+    if (hiddenSet.has(i)) {
+      hiddenWords.push(primaryWords[i] as VerseWord);
+      if (currentWords.length > 0) {
+        segments.push({ type: 'words', words: currentWords });
+        currentWords = [];
+      }
+      if (segments.length === 0 || segments[segments.length - 1].type !== 'blank') {
+        segments.push({ type: 'blank' });
+      }
+    } else {
+      currentWords.push(primaryWords[i]);
+    }
+  }
+  if (currentWords.length > 0) {
+    segments.push({ type: 'words', words: currentWords });
+  }
+
+  // Always insert a verse-end marker after the primary verse
+  segments.push({ type: 'verse-end', verseKey: primaryVerse.verse_key });
+
+  // Info verse: all words visible, no blanks
+  if (infoVerse) {
+    const infoWords = arabicWords(infoVerse);
+    if (infoWords.length > 0) {
+      segments.push({ type: 'words', words: infoWords });
+      segments.push({ type: 'verse-end', verseKey: primaryVerse.verse_key });
+    }
+  }
+
+  const pageNumber = primaryWords[0]?.page_number ?? 1;
+  const pageEloRecord = await prisma.pageElo.findUnique({ where: { pageNumber } });
+
+  return {
+    encryptedVerseKey: encryptVerseKey(primaryVerse.verse_key),
+    segments,
+    answerToken: signAnswer(primaryVerse.verse_key, missingCount, pageNumber, wordCount),
+    encryptedHiddenWords: encryptHiddenWords(hiddenWords),
+    totalWords: wordCount,
+    pageElo: pageEloRecord ? Math.round(pageEloRecord.elo) : 1000,
+  };
 }
