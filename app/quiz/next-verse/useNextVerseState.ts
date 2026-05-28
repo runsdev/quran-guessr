@@ -9,7 +9,6 @@ import type { Question, SubmitResult } from './types';
 import { abandonSession } from '@/app/quiz/actions';
 import { loadJuzFilter } from '@/app/quiz/components/JuzFilterSettings';
 
-const SESSION_KEY = 'quizSession:next-verse';
 const QUESTION_TIME_LIMIT = 90;
 
 export function useNextVerseState() {
@@ -56,10 +55,8 @@ export function useNextVerseState() {
     // eslint-disable-next-line react-hooks/set-state-in-effect
     setJuzFilter(filter);
     const urlToken = new URLSearchParams(window.location.search).get('token') ?? undefined;
-    const stored = urlToken ?? localStorage.getItem(SESSION_KEY) ?? undefined;
-    initSession(stored, filter.length > 0 ? filter : undefined)
+    initSession(urlToken, filter.length > 0 ? filter : undefined)
       .then((data) => {
-        localStorage.setItem(SESSION_KEY, data.sessionToken);
         setSessionToken(data.sessionToken);
         setQuestion(data.question);
         setQuestionNumber(data.questionNumber);
@@ -190,7 +187,6 @@ export function useNextVerseState() {
 
   const handleEndSession = async () => {
     if (!isPractice && sessionToken) {
-      localStorage.removeItem(SESSION_KEY);
       await abandonSession(sessionToken);
     }
     window.location.href = '/quiz';

@@ -34,11 +34,11 @@ export async function initSession(
   const session = await auth();
   const userId = (session?.user as { id?: string } | undefined)?.id ?? null;
 
-  if (sessionToken) {
-    const existing = await getActiveQuizSession(sessionToken);
+  if (userId) {
+    const existing = await getActiveSessionByUserAndMode(userId, GAME_MODE);
     if (existing) {
       return {
-        sessionToken,
+        sessionToken: existing.token,
         question: existing.currentQuestion as unknown as Question,
         questionNumber: existing.questionNumber,
         totalScore: existing.totalScore,
@@ -47,11 +47,11 @@ export async function initSession(
     }
   }
 
-  if (userId) {
-    const existing = await getActiveSessionByUserAndMode(userId, GAME_MODE);
+  if (sessionToken) {
+    const existing = await getActiveQuizSession(sessionToken);
     if (existing) {
       return {
-        sessionToken: existing.token,
+        sessionToken,
         question: existing.currentQuestion as unknown as Question,
         questionNumber: existing.questionNumber,
         totalScore: existing.totalScore,

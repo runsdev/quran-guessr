@@ -46,15 +46,15 @@ export async function initSession(
   const session = await auth();
   const userId = (session?.user as { id?: string } | undefined)?.id ?? null;
 
-  if (sessionToken) {
-    const existing = await getActiveQuizSession(sessionToken);
+  if (userId) {
+    const existing = await getActiveSessionByUserAndMode(userId, GAME_MODE);
     if (existing) {
       return toSessionInitResult(existing);
     }
   }
 
-  if (userId) {
-    const existing = await getActiveSessionByUserAndMode(userId, GAME_MODE);
+  if (sessionToken) {
+    const existing = await getActiveQuizSession(sessionToken);
     if (existing) {
       return toSessionInitResult(existing);
     }

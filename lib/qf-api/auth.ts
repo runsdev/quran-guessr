@@ -48,15 +48,22 @@ async function refreshTokens(refreshToken: string): Promise<TokenResponse | null
 }
 
 /**
+ * In-flight refresh promises keyed by userId.
+ * Prevents concurrent requests from each attempting their own refresh and
+ * invalidating the refresh token that a sibling request already consumed.
+ */
+const pendingRefreshes = new Map<string, Promise<string | null>>();
+
+/**
  * Return a valid access token for the given local userId.
  */
 export async function getAccessToken(userId: string): Promise<string | null> {
   const currentProviderId = IS_PRODUCTION ? 'quran-foundation' : 'quran-foundation-prelive';
 
-  // 1. Only look for the account matching the CURRENT environment
+  // look for the account matching the CURRENT environment
   const account = await prisma.account.findFirst({
     where: { userId, provider: currentProviderId },
-    select: { id: true, access_token: true, refresh_token: true, expires_at: true },
+    select: { id: true, access_token: true, refresh_token: true, expires_at: true, provider: true },
   });
 
   if (!account?.access_token) {
@@ -75,22 +82,63 @@ export async function getAccessToken(userId: string): Promise<string | null> {
     return null;
   }
 
-  const refreshed = await refreshTokens(account.refresh_token);
-  if (!refreshed) {
-    return null;
+  // Deduplicate concurrent refresh attempts for the same user.
+  // If another request is already refreshing this user's token, await that
+  // promise instead of firing a second refresh (which would invalidate the
+  // refresh token the first request already consumed).
+  const existing = pendingRefreshes.get(userId);
+  if (existing) {
+    return existing;
   }
 
-  const newExpiresAt = Math.floor(Date.now() / 1000) + refreshed.expires_in;
+  const refreshPromise = (async (): Promise<string | null> => {
+    try {
+      // Re-read the account inside the lock so we pick up any token that a
+      // concurrent request may have already refreshed while we were waiting.
+      const latest = await prisma.account.findFirst({
+        where: { userId, provider: account.provider ?? '' },
+        select: { id: true, access_token: true, refresh_token: true, expires_at: true },
+      });
 
-  // 2. Safely update ONLY the exact account record we are refreshing
-  await prisma.account.update({
-    where: { id: account.id },
-    data: {
-      access_token: refreshed.access_token,
-      refresh_token: refreshed.refresh_token,
-      expires_at: newExpiresAt,
-    },
-  });
+      const nowInSeconds = Math.floor(Date.now() / 1000);
+      if (
+        latest?.access_token &&
+        latest.expires_at &&
+        nowInSeconds < latest.expires_at - REFRESH_BUFFER_SECONDS
+      ) {
+        // Another request already refreshed the token; use theirs.
+        return latest.access_token;
+      }
 
-  return refreshed.access_token;
+      const currentRefreshToken = latest?.refresh_token ?? account.refresh_token;
+      if (!currentRefreshToken) {
+        return null;
+      }
+
+      const refreshed = await refreshTokens(currentRefreshToken);
+
+      if (!refreshed) {
+        return null;
+      }
+
+      const newExpiresAt = Math.floor(Date.now() / 1000) + refreshed.expires_in;
+
+      // update ONLY the exact account record we are refreshing
+      await prisma.account.update({
+        where: { id: latest?.id ?? account.id },
+        data: {
+          access_token: refreshed.access_token,
+          refresh_token: refreshed.refresh_token,
+          expires_at: newExpiresAt,
+        },
+      });
+
+      return refreshed.access_token;
+    } finally {
+      pendingRefreshes.delete(userId);
+    }
+  })();
+
+  pendingRefreshes.set(userId, refreshPromise);
+  return refreshPromise;
 }
