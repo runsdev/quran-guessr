@@ -36,25 +36,6 @@ export async function initSession(
   const session = await auth();
   const userId = (session?.user as { id?: string } | undefined)?.id ?? null;
 
-  if (sessionToken) {
-    const existing = await getActiveQuizSession(sessionToken);
-    if (existing) {
-      const elapsed = Math.floor((Date.now() - existing.questionStartedAt.getTime()) / 1000);
-      const submitResult = existing.submitResult as SubmitResult | null;
-      const initialTimeLeft =
-        submitResult !== null ? existing.timerLimit : Math.max(0, existing.timerLimit - elapsed);
-
-      return {
-        sessionToken,
-        question: existing.currentQuestion as unknown as Question,
-        questionNumber: existing.questionNumber,
-        totalScore: existing.totalScore,
-        initialTimeLeft,
-        submitResult,
-      };
-    }
-  }
-
   if (userId) {
     const existing = await getActiveSessionByUserAndMode(userId, GAME_MODE);
     if (existing) {
@@ -65,6 +46,25 @@ export async function initSession(
 
       return {
         sessionToken: existing.token,
+        question: existing.currentQuestion as unknown as Question,
+        questionNumber: existing.questionNumber,
+        totalScore: existing.totalScore,
+        initialTimeLeft,
+        submitResult,
+      };
+    }
+  }
+
+  if (sessionToken) {
+    const existing = await getActiveQuizSession(sessionToken);
+    if (existing) {
+      const elapsed = Math.floor((Date.now() - existing.questionStartedAt.getTime()) / 1000);
+      const submitResult = existing.submitResult as SubmitResult | null;
+      const initialTimeLeft =
+        submitResult !== null ? existing.timerLimit : Math.max(0, existing.timerLimit - elapsed);
+
+      return {
+        sessionToken,
         question: existing.currentQuestion as unknown as Question,
         questionNumber: existing.questionNumber,
         totalScore: existing.totalScore,

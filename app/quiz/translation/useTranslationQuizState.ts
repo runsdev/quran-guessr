@@ -11,7 +11,6 @@ import { abandonSession } from '@/app/quiz/actions';
 import { loadJuzFilter } from '@/app/quiz/components/JuzFilterSettings';
 import { TRANSLATION_OPTIONS } from '@/lib/qdc-translations';
 
-const SESSION_KEY = 'quizSession:translation-quiz';
 const QUESTION_TIME_LIMIT = 90;
 
 export function useTranslationQuizState() {
@@ -62,10 +61,8 @@ export function useTranslationQuizState() {
     // eslint-disable-next-line react-hooks/set-state-in-effect
     setJuzFilter(filter);
     const urlToken = new URLSearchParams(window.location.search).get('token') ?? undefined;
-    const stored = urlToken ?? localStorage.getItem(SESSION_KEY) ?? undefined;
-    initSession(translationId, stored, filter.length > 0 ? filter : undefined)
+    initSession(translationId, urlToken, filter.length > 0 ? filter : undefined)
       .then((data) => {
-        localStorage.setItem(SESSION_KEY, data.sessionToken);
         setSessionToken(data.sessionToken);
         setQuestion(data.question);
         setQuestionNumber(data.questionNumber);
@@ -178,7 +175,6 @@ export function useTranslationQuizState() {
 
   const handleEndSession = async () => {
     if (!isPractice && sessionToken) {
-      localStorage.removeItem(SESSION_KEY);
       await abandonSession(sessionToken);
     }
     window.location.href = '/quiz';
