@@ -10,7 +10,7 @@
     "retry": "Coba Lagi",
     "submit": "Kirim",
     "hub": "Beranda",
-    "nextQuestion": "Pertanyaan Berikutnya",
+    "nextQuestion": "Lanjutkan",
     "play": "Main",
     "sessionEnded": "Sesi berakhir",
     "endSession": "Akhiri sesi",
@@ -27,7 +27,7 @@
     "practice": "Latihan",
     "previous": "Halaman sebelumnya",
     "next": "Halaman berikutnya",
-    "showing": "Menampilkan {from}–{to} dari {total} {noun}",
+    "showing": "Menampilkan {from}-{to} dari {total} {noun}",
     "pointsAbbr": "poin",
     "mastery": "Penguasaan: {percent}%"
   },
