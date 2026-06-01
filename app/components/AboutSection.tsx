@@ -1,9 +1,11 @@
+'use client';
+
 import React from 'react';
 
-import { getTranslations } from 'next-intl/server';
+import { useTranslations } from 'next-intl';
 
-export default async function AboutSection(): Promise<React.JSX.Element> {
-  const t = await getTranslations('about');
+export default function AboutSection(): React.JSX.Element {
+  const t = useTranslations('about');
 
   const LINKS = [
     { label: t('github'), icon: 'code', href: 'https://github.com/runsdev/quran-guessr/issues' },

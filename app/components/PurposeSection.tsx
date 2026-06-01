@@ -1,9 +1,11 @@
+'use client';
+
 import React from 'react';
 
-import { getTranslations } from 'next-intl/server';
+import { useTranslations } from 'next-intl';
 
-export default async function PurposeSection(): Promise<React.JSX.Element> {
-  const t = await getTranslations('purpose');
+export default function PurposeSection(): React.JSX.Element {
+  const t = useTranslations('purpose');
 
   const FEATURES = [
     {

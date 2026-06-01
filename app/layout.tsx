@@ -91,15 +91,14 @@ export default async function RootLayout({
       suppressHydrationWarning
     >
       <head>
-        <link rel="preconnect" href="https://fonts.googleapis.com" />
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+        {/* Only preconnect to origins actually used at runtime */}
         <link rel="preconnect" href="https://verses.quran.foundation" crossOrigin="anonymous" />
+        <link rel="dns-prefetch" href="https://api.quran.foundation" />
+        <link rel="dns-prefetch" href="https://www.googletagmanager.com" />
         <meta
           name="google-site-verification"
           content="ugY-qC7oXMg5tU6qAy3jb3F70tAmhio1uWMoy2rpICQ"
         />
-        <GoogleTagManager gtmId="GTM-5B2K62HZ" />
-        <GoogleAnalytics gaId="G-GNR9C7CWZ3" />
       </head>
       <body className="min-h-full flex flex-col">
         <ThemeProvider>
@@ -109,6 +108,9 @@ export default async function RootLayout({
           <MaterialSymbolsLoader />
           <Toaster position="bottom-center" richColors closeButton />
         </ThemeProvider>
+        {/* Third-party analytics deferred until after page is interactive */}
+        <GoogleTagManager gtmId="GTM-5B2K62HZ" />
+        <GoogleAnalytics gaId="G-GNR9C7CWZ3" />
       </body>
     </html>
   );
