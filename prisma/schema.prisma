@@ -138,6 +138,18 @@ model QuizSession {
   user User? @relation(fields: [userId], references: [id], onDelete: SetNull)
 }
 
+// Announcements displayed as a notice modal on the front page.
+// Each record is shown once per browser (read state tracked in localStorage by id).
+model Announcement {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  title     String
+  body      String
+  type      String   @default("info") // "info" | "warning" | "hotfix" | "feature"
+  active    Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
 // Records every game attempt — authenticated or anonymous, ranked or casual.
 // Useful for aggregate analytics and per-user activity history.
 model GameEvent {
