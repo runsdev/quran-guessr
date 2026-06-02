@@ -31,11 +31,12 @@ export function qdcToRaw(w: QdcWord): RawWord {
 }
 
 export async function fetchRandomVerse(
-  juzFilter?: number[],
+  juzFilter: number[] | undefined,
+  isLoggedIn: boolean,
 ): Promise<{ verseKey: string; words: RawWord[] }> {
   if (juzFilter && juzFilter.length > 0) {
     const juzNum = pickRandomJuz(juzFilter);
-    if (!IS_PRODUCTION) {
+    if (!IS_PRODUCTION || !isLoggedIn) {
       const v = await qdcFetchByJuz(juzNum);
       return {
         verseKey: v.verse_key,
@@ -65,7 +66,7 @@ export async function fetchRandomVerse(
       };
     }
   }
-  if (!IS_PRODUCTION) {
+  if (!IS_PRODUCTION || !isLoggedIn) {
     const v = await qdcFetchRandom();
     return {
       verseKey: v.verse_key,

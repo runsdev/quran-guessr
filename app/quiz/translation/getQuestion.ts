@@ -4,6 +4,7 @@ import { encryptVerseKey, signAnswer } from './answerToken';
 import { fetchRandomVerse, qdcToRaw } from './fetchVerse';
 import type { Question, VerseWord } from './types';
 
+import { auth } from '@/auth';
 import { qdcFetchByKey } from '@/lib/qdc-client';
 import { qdcFetchTranslation } from '@/lib/qdc-translations';
 
@@ -78,8 +79,10 @@ export async function getRandomQuestion(
   translationId: number,
   juzFilter?: number[],
 ): Promise<Question> {
+  const session = await auth();
+  const isLoggedIn = !!(session?.user as { id?: string } | undefined)?.id;
   for (let attempt = 0; attempt < 5; attempt++) {
-    const { verseKey, words } = await fetchRandomVerse(juzFilter);
+    const { verseKey, words } = await fetchRandomVerse(juzFilter, isLoggedIn);
     const correctTranslation = await qdcFetchTranslation(verseKey, translationId);
     if (!correctTranslation) {
       continue;
