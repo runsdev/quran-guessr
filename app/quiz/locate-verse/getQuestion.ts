@@ -3,6 +3,7 @@ import type { Word } from '@quranjs/api';
 import { encryptVerseKey, signAnswer } from './answerToken';
 import type { Question, VerseWord } from './types';
 
+import { auth } from '@/auth';
 import { qdcFetchByJuz, qdcFetchByPage, qdcFetchRandom } from '@/lib/qdc-client';
 import type { QdcWord } from '@/lib/qdc-client';
 import { getContentClient } from '@/lib/qf-server-client';
@@ -59,11 +60,12 @@ function qdcWordToRaw(w: QdcWord): RawWord {
 }
 
 async function fetchRandomVerse(
-  juzFilter?: number[],
-  pageNumber?: number,
+  juzFilter: number[] | undefined,
+  pageNumber: number | undefined,
+  isLoggedIn: boolean,
 ): Promise<{ verseKey: string; words: RawWord[] }> {
   if (pageNumber !== undefined) {
-    if (!IS_PRODUCTION) {
+    if (!IS_PRODUCTION || !isLoggedIn) {
       const qdcVerse = await qdcFetchByPage(pageNumber);
       return {
         verseKey: qdcVerse.verse_key,
@@ -97,7 +99,7 @@ async function fetchRandomVerse(
 
   if (juzFilter && juzFilter.length > 0) {
     const juzNum = pickRandomJuz(juzFilter);
-    if (!IS_PRODUCTION) {
+    if (!IS_PRODUCTION || !isLoggedIn) {
       const qdcVerse = await qdcFetchByJuz(juzNum);
       return {
         verseKey: qdcVerse.verse_key,
@@ -126,7 +128,7 @@ async function fetchRandomVerse(
     }
   }
 
-  if (!IS_PRODUCTION) {
+  if (!IS_PRODUCTION || !isLoggedIn) {
     const qdcVerse = await qdcFetchRandom();
     return {
       verseKey: qdcVerse.verse_key,
@@ -152,7 +154,9 @@ export async function getRandomQuestion(
   juzFilter?: number[],
   pageNumber?: number,
 ): Promise<Question> {
-  const { verseKey, words } = await fetchRandomVerse(juzFilter, pageNumber);
+  const session = await auth();
+  const isLoggedIn = !!(session?.user as { id?: string } | undefined)?.id;
+  const { verseKey, words } = await fetchRandomVerse(juzFilter, pageNumber, isLoggedIn);
 
   const firstWord = words.find((w) => w.char_type_name !== 'end');
   const correctPage = firstWord?.page_number ?? words[0].page_number;

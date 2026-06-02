@@ -1,3 +1,4 @@
+/* eslint-disable max-lines */
 import type { Verse, Word } from '@quranjs/api';
 
 import { encryptVerseKey, signAnswer, encryptHiddenWords } from './answerToken';
@@ -5,6 +6,7 @@ import type { Question, Segment } from './types';
 
 import { SURAH_VERSE_COUNTS } from '@/app/quiz/next-verse/surahData';
 import type { VerseWord } from '@/app/quiz/types';
+import { auth } from '@/auth';
 import { prisma } from '@/lib/prisma';
 import { qdcFetchByJuz, qdcFetchByPage, qdcFetchRandom, qdcFetchByKey } from '@/lib/qdc-client';
 import type { QdcVerse } from '@/lib/qdc-client';
@@ -63,9 +65,13 @@ function qdcToQuranVerse(v: QdcVerse): QuranVerse {
   };
 }
 
-async function fetchVerse(targetPageNumber?: number, juzFilter?: number[]): Promise<QuranVerse> {
+async function fetchVerse(
+  targetPageNumber: number | undefined,
+  juzFilter: number[] | undefined,
+  isLoggedIn: boolean,
+): Promise<QuranVerse> {
   if (targetPageNumber !== undefined) {
-    if (!IS_PRODUCTION) {
+    if (!IS_PRODUCTION || !isLoggedIn) {
       return qdcToQuranVerse(await qdcFetchByPage(targetPageNumber));
     }
     try {
@@ -93,7 +99,7 @@ async function fetchVerse(targetPageNumber?: number, juzFilter?: number[]): Prom
 
   if (juzFilter && juzFilter.length > 0) {
     const juzNum = pickRandomJuz(juzFilter);
-    if (!IS_PRODUCTION) {
+    if (!IS_PRODUCTION || !isLoggedIn) {
       return qdcToQuranVerse(await qdcFetchByJuz(juzNum));
     }
     try {
@@ -112,7 +118,7 @@ async function fetchVerse(targetPageNumber?: number, juzFilter?: number[]): Prom
     }
   }
 
-  if (!IS_PRODUCTION) {
+  if (!IS_PRODUCTION || !isLoggedIn) {
     return qdcToQuranVerse(await qdcFetchRandom());
   }
   try {
@@ -125,8 +131,8 @@ async function fetchVerse(targetPageNumber?: number, juzFilter?: number[]): Prom
   }
 }
 
-async function fetchVerseByKey(verseKey: string): Promise<QuranVerse | null> {
-  if (!IS_PRODUCTION) {
+async function fetchVerseByKey(verseKey: string, isLoggedIn: boolean): Promise<QuranVerse | null> {
+  if (!IS_PRODUCTION || !isLoggedIn) {
     const v = await qdcFetchByKey(verseKey);
     return v ? qdcToQuranVerse(v) : null;
   }
@@ -169,7 +175,9 @@ export async function getRandomQuestion(
   targetPageNumber?: number,
   juzFilter?: number[],
 ): Promise<Question> {
-  const primaryVerse = await fetchVerse(targetPageNumber, juzFilter);
+  const session = await auth();
+  const isLoggedIn = !!(session?.user as { id?: string } | undefined)?.id;
+  const primaryVerse = await fetchVerse(targetPageNumber, juzFilter, isLoggedIn);
   const primaryWords = arabicWords(primaryVerse);
   const wordCount = primaryWords.length;
 
@@ -187,7 +195,7 @@ export async function getRandomQuestion(
   if (visibleCount <= 2) {
     const nextKey = nextSurahVerseKey(primaryVerse.verse_key);
     if (nextKey) {
-      infoVerse = await fetchVerseByKey(nextKey);
+      infoVerse = await fetchVerseByKey(nextKey, isLoggedIn);
     }
   }
 

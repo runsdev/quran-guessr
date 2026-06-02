@@ -1,3 +1,4 @@
+/* eslint-disable max-lines */
 /* eslint-disable @typescript-eslint/naming-convention */
 import type { Word } from '@quranjs/api';
 
@@ -5,6 +6,7 @@ import { encryptVerseKey, signAnswer } from './answerToken';
 import { SURAH_NAMES, nextVerseKey, fetchRandomVerseInAyahRange } from './surahData';
 import type { Question, VerseWord } from './types';
 
+import { auth } from '@/auth';
 import { qdcFetchByJuz, qdcFetchByPage, qdcFetchRandom, qdcFetchByKey } from '@/lib/qdc-client';
 import type { QdcWord } from '@/lib/qdc-client';
 import { getContentClient } from '@/lib/qf-server-client';
@@ -40,11 +42,12 @@ function qdcToRaw(w: QdcWord): RawWord {
 }
 
 async function fetchRandomVerse(
-  juzFilter?: number[],
-  pageNumber?: number,
+  juzFilter: number[] | undefined,
+  pageNumber: number | undefined,
+  isLoggedIn: boolean,
 ): Promise<{ verseKey: string; words: RawWord[] }> {
   if (pageNumber !== undefined) {
-    if (!IS_PRODUCTION) {
+    if (!IS_PRODUCTION || !isLoggedIn) {
       const qdcVerse = await qdcFetchByPage(pageNumber);
       return {
         verseKey: qdcVerse.verse_key,
@@ -77,7 +80,7 @@ async function fetchRandomVerse(
   }
   if (juzFilter && juzFilter.length > 0) {
     const juzNum = pickRandomJuz(juzFilter);
-    if (!IS_PRODUCTION) {
+    if (!IS_PRODUCTION || !isLoggedIn) {
       const qdcVerse = await qdcFetchByJuz(juzNum);
       return {
         verseKey: qdcVerse.verse_key,
@@ -106,7 +109,7 @@ async function fetchRandomVerse(
     }
   }
 
-  if (!IS_PRODUCTION) {
+  if (!IS_PRODUCTION || !isLoggedIn) {
     const qdcVerse = await qdcFetchRandom();
     return {
       verseKey: qdcVerse.verse_key,
@@ -128,8 +131,8 @@ async function fetchRandomVerse(
   }
 }
 
-async function fetchVerseByKey(verseKey: string): Promise<RawWord[] | null> {
-  if (!IS_PRODUCTION) {
+async function fetchVerseByKey(verseKey: string, isLoggedIn: boolean): Promise<RawWord[] | null> {
+  if (!IS_PRODUCTION || !isLoggedIn) {
     const qdcVerse = await qdcFetchByKey(verseKey);
     if (!qdcVerse) {
       return null;
@@ -160,21 +163,24 @@ export async function getRandomQuestion(
   juzFilter?: number[],
   pageNumber?: number,
 ): Promise<Question> {
+  const session = await auth();
+  const isLoggedIn = !!(session?.user as { id?: string } | undefined)?.id;
+  const fetchVerseByKeyBound = (key: string) => fetchVerseByKey(key, isLoggedIn);
   // Keep retrying until we get a verse that has a fetchable next verse (nextVerseKey returns null for 114:6).
   let current: { verseKey: string; words: RawWord[] };
   let nextKey: string | null;
   let nextVerseWords: RawWord[] | null;
   do {
-    current = await fetchRandomVerse(juzFilter, pageNumber);
+    current = await fetchRandomVerse(juzFilter, pageNumber, isLoggedIn);
     nextKey = nextVerseKey(current.verseKey);
-    nextVerseWords = nextKey ? await fetchVerseByKey(nextKey) : null;
+    nextVerseWords = nextKey ? await fetchVerseByKeyBound(nextKey) : null;
   } while (!nextKey || !nextVerseWords);
 
   // Fetch 3 distractors from the same surah, within ±10 ayahs of the correct answer
   const [nextSurah, nextAyah] = nextKey.split(':').map(Number) as [number, number];
   const distractorResults = await Promise.all(
     Array.from({ length: 3 }, () =>
-      fetchRandomVerseInAyahRange(nextSurah, nextAyah - 10, nextAyah + 10, fetchVerseByKey),
+      fetchRandomVerseInAyahRange(nextSurah, nextAyah - 10, nextAyah + 10, fetchVerseByKeyBound),
     ),
   );
 
@@ -193,7 +199,7 @@ export async function getRandomQuestion(
       nextSurah,
       nextAyah - 5,
       nextAyah + 5,
-      fetchVerseByKey,
+      fetchVerseByKeyBound,
     );
     if (!usedKeys.has(extra.verseKey)) {
       usedKeys.add(extra.verseKey);
