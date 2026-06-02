@@ -1,5 +1,7 @@
 import { Suspense } from 'react';
 
+import { getActiveAnnouncements } from './actions/announcements';
+import AnnouncementModal from './components/AnnouncementModal';
 import BelowFoldSections from './components/BelowFoldSections';
 import BottomNav from './components/BottomNav';
 import HeroSection from './components/HeroSection';
@@ -8,7 +10,9 @@ import QuizAccordionSection from './components/QuizAccordionSection';
 import StripSearchParams from './components/StripSearchParams';
 import TopAppBar from './components/TopAppBar';
 
-export default function Home() {
+export default async function Home() {
+  const announcements = await getActiveAnnouncements();
+
   return (
     <>
       <JsonLd />
@@ -22,6 +26,7 @@ export default function Home() {
         <BelowFoldSections />
       </main>
       <BottomNav />
+      <AnnouncementModal announcements={announcements} />
     </>
   );
 }
