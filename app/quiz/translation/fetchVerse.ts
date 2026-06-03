@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable @typescript-eslint/naming-convention */
 /**
  * Shared verse-fetching helpers for the translation quiz.
@@ -36,56 +37,66 @@ export async function fetchRandomVerse(
 ): Promise<{ verseKey: string; words: RawWord[] }> {
   if (juzFilter && juzFilter.length > 0) {
     const juzNum = pickRandomJuz(juzFilter);
-    if (!IS_PRODUCTION || !isLoggedIn) {
-      const v = await qdcFetchByJuz(juzNum);
-      return {
-        verseKey: v.verse_key,
-        words: v.words.sort((a, b) => a.position - b.position).map(qdcToRaw),
-      };
-    }
-    try {
-      const client = getContentClient();
-      const verses = await client.content.v4.verses.byJuz(
-        String(juzNum) as Parameters<typeof client.content.v4.verses.byJuz>[0],
-        WORD_OPTS,
-      );
-      if (!verses?.length) {
-        throw new Error('No verses for juz');
-      }
-      const verse = verses[Math.floor(Math.random() * verses.length)];
-      return {
-        verseKey: verse.verseKey,
-        words: [...(verse.words ?? [])].sort((a, b) => a.position - b.position).map(mapWord),
-      };
-    } catch (err) {
-      console.warn(`SDK byJuz(${juzNum}) fallback:`, err);
-      const v = await qdcFetchByJuz(juzNum);
-      return {
-        verseKey: v.verse_key,
-        words: v.words.sort((a, b) => a.position - b.position).map(qdcToRaw),
-      };
-    }
-  }
-  if (!IS_PRODUCTION || !isLoggedIn) {
-    const v = await qdcFetchRandom();
+    const v = await qdcFetchByJuz(juzNum);
     return {
       verseKey: v.verse_key,
       words: v.words.sort((a, b) => a.position - b.position).map(qdcToRaw),
     };
+    // if (!IS_PRODUCTION || !isLoggedIn) {
+    //   const v = await qdcFetchByJuz(juzNum);
+    //   return {
+    //     verseKey: v.verse_key,
+    //     words: v.words.sort((a, b) => a.position - b.position).map(qdcToRaw),
+    //   };
+    // }
+    // try {
+    //   const client = getContentClient();
+    //   const verses = await client.content.v4.verses.byJuz(
+    //     String(juzNum) as Parameters<typeof client.content.v4.verses.byJuz>[0],
+    //     WORD_OPTS,
+    //   );
+    //   if (!verses?.length) {
+    //     throw new Error('No verses for juz');
+    //   }
+    //   const verse = verses[Math.floor(Math.random() * verses.length)];
+    //   return {
+    //     verseKey: verse.verseKey,
+    //     words: [...(verse.words ?? [])].sort((a, b) => a.position - b.position).map(mapWord),
+    //   };
+    // } catch (err) {
+    //   console.warn(`SDK byJuz(${juzNum}) fallback:`, err);
+    //   const v = await qdcFetchByJuz(juzNum);
+    //   return {
+    //     verseKey: v.verse_key,
+    //     words: v.words.sort((a, b) => a.position - b.position).map(qdcToRaw),
+    //   };
+    // }
   }
-  try {
-    const client = getContentClient();
-    const verse = await client.content.v4.verses.random(WORD_OPTS);
-    return {
-      verseKey: verse.verseKey,
-      words: [...(verse.words ?? [])].sort((a, b) => a.position - b.position).map(mapWord),
-    };
-  } catch (err) {
-    console.warn('SDK random fallback:', err);
-    const v = await qdcFetchRandom();
-    return {
-      verseKey: v.verse_key,
-      words: v.words.sort((a, b) => a.position - b.position).map(qdcToRaw),
-    };
-  }
+  const v = await qdcFetchRandom();
+  return {
+    verseKey: v.verse_key,
+    words: v.words.sort((a, b) => a.position - b.position).map(qdcToRaw),
+  };
+  // if (!IS_PRODUCTION || !isLoggedIn) {
+  //   const v = await qdcFetchRandom();
+  //   return {
+  //     verseKey: v.verse_key,
+  //     words: v.words.sort((a, b) => a.position - b.position).map(qdcToRaw),
+  //   };
+  // }
+  // try {
+  //   const client = getContentClient();
+  //   const verse = await client.content.v4.verses.random(WORD_OPTS);
+  //   return {
+  //     verseKey: verse.verseKey,
+  //     words: [...(verse.words ?? [])].sort((a, b) => a.position - b.position).map(mapWord),
+  //   };
+  // } catch (err) {
+  //   console.warn('SDK random fallback:', err);
+  //   const v = await qdcFetchRandom();
+  //   return {
+  //     verseKey: v.verse_key,
+  //     words: v.words.sort((a, b) => a.position - b.position).map(qdcToRaw),
+  //   };
+  // }
 }

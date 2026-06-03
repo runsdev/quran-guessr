@@ -1,35 +1,32 @@
-/* eslint-disable max-lines */
-import type { Verse, Word } from '@quranjs/api';
-
 import { encryptVerseKey, signAnswer, encryptHiddenWords } from './answerToken';
 import type { Question, Segment } from './types';
 
 import { SURAH_VERSE_COUNTS } from '@/app/quiz/next-verse/surahData';
 import type { VerseWord } from '@/app/quiz/types';
-import { auth } from '@/auth';
+// import { auth } from '@/auth';
 import { prisma } from '@/lib/prisma';
 import { qdcFetchByJuz, qdcFetchByPage, qdcFetchRandom, qdcFetchByKey } from '@/lib/qdc-client';
 import type { QdcVerse } from '@/lib/qdc-client';
-import { getContentClient } from '@/lib/qf-server-client';
+// import { getContentClient } from '@/lib/qf-server-client';
 import { pickRandomJuz } from '@/lib/quran-pages';
 
-const IS_PRODUCTION = process.env.NODE_ENV === 'production';
+// const IS_PRODUCTION = process.env.NODE_ENV === 'production';
 
 /** Map an SDK Word to the app's VerseWord shape. */
-function mapWord(w: Word): VerseWord & {
-  // eslint-disable-next-line @typescript-eslint/naming-convention
-  page_number: number;
-} {
-  // prettier-ignore
-  // eslint-disable-next-line @typescript-eslint/naming-convention
-  return { id: w.id ?? 0, position: w.position, code_v2: w.codeV2 ?? '', text_qpc_hafs: w.text ?? '', page_number: w.pageNumber ?? 1, char_type_name: w.charTypeName };
-}
+// function mapWord(w: Word): VerseWord & {
+//   // eslint-disable-next-line @typescript-eslint/naming-convention
+//   page_number: number;
+// } {
+//   // prettier-ignore
+//   // eslint-disable-next-line @typescript-eslint/naming-convention
+//   return { id: w.id ?? 0, position: w.position, code_v2: w.codeV2 ?? '', text_qpc_hafs: w.text ?? '', page_number: w.pageNumber ?? 1, char_type_name: w.charTypeName };
+// }
 
 /** Options passed to every verse endpoint: include words and request the QCF v2 glyph codes. */
-const WORD_OPTS = {
-  words: true,
-  wordFields: { codeV2: true },
-} as const;
+// const WORD_OPTS = {
+//   words: true,
+//   wordFields: { codeV2: true },
+// } as const;
 
 interface QuranVerse {
   // eslint-disable-next-line @typescript-eslint/naming-convention
@@ -38,13 +35,13 @@ interface QuranVerse {
   words: Array<VerseWord & { page_number: number }>;
 }
 
-function toQuranVerse(v: Verse): QuranVerse {
-  return {
-    // eslint-disable-next-line @typescript-eslint/naming-convention
-    verse_key: v.verseKey,
-    words: (v.words ?? []).map(mapWord),
-  };
-}
+// function toQuranVerse(v: Verse): QuranVerse {
+//   return {
+//     // eslint-disable-next-line @typescript-eslint/naming-convention
+//     verse_key: v.verseKey,
+//     words: (v.words ?? []).map(mapWord),
+//   };
+// }
 
 function qdcToQuranVerse(v: QdcVerse): QuranVerse {
   return {
@@ -68,85 +65,89 @@ function qdcToQuranVerse(v: QdcVerse): QuranVerse {
 async function fetchVerse(
   targetPageNumber: number | undefined,
   juzFilter: number[] | undefined,
-  isLoggedIn: boolean,
 ): Promise<QuranVerse> {
   if (targetPageNumber !== undefined) {
-    if (!IS_PRODUCTION || !isLoggedIn) {
-      return qdcToQuranVerse(await qdcFetchByPage(targetPageNumber));
-    }
-    try {
-      // byPage with words:true returns empty on some environments; use a two-step
-      // approach: get the verse index for the page (no words), pick randomly, then
-      // fetch the full verse with words via byKey.
-      const client = getContentClient();
-      const pageIndex = await client.content.v4.verses.byPage(
-        String(targetPageNumber) as Parameters<typeof client.content.v4.verses.byPage>[0],
-      );
-      if (!pageIndex?.length) {
-        throw new Error('No verses found for page');
-      }
-      const picked = pageIndex[Math.floor(Math.random() * pageIndex.length)];
-      const verse = await client.content.v4.verses.byKey(
-        picked.verseKey as Parameters<typeof client.content.v4.verses.byKey>[0],
-        WORD_OPTS,
-      );
-      return toQuranVerse(verse);
-    } catch (err) {
-      console.warn(`SDK byPage(${targetPageNumber}) failed, falling back to direct API:`, err);
-      return qdcToQuranVerse(await qdcFetchByPage(targetPageNumber));
-    }
+    return qdcToQuranVerse(await qdcFetchByPage(targetPageNumber));
+    // if (!IS_PRODUCTION || !isLoggedIn) {
+    //   return qdcToQuranVerse(await qdcFetchByPage(targetPageNumber));
+    // }
+    // try {
+    //   // byPage with words:true returns empty on some environments; use a two-step
+    //   // approach: get the verse index for the page (no words), pick randomly, then
+    //   // fetch the full verse with words via byKey.
+    //   const client = getContentClient();
+    //   const pageIndex = await client.content.v4.verses.byPage(
+    //     String(targetPageNumber) as Parameters<typeof client.content.v4.verses.byPage>[0],
+    //   );
+    //   if (!pageIndex?.length) {
+    //     throw new Error('No verses found for page');
+    //   }
+    //   const picked = pageIndex[Math.floor(Math.random() * pageIndex.length)];
+    //   const verse = await client.content.v4.verses.byKey(
+    //     picked.verseKey as Parameters<typeof client.content.v4.verses.byKey>[0],
+    //     WORD_OPTS,
+    //   );
+    //   return toQuranVerse(verse);
+    // } catch (err) {
+    //   console.warn(`SDK byPage(${targetPageNumber}) failed, falling back to direct API:`, err);
+    //   return qdcToQuranVerse(await qdcFetchByPage(targetPageNumber));
+    // }
   }
 
   if (juzFilter && juzFilter.length > 0) {
     const juzNum = pickRandomJuz(juzFilter);
-    if (!IS_PRODUCTION || !isLoggedIn) {
-      return qdcToQuranVerse(await qdcFetchByJuz(juzNum));
-    }
-    try {
-      const client = getContentClient();
-      const verses = await client.content.v4.verses.byJuz(
-        String(juzNum) as Parameters<typeof client.content.v4.verses.byJuz>[0],
-        WORD_OPTS,
-      );
-      if (!verses?.length) {
-        throw new Error('No verses found for juz');
-      }
-      return toQuranVerse(verses[Math.floor(Math.random() * verses.length)]);
-    } catch (err) {
-      console.warn(`SDK byJuz(${juzNum}) failed, falling back to direct API:`, err);
-      return qdcToQuranVerse(await qdcFetchByJuz(juzNum));
-    }
+    return qdcToQuranVerse(await qdcFetchByJuz(juzNum));
+    // if (!IS_PRODUCTION || !isLoggedIn) {
+    //   return qdcToQuranVerse(await qdcFetchByJuz(juzNum));
+    // }
+    // try {
+    //   const client = getContentClient();
+    //   const verses = await client.content.v4.verses.byJuz(
+    //     String(juzNum) as Parameters<typeof client.content.v4.verses.byJuz>[0],
+    //     WORD_OPTS,
+    //   );
+    //   if (!verses?.length) {
+    //     throw new Error('No verses found for juz');
+    //   }
+    //   return toQuranVerse(verses[Math.floor(Math.random() * verses.length)]);
+    // } catch (err) {
+    //   console.warn(`SDK byJuz(${juzNum}) failed, falling back to direct API:`, err);
+    //   return qdcToQuranVerse(await qdcFetchByJuz(juzNum));
+    // }
   }
 
-  if (!IS_PRODUCTION || !isLoggedIn) {
-    return qdcToQuranVerse(await qdcFetchRandom());
-  }
-  try {
-    const client = getContentClient();
-    const verse = await client.content.v4.verses.random(WORD_OPTS);
-    return toQuranVerse(verse);
-  } catch (err) {
-    console.warn('SDK random failed, falling back to direct API:', err);
-    return qdcToQuranVerse(await qdcFetchRandom());
-  }
+  return qdcToQuranVerse(await qdcFetchRandom());
+  // if (!IS_PRODUCTION || !isLoggedIn) {
+  //   return qdcToQuranVerse(await qdcFetchRandom());
+  // }
+  // try {
+  //   const client = getContentClient();
+  //   const verse = await client.content.v4.verses.random(WORD_OPTS);
+  //   return toQuranVerse(verse);
+  // } catch (err) {
+  //   console.warn('SDK random failed, falling back to direct API:', err);
+  //   return qdcToQuranVerse(await qdcFetchRandom());
+  // }
 }
 
-async function fetchVerseByKey(verseKey: string, isLoggedIn: boolean): Promise<QuranVerse | null> {
-  if (!IS_PRODUCTION || !isLoggedIn) {
-    const v = await qdcFetchByKey(verseKey);
-    return v ? qdcToQuranVerse(v) : null;
-  }
-  try {
-    const client = getContentClient();
-    const verse = await client.content.v4.verses.byKey(
-      verseKey as Parameters<typeof client.content.v4.verses.byKey>[0],
-      WORD_OPTS,
-    );
-    return toQuranVerse(verse);
-  } catch {
-    const v = await qdcFetchByKey(verseKey);
-    return v ? qdcToQuranVerse(v) : null;
-  }
+async function fetchVerseByKey(verseKey: string): Promise<QuranVerse | null> {
+  const v = await qdcFetchByKey(verseKey);
+  return v ? qdcToQuranVerse(v) : null;
+  // if (!IS_PRODUCTION || !isLoggedIn) {
+  //   const v = await qdcFetchByKey(verseKey);
+  //   return v ? qdcToQuranVerse(v) : null;
+  // }
+  // try {
+  //   const client = getContentClient();
+  //   const verse = await client.content.v4.verses.byKey(
+  //     verseKey as Parameters<typeof client.content.v4.verses.byKey>[0],
+  //     WORD_OPTS,
+  //   );
+  //   return toQuranVerse(verse);
+  // } catch {
+  //   const v = await qdcFetchByKey(verseKey);
+  //   return v ? qdcToQuranVerse(v) : null;
+  // }
 }
 
 /** Next verse key within the same surah, or null if at the end of the surah. */
@@ -175,9 +176,9 @@ export async function getRandomQuestion(
   targetPageNumber?: number,
   juzFilter?: number[],
 ): Promise<Question> {
-  const session = await auth();
-  const isLoggedIn = !!(session?.user as { id?: string } | undefined)?.id;
-  const primaryVerse = await fetchVerse(targetPageNumber, juzFilter, isLoggedIn);
+  // const session = await auth();
+  // const isLoggedIn = !!(session?.user as { id?: string } | undefined)?.id;
+  const primaryVerse = await fetchVerse(targetPageNumber, juzFilter);
   const primaryWords = arabicWords(primaryVerse);
   const wordCount = primaryWords.length;
 
@@ -195,7 +196,7 @@ export async function getRandomQuestion(
   if (visibleCount <= 2) {
     const nextKey = nextSurahVerseKey(primaryVerse.verse_key);
     if (nextKey) {
-      infoVerse = await fetchVerseByKey(nextKey, isLoggedIn);
+      infoVerse = await fetchVerseByKey(nextKey);
     }
   }
 

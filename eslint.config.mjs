@@ -32,6 +32,7 @@ const eslintConfig = defineConfig([
     rules: {
       // ── Prettier ──────────────────────────────────────────────────
       'prettier/prettier': 'error',
+      'prettier/prettier': ['error', { endOfLine: 'auto' }],
 
       // ── TypeScript ────────────────────────────────────────────────
       '@typescript-eslint/no-explicit-any': 'off',

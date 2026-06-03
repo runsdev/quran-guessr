@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import type { Word } from '@quranjs/api';
 
 import { encryptVerseKey, signAnswer } from './answerToken';
@@ -65,89 +66,103 @@ async function fetchRandomVerse(
   isLoggedIn: boolean,
 ): Promise<{ verseKey: string; words: RawWord[] }> {
   if (pageNumber !== undefined) {
-    if (!IS_PRODUCTION || !isLoggedIn) {
-      const qdcVerse = await qdcFetchByPage(pageNumber);
-      return {
-        verseKey: qdcVerse.verse_key,
-        words: qdcVerse.words.sort((a, b) => a.position - b.position).map(qdcWordToRaw),
-      };
-    }
-    try {
-      const client = getContentClient();
-      const pageIndex = await client.content.v4.verses.byPage(
-        String(pageNumber) as Parameters<typeof client.content.v4.verses.byPage>[0],
-      );
-      if (!pageIndex?.length) {
-        throw new Error('No verses for page');
-      }
-      const picked = pageIndex[Math.floor(Math.random() * pageIndex.length)];
-      const verse = await client.content.v4.verses.byKey(
-        picked.verseKey as Parameters<typeof client.content.v4.verses.byKey>[0],
-        WORD_OPTS,
-      );
-      const words = [...(verse.words ?? [])].sort((a, b) => a.position - b.position).map(mapWord);
-      return { verseKey: verse.verseKey, words };
-    } catch (err) {
-      console.warn(`SDK byPage(${pageNumber}) failed, falling back to direct API:`, err);
-      const qdcVerse = await qdcFetchByPage(pageNumber);
-      return {
-        verseKey: qdcVerse.verse_key,
-        words: qdcVerse.words.sort((a, b) => a.position - b.position).map(qdcWordToRaw),
-      };
-    }
+    const qdcVerse = await qdcFetchByPage(pageNumber);
+    return {
+      verseKey: qdcVerse.verse_key,
+      words: qdcVerse.words.sort((a, b) => a.position - b.position).map(qdcWordToRaw),
+    };
+    // if (!IS_PRODUCTION || !isLoggedIn) {
+    //   const qdcVerse = await qdcFetchByPage(pageNumber);
+    //   return {
+    //     verseKey: qdcVerse.verse_key,
+    //     words: qdcVerse.words.sort((a, b) => a.position - b.position).map(qdcWordToRaw),
+    //   };
+    // }
+    // try {
+    //   const client = getContentClient();
+    //   const pageIndex = await client.content.v4.verses.byPage(
+    //     String(pageNumber) as Parameters<typeof client.content.v4.verses.byPage>[0],
+    //   );
+    //   if (!pageIndex?.length) {
+    //     throw new Error('No verses for page');
+    //   }
+    //   const picked = pageIndex[Math.floor(Math.random() * pageIndex.length)];
+    //   const verse = await client.content.v4.verses.byKey(
+    //     picked.verseKey as Parameters<typeof client.content.v4.verses.byKey>[0],
+    //     WORD_OPTS,
+    //   );
+    //   const words = [...(verse.words ?? [])].sort((a, b) => a.position - b.position).map(mapWord);
+    //   return { verseKey: verse.verseKey, words };
+    // } catch (err) {
+    //   console.warn(`SDK byPage(${pageNumber}) failed, falling back to direct API:`, err);
+    //   const qdcVerse = await qdcFetchByPage(pageNumber);
+    //   return {
+    //     verseKey: qdcVerse.verse_key,
+    //     words: qdcVerse.words.sort((a, b) => a.position - b.position).map(qdcWordToRaw),
+    //   };
+    // }
   }
 
   if (juzFilter && juzFilter.length > 0) {
     const juzNum = pickRandomJuz(juzFilter);
-    if (!IS_PRODUCTION || !isLoggedIn) {
-      const qdcVerse = await qdcFetchByJuz(juzNum);
-      return {
-        verseKey: qdcVerse.verse_key,
-        words: qdcVerse.words.sort((a, b) => a.position - b.position).map(qdcWordToRaw),
-      };
-    }
-    try {
-      const client = getContentClient();
-      const verses = await client.content.v4.verses.byJuz(
-        String(juzNum) as Parameters<typeof client.content.v4.verses.byJuz>[0],
-        WORD_OPTS,
-      );
-      if (!verses?.length) {
-        throw new Error('No verses for juz');
-      }
-      const verse = verses[Math.floor(Math.random() * verses.length)];
-      const words = [...(verse.words ?? [])].sort((a, b) => a.position - b.position).map(mapWord);
-      return { verseKey: verse.verseKey, words };
-    } catch (err) {
-      console.warn(`SDK byJuz(${juzNum}) failed, falling back to direct API:`, err);
-      const qdcVerse = await qdcFetchByJuz(juzNum);
-      return {
-        verseKey: qdcVerse.verse_key,
-        words: qdcVerse.words.sort((a, b) => a.position - b.position).map(qdcWordToRaw),
-      };
-    }
-  }
-
-  if (!IS_PRODUCTION || !isLoggedIn) {
-    const qdcVerse = await qdcFetchRandom();
+    const qdcVerse = await qdcFetchByJuz(juzNum);
     return {
       verseKey: qdcVerse.verse_key,
       words: qdcVerse.words.sort((a, b) => a.position - b.position).map(qdcWordToRaw),
     };
+    // if (!IS_PRODUCTION || !isLoggedIn) {
+    //   const qdcVerse = await qdcFetchByJuz(juzNum);
+    //   return {
+    //     verseKey: qdcVerse.verse_key,
+    //     words: qdcVerse.words.sort((a, b) => a.position - b.position).map(qdcWordToRaw),
+    //   };
+    // }
+    // try {
+    //   const client = getContentClient();
+    //   const verses = await client.content.v4.verses.byJuz(
+    //     String(juzNum) as Parameters<typeof client.content.v4.verses.byJuz>[0],
+    //     WORD_OPTS,
+    //   );
+    //   if (!verses?.length) {
+    //     throw new Error('No verses for juz');
+    //   }
+    //   const verse = verses[Math.floor(Math.random() * verses.length)];
+    //   const words = [...(verse.words ?? [])].sort((a, b) => a.position - b.position).map(mapWord);
+    //   return { verseKey: verse.verseKey, words };
+    // } catch (err) {
+    //   console.warn(`SDK byJuz(${juzNum}) failed, falling back to direct API:`, err);
+    //   const qdcVerse = await qdcFetchByJuz(juzNum);
+    //   return {
+    //     verseKey: qdcVerse.verse_key,
+    //     words: qdcVerse.words.sort((a, b) => a.position - b.position).map(qdcWordToRaw),
+    //   };
+    // }
   }
-  try {
-    const client = getContentClient();
-    const verse = await client.content.v4.verses.random(WORD_OPTS);
-    const words = [...(verse.words ?? [])].sort((a, b) => a.position - b.position).map(mapWord);
-    return { verseKey: verse.verseKey, words };
-  } catch (err) {
-    console.warn('SDK random failed, falling back to direct API:', err);
-    const qdcVerse = await qdcFetchRandom();
-    return {
-      verseKey: qdcVerse.verse_key,
-      words: qdcVerse.words.sort((a, b) => a.position - b.position).map(qdcWordToRaw),
-    };
-  }
+  const qdcVerse = await qdcFetchRandom();
+  return {
+    verseKey: qdcVerse.verse_key,
+    words: qdcVerse.words.sort((a, b) => a.position - b.position).map(qdcWordToRaw),
+  };
+  // if (!IS_PRODUCTION || !isLoggedIn) {
+  //   const qdcVerse = await qdcFetchRandom();
+  //   return {
+  //     verseKey: qdcVerse.verse_key,
+  //     words: qdcVerse.words.sort((a, b) => a.position - b.position).map(qdcWordToRaw),
+  //   };
+  // }
+  // try {
+  //   const client = getContentClient();
+  //   const verse = await client.content.v4.verses.random(WORD_OPTS);
+  //   const words = [...(verse.words ?? [])].sort((a, b) => a.position - b.position).map(mapWord);
+  //   return { verseKey: verse.verseKey, words };
+  // } catch (err) {
+  //   console.warn('SDK random failed, falling back to direct API:', err);
+  //   const qdcVerse = await qdcFetchRandom();
+  //   return {
+  //     verseKey: qdcVerse.verse_key,
+  //     words: qdcVerse.words.sort((a, b) => a.position - b.position).map(qdcWordToRaw),
+  //   };
+  // }
 }
 
 export async function getRandomQuestion(
@@ -167,7 +182,7 @@ export async function getRandomQuestion(
   // Keep page_number so VerseCard can select the correct QCF v2 per-page font.
   // Strip line_number only — it directly reveals the answer line.
   const verseWords: VerseWord[] = words.map(
-    // eslint-disable-next-line @typescript-eslint/naming-convention, @typescript-eslint/no-unused-vars
+    // eslint-disable-next-line @typescript-eslint/naming-convention
     ({ line_number: _l, ...word }) => word,
   );
 
