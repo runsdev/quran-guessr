@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import type { Word } from '@quranjs/api';
+// import type { Word } from '@quranjs/api';
 
 import { encryptVerseKey, signAnswer } from './answerToken';
 import type { Question, VerseWord } from './types';
@@ -7,10 +7,10 @@ import type { Question, VerseWord } from './types';
 import { auth } from '@/auth';
 import { qdcFetchByJuz, qdcFetchByPage, qdcFetchRandom } from '@/lib/qdc-client';
 import type { QdcWord } from '@/lib/qdc-client';
-import { getContentClient } from '@/lib/qf-server-client';
+// import { getContentClient } from '@/lib/qf-server-client';
 import { SURAH_NAMES, pickRandomJuz } from '@/lib/quran-pages';
 
-const IS_PRODUCTION = process.env.NODE_ENV === 'production';
+// const IS_PRODUCTION = process.env.NODE_ENV === 'production';
 
 interface RawWord extends VerseWord {
   // eslint-disable-next-line @typescript-eslint/naming-convention
@@ -20,28 +20,28 @@ interface RawWord extends VerseWord {
 }
 
 /** Options for locate-verse: include words and request the QCF v2 glyph codes. */
-const WORD_OPTS = {
-  words: true,
-  wordFields: { codeV2: true },
-} as const;
+// const WORD_OPTS = {
+//   words: true,
+//   wordFields: { codeV2: true },
+// } as const;
 
-function mapWord(w: Word): RawWord {
-  return {
-    id: w.id ?? 0,
-    position: w.position,
-    // eslint-disable-next-line @typescript-eslint/naming-convention
-    code_v2: w.codeV2 ?? '',
-    // word.text is the default QPC Hafs rendering returned by the Content API.
-    // eslint-disable-next-line @typescript-eslint/naming-convention
-    text_qpc_hafs: w.text ?? '',
-    // eslint-disable-next-line @typescript-eslint/naming-convention
-    page_number: w.pageNumber ?? 1,
-    // eslint-disable-next-line @typescript-eslint/naming-convention
-    line_number: w.lineNumber ?? 1,
-    // eslint-disable-next-line @typescript-eslint/naming-convention
-    char_type_name: w.charTypeName,
-  };
-}
+// function mapWord(w: Word): RawWord {
+//   return {
+//     id: w.id ?? 0,
+//     position: w.position,
+//     // eslint-disable-next-line @typescript-eslint/naming-convention
+//     code_v2: w.codeV2 ?? '',
+//     // word.text is the default QPC Hafs rendering returned by the Content API.
+//     // eslint-disable-next-line @typescript-eslint/naming-convention
+//     text_qpc_hafs: w.text ?? '',
+//     // eslint-disable-next-line @typescript-eslint/naming-convention
+//     page_number: w.pageNumber ?? 1,
+//     // eslint-disable-next-line @typescript-eslint/naming-convention
+//     line_number: w.lineNumber ?? 1,
+//     // eslint-disable-next-line @typescript-eslint/naming-convention
+//     char_type_name: w.charTypeName,
+//   };
+// }
 
 function qdcWordToRaw(w: QdcWord): RawWord {
   return {

@@ -3,27 +3,27 @@
 /**
  * Shared verse-fetching helpers for the translation quiz.
  */
-import type { Word } from '@quranjs/api';
+// import type { Word } from '@quranjs/api';
 
 import type { VerseWord } from './types';
 
 import { qdcFetchByJuz, qdcFetchRandom } from '@/lib/qdc-client';
 import type { QdcWord } from '@/lib/qdc-client';
-import { getContentClient } from '@/lib/qf-server-client';
+// import { getContentClient } from '@/lib/qf-server-client';
 import { pickRandomJuz } from '@/lib/quran-pages';
 
-const IS_PRODUCTION = process.env.NODE_ENV === 'production';
+// const IS_PRODUCTION = process.env.NODE_ENV === 'production';
 
 export interface RawWord extends VerseWord {
   page_number: number;
 }
 
-const WORD_OPTS = { words: true, wordFields: { codeV2: true } } as const;
+// const WORD_OPTS = { words: true, wordFields: { codeV2: true } } as const;
 
-function mapWord(w: Word): RawWord {
-  // prettier-ignore
-  return { id: w.id ?? 0, position: w.position, code_v2: w.codeV2 ?? '', text_qpc_hafs: w.text ?? '', page_number: w.pageNumber ?? 1, char_type_name: w.charTypeName };
-}
+// function mapWord(w: Word): RawWord {
+//   // prettier-ignore
+//   return { id: w.id ?? 0, position: w.position, code_v2: w.codeV2 ?? '', text_qpc_hafs: w.text ?? '', page_number: w.pageNumber ?? 1, char_type_name: w.charTypeName };
+// }
 
 export function qdcToRaw(w: QdcWord): RawWord {
   const { id, position, code_v2, text, page_number, char_type_name } = w;
