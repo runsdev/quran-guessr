@@ -32,6 +32,7 @@
     "mastery": "Penguasaan: {percent}%"
   },
   "nav": {
+    "signIn": "Masuk",
     "quranGuessr": "QuranGuessr",
     "goToHomepage": "QuranGuessr — ke halaman utama"
   },
