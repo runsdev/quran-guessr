@@ -4,6 +4,8 @@ import React, { useEffect, useState } from 'react';
 
 import Image from 'next/image';
 import Link from 'next/link';
+import { usePathname } from 'next/navigation';
+import { signIn } from 'next-auth/react';
 import { useSession } from 'next-auth/react';
 import { useTranslations } from 'next-intl';
 
@@ -26,6 +28,7 @@ export default function TopAppBar({ activeHref }: TopAppBarProps): React.JSX.Ele
   const t = useTranslations('common');
   const tNav = useTranslations('nav');
   const { data: session } = useSession();
+  const pathname = usePathname();
 
   const userId = (session?.user as { id?: string } | undefined)?.id ?? null;
 
@@ -183,8 +186,8 @@ export default function TopAppBar({ activeHref }: TopAppBarProps): React.JSX.Ele
             )}
           </Link>
         ) : (
-          <Link
-            href="/profile"
+          <button
+            onClick={() => signIn('quran-foundation', { callbackUrl: pathname })}
             style={{
               display: 'inline-flex',
               alignItems: 'center',
@@ -200,7 +203,7 @@ export default function TopAppBar({ activeHref }: TopAppBarProps): React.JSX.Ele
             }}
           >
             {tNav('signIn')}
-          </Link>
+          </button>
         )}
       </div>
     </header>
