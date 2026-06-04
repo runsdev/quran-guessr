@@ -147,40 +147,61 @@ export default function TopAppBar({ activeHref }: TopAppBarProps): React.JSX.Ele
       <div className="flex items-center gap-3">
         <LanguageSwitcher />
         <ThemeSwitcher />
-        <Link
-          href="/profile"
-          aria-label={t('profile')}
-          style={{
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            width: 36,
-            height: 36,
-            border: '1px solid var(--color-outline)',
-            borderRadius: 9999,
-            overflow: 'hidden',
-            flexShrink: 0,
-          }}
-        >
-          {imageUrl ? (
-            // eslint-disable-next-line @next/next/no-img-element
-            <img
-              src={imageUrl}
-              alt={userName}
-              width={36}
-              height={36}
-              referrerPolicy="no-referrer"
-              style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-            />
-          ) : (
-            <span
-              className="material-symbols-outlined"
-              style={{ fontSize: 20, color: 'var(--color-on-surface-variant)' }}
-            >
-              person
-            </span>
-          )}
-        </Link>
+        {userId ? (
+          <Link
+            href="/profile"
+            aria-label={t('profile')}
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              width: 36,
+              height: 36,
+              border: '1px solid var(--color-outline)',
+              borderRadius: 9999,
+              overflow: 'hidden',
+              flexShrink: 0,
+            }}
+          >
+            {imageUrl ? (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img
+                src={imageUrl}
+                alt={userName}
+                width={36}
+                height={36}
+                referrerPolicy="no-referrer"
+                style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+              />
+            ) : (
+              <span
+                className="material-symbols-outlined"
+                style={{ fontSize: 20, color: 'var(--color-on-surface-variant)' }}
+              >
+                person
+              </span>
+            )}
+          </Link>
+        ) : (
+          <Link
+            href="/profile"
+            style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              padding: '8px 16px',
+              fontSize: '14px',
+              fontWeight: 500,
+              color: 'var(--color-on-primary, #ffffff)',
+              backgroundColor: 'var(--color-primary, #000000)',
+              borderRadius: '8px',
+              textDecoration: 'none',
+              transition: 'opacity 0.2s',
+            }}
+          >
+            {tNav('signIn')}
+          </Link>
+        )}
       </div>
     </header>
   );

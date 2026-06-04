@@ -32,6 +32,7 @@
     "mastery": "Mastery: {percent}%"
   },
   "nav": {
+    "signIn": "Sign In",
     "quranGuessr": "QuranGuessr",
     "goToHomepage": "QuranGuessr — go to homepage"
   },
